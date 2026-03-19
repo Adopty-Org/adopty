@@ -6,6 +6,8 @@ import { ENV } from "./config/env.js"
 import { connectDB } from "./config/db.js"
 import { serve } from "inngest/express"
 
+import { functions, ingest} from "./config/inngest.js";
+
 
 const app = express()
 
