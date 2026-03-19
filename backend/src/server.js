@@ -4,6 +4,7 @@ import { clerkMiddleware } from '@clerk/express'
 
 import { ENV } from "./config/env.js"
 import { connectDB } from "./config/db.js"
+import { serve } from "inngest/express"
 
 
 const app = express()
