@@ -5,7 +5,8 @@ export let db; // exporte la connexion
 
 export const connectDB = async () => {
   try {
-    db = await mysql.createConnection({
+    if (db) return db; // ✅ évite de recréer le pool
+    db = mysql.createPool({
       host: ENV.DB_HOST,
       port: ENV.DB_PORT,
       user: ENV.DB_USER,
