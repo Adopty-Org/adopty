@@ -15,7 +15,7 @@ const __dirname = path.resolve()
 
 app.use(clerkMiddleware())
 
-app.use("/api/ingest", serve({client:ingest, functions:functions}))//  serve() est une fonction qui permet de créer une route pour les fonctions Inngest. Elle prend en paramètre l'instance Inngest et un tableau de fonctions. Elle crée une route /api/ingest qui écoute les événements et exécute les fonctions correspondantes.
+app.use("/api/inngest", serve({client:ingest, functions:functions}))//  serve() est une fonction qui permet de créer une route pour les fonctions Inngest. Elle prend en paramètre l'instance Inngest et un tableau de fonctions. Elle crée une route /api/ingest qui écoute les événements et exécute les fonctions correspondantes.
 
 app.get("/api/calling", (req,res)=>{
     res.status(200).json({message: "oui ca fonctionne"})
