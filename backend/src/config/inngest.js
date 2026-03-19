@@ -1,4 +1,4 @@
-import { Inngest } from "inngest";
+/*import { Inngest } from "inngest";
 import { connectDB } from "./db.js";
 import * as utiliDB from "../database/utilisateur.db.js"
 
@@ -48,4 +48,18 @@ const deleteUserFromDB = ingest.createFunction(
 )
 
 
-export const functions = [syncUser, deleteUserFromDB]
+export const functions = [syncUser, deleteUserFromDB]*/
+
+import { Inngest } from "inngest";
+
+export const ingest = new Inngest({ id: "test" });
+
+const testFunction = ingest.createFunction(
+  { id: "test-function" },
+  { event: "test/event" },
+  async () => {
+    console.log("✅ Test function executed");
+  }
+);
+
+export const functions = [testFunction];
