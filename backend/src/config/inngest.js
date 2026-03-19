@@ -1,4 +1,4 @@
-/*import { Inngest } from "inngest";
+import { Inngest } from "inngest";
 import { connectDB } from "./db.js";
 import * as utiliDB from "../database/utilisateur.db.js"
 
@@ -48,9 +48,9 @@ const deleteUserFromDB = ingest.createFunction(
 )
 
 
-export const functions = [syncUser, deleteUserFromDB]*/
+export const functions = [syncUser, deleteUserFromDB]
 
-import { Inngest } from "inngest";
+/*import { Inngest } from "inngest";
 
 export const ingest = new Inngest({ id: "test" });
 
@@ -62,4 +62,4 @@ const testFunction = ingest.createFunction(
   }
 );
 
-export const functions = [testFunction];
+export const functions = [testFunction];*/

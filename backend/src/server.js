@@ -15,6 +15,7 @@ const app = express()
 
 const __dirname = path.resolve()
 
+app.use(express.json());// 3 heures de soucis.... 
 app.use(clerkMiddleware())
 
 //app.use("/api/inngest", serve({client:ingest, functions:functions}))//  serve() est une fonction qui permet de créer une route pour les fonctions Inngest. Elle prend en paramètre l'instance Inngest et un tableau de fonctions. Elle crée une route /api/ingest qui écoute les événements et exécute les fonctions correspondantes.
