@@ -1,5 +1,5 @@
-import { db } from "../backend/src/config/db.js";
-import { Utilisateur } from "../backend/src/modeles/utilisateur.model.js";
+import { db } from "../config/db.js";
+import { Utilisateur } from "../modeles/utilisateur.model.js";
 
 export const createUtilisateur = async (user) => {
   const [result] = await db.query(

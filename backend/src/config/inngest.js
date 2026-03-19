@@ -1,6 +1,6 @@
 import { Inngest } from "inngest";
 import { connectDB } from "./db.js";
-import * as utiliDB from "../../../database/utilisateur.db.js"
+import * as utiliDB from "../database/utilisateur.db.js"
 
 export const ingest = new Inngest({ id : "AnyBuy"})
 
