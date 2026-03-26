@@ -8,6 +8,8 @@ import { serve } from "inngest/express"
 
 import { functions, ingest} from "./config/inngest.js";
 
+import { webRoutes } from "./routes/web.route.js"
+
 
 const app = express()
 
@@ -26,6 +28,8 @@ app.use(clerkMiddleware())
 });*/
 
 app.use("/api/inngest", serve({ client: ingest, functions }));
+
+app.use("/api/web", webRoutes)
 
 app.get("/api/calling", (req,res)=>{
     res.status(200).json({message: "oui ca fonctionne"})
