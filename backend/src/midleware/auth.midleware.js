@@ -12,7 +12,7 @@ export const protectRoute = [
                 return res.status(401).json({ message: "Pas autorises - le token est errones" })
             }
 
-            const user =getUtilisateurByClerkId(clerkId)
+            const user = await getUtilisateurByClerkId(clerkId)
             if(!user){
                 return res.status(401).json({ message: "Pas autorises - le token est errones" })
             }
@@ -32,7 +32,7 @@ export const adminOnly = (req,res,next) => {
     if(!req.user){
         return res.status(401).json({ message: "Pas autorises - le token est errones" })
     }
-    if(req.user.email !== ENV.ADMIN_EMAIL){
+    if(req.user.AdresseEmail !== ENV.ADMIN_EMAIL){  //  <=  attention , bisar
         return res.status(403).json({ message: "Interdit - access administrateur seulement." })
     }
     next();
