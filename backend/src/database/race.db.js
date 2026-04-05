@@ -1,0 +1,60 @@
+import { db } from "../config/db";
+import { Race } from "../modeles/race.model.js";
+
+export const createRace = async (race) => {
+    const [result] = await db.query(
+        `INSERT INTO race (Nom, Description, Espece) 
+        VALUES (?, ?)`,
+        [
+            race.Nom,
+            race.Description,
+            race.Espece
+        ]
+    );
+
+    return result.insertId;
+}
+
+export const getAllRaces = async () => {
+  const [rows] = await db.query("SELECT * FROM race");
+  return rows.map(row => new Race(row));
+};
+
+export const getRaceById = async (id) => {
+  const [rows] = await db.query(
+    "SELECT * FROM race WHERE Id = ?",
+    [id]
+  );
+
+  if (!rows[0]) return null;
+
+  return new Race(rows[0]);
+};
+
+export const updateRace = async (id, race) => {
+  const [result] = await db.query(
+    `UPDATE race SET 
+      Nom = ?, 
+      Description = ?,
+      Espece = ?,
+     WHERE Id = ?`,
+    [
+      race.Nom,
+      race.Description,
+      race.Espece,
+      id
+    ]
+  );
+
+  return result.affectedRows;
+};
+
+export const deleteRace = async (id) => {
+  const [result] = await db.query(
+    "DELETE FROM race WHERE Id = ?",
+    [id]
+  );
+
+  return result.affectedRows;
+};
+
