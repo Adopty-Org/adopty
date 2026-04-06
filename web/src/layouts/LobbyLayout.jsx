@@ -9,10 +9,11 @@ function LobbyLayout() {
         <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
         <div className="drawer-content flex flex-col">
             <Navbar/>
+            <Outlet/>
         </div>
         
         <Sidebar/>
-        <Outlet/>
+        
     </div>
   )
 }

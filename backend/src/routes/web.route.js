@@ -12,7 +12,7 @@ const router = Router();
 //  les routes d'animaux - pour le service web seulement
 //
 
-router.post("/animaux", protectRoute, web.createAnimal);
+router.post("/animaux", protectRoute, web.createAnimalControlleur);
 router.get("/animaux/:id", web.getAnimal);
 router.get("/animaux", web.getAllAnimals);
 router.put("/animaux/:id", protectRoute, web.updateAnimal);
