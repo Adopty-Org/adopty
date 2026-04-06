@@ -9,14 +9,14 @@ import cors from "cors"
 
 import { functions, ingest} from "./config/inngest.js";
 
-import { webRoutes } from "./routes/web.route.js"
-import { animalRoutes } from "./routes/animal.route.js"
-import { especeRoutes } from "./routes/espece.route.js"
-import { raceRoutes } from "./routes/race.route.js"
-import { refugeRoutes } from "./routes/refuge.route.js"
-import { roleRoutes } from "./routes/role.route.js"
-import { utilisateurRoutes } from "./routes/utilisateur.route.js"
-import { vaccinRoutes } from "./routes/vaccin.route.js"
+import webRoutes from "./routes/web.route.js"
+import animalRoutes from "./routes/animal.route.js"
+import especeRoutes from "./routes/espece.route.js"
+import raceRoutes from "./routes/race.route.js"
+import refugeRoutes from "./routes/refuge.route.js"
+import roleRoutes from "./routes/role.route.js"
+import utilisateurRoutes from "./routes/utilisateur.route.js"
+import vaccinRoutes from "./routes/vaccin.route.js"
 
 
 const app = express()

@@ -32,12 +32,12 @@ export class Utilisateur {
     };*/
 
     constructor(data) {
-    this.Id = data.Id
+    this.Id = data.Id;
     this.clerkId = data.clerkId;
     this.stripeCustomerId = data.stripeCustomerId;
-    this.Nom = data.Nom
-    this.Prenom = data.Prenom
-    this.Addresse = data.Addresse
+    this.Nom = data.Nom;
+    this.Prenom = data.Prenom;
+    this.Addresse = data.Addresse;
     this.AddresseEmail = data.AddresseEmail;
     this.Wilaya = data.Wilaya;
     this.MotDePasse = data.MotDePasse;

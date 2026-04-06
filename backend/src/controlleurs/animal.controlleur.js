@@ -1,6 +1,6 @@
 import cloudinary from "../config/cloudinary.js"
 import { Animal } from "../modeles/animal.model.js";
-import { createAnimal, getAllAnimals, getAnimalById, updateAnimal } from "../database/animal.db.js";
+import { createAnimal, deleteAnimal, getAllAnimals, getAnimalById, updateAnimal } from "../database/animal.db.js";
 import { createPhotoAnimal } from "../database/photo.db.js";
 
 export async function createAnimalControlleur(req,res) {
@@ -63,7 +63,7 @@ export async function createAnimalControlleur(req,res) {
         // Création photos
         await Promise.all(
         imageUrls.map(url => createPhotoAnimal({
-            IdAnimal: newAnimalId,
+            IdAnimal: requete,
             Url: url
         }))
         );

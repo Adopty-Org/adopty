@@ -49,6 +49,7 @@ export const updateUtilisateur = async (id, user) => {
       Prenom = ?, 
       Addresse = ?, 
       AddresseEmail = ?, 
+      MotDePasse = ?,
       Wilaya = ?, 
       Photo = ?, 
       ModifieeLe = NOW(),
@@ -59,6 +60,7 @@ export const updateUtilisateur = async (id, user) => {
       user.Prenom,
       user.Addresse,
       user.AddresseEmail,
+      user.MotDePasse,
       user.Wilaya,
       user.Photo,
       user.ModifieePar,
@@ -222,7 +224,7 @@ export const setAnimalToUtilisateurByIds = async (animalId, utilisateurId) => {
     const [result] = await db.query(
         `UPDATE possession SET
          IdUtilisateur = ?
-        WHERE IdAnimal =? AND IdUtilisateur IS NULL`,
+        WHERE IdAnimal =? AND IdUtilisateur IS NULL AND IdRefuge IS NULL`,
         [
             utilisateurId,
             animalId,
@@ -236,7 +238,7 @@ export const unsetAnimalToUtilisateurByIds = async (animalId, utilisateurId) => 
     const [result] = await db.query(
         `UPDATE possession SET
          IdUtilisateur = NULL
-        WHERE IdAnimal =? AND IdUtilisateur = ?`,
+        WHERE IdAnimal =? AND IdUtilisateur = ? AND IdRefuge IS NOT NULL`,   //    <= todo:(a voir si ca fonctionne)
         [
             animalId,
             utilisateurId

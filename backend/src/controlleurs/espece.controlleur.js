@@ -61,7 +61,7 @@ export async function deleteEspeceControlleur(req,res) {
 export async function getEspeceControlleur(req,res) {
     try {
         const { id } = req.params;
-        const espece = getEspeceById(id);
+        const espece = await getEspeceById(id);
         if(!espece){
             return res.status(404).json({message:"Espece non trouvé"})
         }
@@ -75,7 +75,7 @@ export async function getEspeceControlleur(req,res) {
 
 export async function getAllEspecesControlleur(req,res) {
     try {
-        const especes = getAllEspeces();
+        const especes = await getAllEspeces();
         res.status(200).json(especes);
         
     } catch (error) {

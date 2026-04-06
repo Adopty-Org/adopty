@@ -63,7 +63,7 @@ export async function deleteRaceControlleur(req,res) {
 export async function getRaceControlleur(req,res) {
     try {
         const { id } = req.params;
-        const race = getRaceById(id);
+        const race = await getRaceById(id);
         if(!race){
             return res.status(404).json({message:"Race non trouvé"})
         }
@@ -77,7 +77,7 @@ export async function getRaceControlleur(req,res) {
 
 export async function getAllRacesControlleur(req,res) {
     try {
-        const races = getAllRaces();
+        const races = await getAllRaces();
         res.status(200).json(races);
         
     } catch (error) {

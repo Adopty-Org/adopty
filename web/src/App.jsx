@@ -22,8 +22,10 @@ function App() {
   return (
     <Routes>
       <Route path="/login" element={ isSignedIn ? <Navigate to = {"/lobby"}/> : <LoginPage/> }/>
-      <Route path="/sign-up"element={<SignUpPage/>}/> // on l'a fait sortir car le navbar et le sidebar se metais a travers de notre chemin
-      <Route path="/" element={<LobbyLayout/>}>  /* pas de isSignedIn car debile */
+      {/* on l'a fait sortir car le navbar et le sidebar se metais a travers de notre chemin */}
+      <Route path="/sign-up" element={<SignUpPage/>}/>
+      {/* pas de isSignedIn car debile */}
+      <Route path="/" element={<LobbyLayout/>}>
         <Route index element={<Navigate to={"lobby"}/>}/>
         <Route path="lobby" element={<LobbyPage/>}/>
         <Route path="shop"element={<ShopPage/>}/>

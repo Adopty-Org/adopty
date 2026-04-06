@@ -1,4 +1,4 @@
-import { db } from "../config/db";
+import { db } from "../config/db.js";
 import { Role } from "../modeles/role.model.js";
 
 export const createRole = async (role) => {
@@ -33,7 +33,7 @@ export const updateRole = async (id, role) => {
   const [result] = await db.query(
     `UPDATE role SET 
       Nom = ?, 
-      Description = ?,
+      Description = ?
      WHERE Id = ?`,
     [
       role.Nom,

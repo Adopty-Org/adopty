@@ -9,6 +9,7 @@ export default function Step2({ signUp }) {
 
   const [code, setCode] = useState("");
   const [name, setName] = useState("");
+  const [error, setError] = useState(null);
 
   if (!signUp) {
     return (
@@ -26,11 +27,16 @@ export default function Step2({ signUp }) {
         code,
       });
 
+      if (result.status !== "complete" || !result.createdSessionId) {
+        return;
+      }
+
       await setActive({ session: result.createdSessionId });
 
       alert("Compte créé !");
     } catch (err) {
       console.log(err);
+      setError(err.errors?.[0]?.message || "Une erreur est survenue");
     }
   };
 
@@ -75,6 +81,9 @@ export default function Step2({ signUp }) {
           >
             Terminer
           </button>
+
+          {error && <div className="alert alert-error">{error}</div>}
+          
         </div>
       </div>
     </div>

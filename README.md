@@ -57,7 +57,7 @@ Adopty is a multi-platform application designed to facilitate animal adoption pr
 ### Quick Setup
 
 1. **Clone the repository**
-   ```bash
+```bash
    git clone https://github.com/Adopty-Org/adopty.git
    cd adopty
    ```
@@ -66,7 +66,7 @@ Adopty is a multi-platform application designed to facilitate animal adoption pr
 
    Copy example files and fill in your credentials:
 
-   ```bash
+```bash
    # Backend
    cp backend/.env.example backend/.env
 
@@ -83,7 +83,7 @@ Adopty is a multi-platform application designed to facilitate animal adoption pr
    - **Mobile**: Similar to web, plus Expo-specific configs
 
 3. **Install dependencies**
-   ```bash
+```bash
    # Install all dependencies
    npm install --prefix backend
    npm install --prefix web
@@ -129,15 +129,15 @@ npm run start --prefix backend
 
 ## 📁 Project Structure
 
-```
+```text
 adopty/
 ├── backend/           # Node.js/Express API server
 │   ├── src/
 │   │   ├── config/    # Configuration files
-│   │   ├── controllers/ # Route handlers
+│   │   ├── controlleurs/ # Route handlers
 │   │   ├── database/  # Database models/queries
 │   │   ├── middleware/ # Custom middleware
-│   │   ├── models/    # Data models
+│   │   ├── modeles/    # Data models
 │   │   ├── routes/    # API routes
 │   │   └── server.js  # Main server file
 │   └── package.json

@@ -16,6 +16,8 @@ export default function SignUpPage() {
             className={`absolute w-full transition-all duration-500 ${
               step === 1 ? "translate-x-0 opacity-100" : "-translate-x-full opacity-0"
             }`}
+            aria-hidden={step !== 1}
+            inert={step !== 1}
           >
             <Step1
               next={(data) => {
@@ -30,6 +32,8 @@ export default function SignUpPage() {
             className={`absolute w-full transition-all duration-500 ${
               step === 2 ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"
             }`}
+            aria-hidden={step !== 2}
+            inert={step !== 2}
           >
             <Step2 signUp={signUpData} />
           </div>

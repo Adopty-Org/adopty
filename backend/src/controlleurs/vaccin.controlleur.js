@@ -1,4 +1,4 @@
-import { createVaccin, getAllVaccins, getVaccinById } from "../database/vaccin.db.js";
+import { createVaccin, deleteVaccin, getAllVaccins, getVaccinById, updateVaccin } from "../database/vaccin.db.js";
 
 export async function createVaccinControlleur(req,res) {// pas utilisable je crois
     try {
@@ -61,7 +61,7 @@ export async function deleteVaccinControlleur(req,res) {
 export async function getVaccinControlleur(req,res) {
     try {
         const { id } = req.params;
-        const vaccin = getVaccinById(id);
+        const vaccin = await getVaccinById(id);
         if(!vaccin){
             return res.status(404).json({message:"Vaccin non trouvé"})
         }
@@ -75,7 +75,7 @@ export async function getVaccinControlleur(req,res) {
 
 export async function getAllVaccinsControlleur(req,res) {
     try {
-        const vaccins = getAllVaccins();
+        const vaccins = await getAllVaccins();
         res.status(200).json(vaccins);
         
     } catch (error) {

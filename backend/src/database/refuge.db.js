@@ -1,4 +1,4 @@
-import { db } from "../config/db";
+import { db } from "../config/db.js";
 import { Animal } from "../modeles/animal.model.js";
 import { Refuge } from "../modeles/refuge.model.js";
 
@@ -118,7 +118,7 @@ export const setAnimalToRefugeByIds = async (animalId, refugeId) => {
     const [result] = await db.query(
         `UPDATE possession SET
          IdRefuge = ?
-        WHERE IdAnimal =? AND IdRefuge IS NULL`,
+        WHERE IdAnimal =? AND IdRefuge IS NULL AND IdUtilisateur IS NULL`,
         [
             refugeId,
             animalId,
@@ -132,7 +132,7 @@ export const unsetAnimalToRefugeByIds = async (animalId, refugeId) => {
     const [result] = await db.query(
         `UPDATE possession SET
          IdRefuge = NULL
-        WHERE IdAnimal =? AND IdRefuge = ?`,
+        WHERE IdAnimal =? AND IdRefuge = ? AND IdUtilisateur IS NOT NULL`,   //    <= todo:(a voir si ca fonctionne)
         [
             animalId,
             refugeId

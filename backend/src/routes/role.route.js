@@ -3,10 +3,10 @@ import * as role from "../controlleurs/role.controlleur.js"
 
 const router = Router()
 
-router.post("/roles", role.createRoleControlleur);
-router.get("/roles/:id", role.getRoleControlleur);
-router.get("/roles", role.getAllRolesControlleur);
-router.put("/roles/:id", role.updateRoleControlleur);
-router.delete("/roles/:id", role.deleteRoleControlleur);
+router.post("/", role.createRoleControlleur);
+router.get("/:id", role.getRoleControlleur);
+router.get("/", role.getAllRolesControlleur);
+router.put("/:id", role.updateRoleControlleur);
+router.delete("/:id", role.deleteRoleControlleur);
 
 export default router;

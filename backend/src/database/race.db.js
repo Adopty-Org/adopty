@@ -1,10 +1,10 @@
-import { db } from "../config/db";
+import { db } from "../config/db.js";
 import { Race } from "../modeles/race.model.js";
 
 export const createRace = async (race) => {
     const [result] = await db.query(
         `INSERT INTO race (Nom, Description, Espece) 
-        VALUES (?, ?)`,
+        VALUES (?, ?, ?)`,
         [
             race.Nom,
             race.Description,

@@ -1,4 +1,4 @@
-import { db } from "../config/db";
+import { db } from "../config/db.js";
 import { Photo } from "../modeles/photo.model.js";
 
 export const createPhotoUtilisateur = async (photo) => {
@@ -55,7 +55,7 @@ export const getPhotoById = async (id) => {
 
 export const updatePhoto = async (id, photo) => {
   const [result] = await db.query(
-    `UPDATE Photo SET 
+    `UPDATE photo SET 
       IdUtilisateur = ?, 
       IdRefuge = ?, 
       IdAnimal = ?, 

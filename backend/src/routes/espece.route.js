@@ -3,10 +3,10 @@ import * as espece from "../controlleurs/espece.controlleur.js"
 
 const router = Router()
 
-router.post("/especes", espece.createEspeceControlleur);
-router.get("/especes/:id", espece.getEspeceControlleur);
-router.get("/especes", espece.getAllEspecesControlleur);
-router.put("/especes/:id", espece.updateEspeceControlleur);
-router.delete("/especes/:id", espece.deleteEspeceControlleur);
+router.post("/", espece.createEspeceControlleur);
+router.get("/:id", espece.getEspeceControlleur);
+router.get("/", espece.getAllEspecesControlleur);
+router.put("/:id", espece.updateEspeceControlleur);
+router.delete("/:id", espece.deleteEspeceControlleur);
 
 export default router;

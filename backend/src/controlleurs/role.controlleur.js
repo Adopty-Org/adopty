@@ -61,7 +61,7 @@ export async function deleteRoleControlleur(req,res) {
 export async function getRoleControlleur(req,res) {
     try {
         const { id } = req.params;
-        const role = getRoleById(id);
+        const role = await getRoleById(id);
         if(!role){
             return res.status(404).json({message:"Role non trouvé"})
         }
@@ -75,7 +75,7 @@ export async function getRoleControlleur(req,res) {
 
 export async function getAllRolesControlleur(req,res) {
     try {
-        const roles = getAllRoles();
+        const roles = await getAllRoles();
         res.status(200).json(roles);
         
     } catch (error) {

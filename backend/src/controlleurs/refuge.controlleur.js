@@ -66,7 +66,7 @@ export async function deleteRefugeControlleur(req,res) {
 export async function getRefugeControlleur(req,res) {
     try {
         const { id } = req.params;
-        const refuge = getRefugeById(id);
+        const refuge = await getRefugeById(id);
         if(!refuge){
             return res.status(404).json({message:"Refuge non trouvé"})
         }
@@ -80,7 +80,7 @@ export async function getRefugeControlleur(req,res) {
 
 export async function getAllRefugesControlleur(req,res) {
     try {
-        const refuges = getAllRefuges();
+        const refuges = await getAllRefuges();
         res.status(200).json(refuges);
         
     } catch (error) {

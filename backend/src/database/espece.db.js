@@ -1,4 +1,4 @@
-import { db } from "../config/db";
+import { db } from "../config/db.js";
 import { Espece } from "../modeles/espece.model.js";
 
 export const createEspece = async (espece) => {
@@ -34,7 +34,7 @@ export const updateEspece = async (id, espece) => {
   const [result] = await db.query(
     `UPDATE espece SET 
       Nom = ?, 
-      Description = ?,
+      Description = ?
      WHERE Id = ?`,
     [
       espece.Nom,

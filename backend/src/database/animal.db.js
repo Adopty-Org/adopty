@@ -1,4 +1,4 @@
-import { db } from "../config/db";
+import { db } from "../config/db.js";
 import { Animal } from "../modeles/animal.model.js";
 import { Vaccin } from "../modeles/vaccin.model.js";
 

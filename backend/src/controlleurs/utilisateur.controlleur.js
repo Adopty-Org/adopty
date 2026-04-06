@@ -75,7 +75,7 @@ export async function deleteAccountControlleur(req,res) {
 export async function getAccountControlleur(req,res) {
     try {
         const { id } = req.params;
-        const utilisateur = getUtilisateurById(id);
+        const utilisateur = await getUtilisateurById(id);
         if(!utilisateur){
             return res.status(404).json({message:"Utilisateur non trouvé"})
         }

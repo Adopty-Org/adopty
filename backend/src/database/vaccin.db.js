@@ -1,4 +1,4 @@
-import { db } from "../config/db";
+import { db } from "../config/db.js";
 import { Vaccin } from "../modeles/vaccin.model.js";
 
 export const createVaccin = async (vaccin) => {
