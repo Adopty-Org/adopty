@@ -2,6 +2,7 @@ import { addAnimalToUtilisateurByIds, addRefugeToUtilisateurByIds, addRoleToUtil
 
 export async function createAccountControlleur(req,res) {// pas utilisable je crois
     try {
+        // todo: enlever les champs stripeAccountId et stripeAccountStatus de la requete et les mettre a null par defaut, et les remplir dans une route a part lors de la creation du compte stripe
         const { clerkId, stripeCustomerId, stripeAccountId, Nom, Prenom, Addresse, AddresseEmail, Wilaya, MotDePasse, Photo, CreePar, stripeAccountStatus } = req.body;
 
         if(!Nom || !Prenom || !Addresse ){

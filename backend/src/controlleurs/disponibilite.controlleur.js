@@ -4,6 +4,7 @@ import { getProfilPrestataireById } from "../database/profil_prestataire.db.js";
 export async function createDisponibiliteControlleur(req,res) {
     try {
         const { IdProfil,DateDebut,DateFin,Recurrence,Frequence,Disponibilite } = req.body;
+        const toDbValue = (v) => v === undefined ? null : v;
 
         const isMissing = (v) => v === undefined || v === null || v === "";
         if (isMissing(IdProfil) || (isMissing(DateFin) && isMissing(Recurrence)) || isMissing(Disponibilite)) {
@@ -11,12 +12,12 @@ export async function createDisponibiliteControlleur(req,res) {
         }
 
         const requete = await createDisponibilite({
-            IdProfil,
-            DateDebut,
-            DateFin,
-            Recurrence,
-            Frequence,
-            Disponibilite 
+            IdProfil: toDbValue(IdProfil),
+            DateDebut: toDbValue(DateDebut),
+            DateFin: toDbValue(DateFin),
+            Recurrence: toDbValue(Recurrence),
+            Frequence: toDbValue(Frequence),
+            Disponibilite: toDbValue(Disponibilite) 
         })
 
         res.status(201).json({ message: "Disponibilite crée avec succès", id: requete });
@@ -30,14 +31,15 @@ export async function updateDisponibiliteControlleur(req,res) {
     try {
         const { id } = req.params;
         const { IdProfil,DateDebut,DateFin,Recurrence,Frequence,Disponibilite } = req.body;
+        const toDbValue = (v) => v === undefined ? null : v;
         
         const affectedRows = await updateDisponibilite(id, {
-            IdProfil,
-            DateDebut,
-            DateFin,
-            Recurrence,
-            Frequence,
-            Disponibilite
+            IdProfil: toDbValue(IdProfil),
+            DateDebut: toDbValue(DateDebut),
+            DateFin: toDbValue(DateFin),
+            Recurrence: toDbValue(Recurrence),
+            Frequence: toDbValue(Frequence),
+            Disponibilite: toDbValue(Disponibilite)
         });
         if (affectedRows === 0) {
             return res.status(404).json({ message: "Disponibilite non trouvée" });
