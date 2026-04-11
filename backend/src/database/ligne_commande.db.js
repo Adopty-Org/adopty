@@ -36,7 +36,7 @@ export const updateLigneCommande = async (id, ligne_commande) => {
     `UPDATE ligne_commande SET 
       IdSousCommande = ?, 
       IdProduit = ?,
-      Quantite = ?,
+      Quantite = ?
      WHERE Id = ?`,
     [
       ligne_commande.IdSousCommande,

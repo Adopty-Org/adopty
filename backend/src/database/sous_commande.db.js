@@ -4,7 +4,7 @@ import { SousCommande } from "../modeles/sous_commande.model.js";
 export const createSousCommande = async (sous_commande) => {
     const [result] = await db.query(
         `INSERT INTO sous_commande (IdCommande, IdRefuge, Statut, Total_prix, stripe_transfer_id, platformFee) 
-        VALUES (?, ?, ?, ?, ?)`,
+        VALUES (?, ?, ?, ?, ?, ?)`,
         [
             sous_commande.IdCommande,
             sous_commande.IdRefuge,

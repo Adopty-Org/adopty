@@ -1,4 +1,5 @@
 import { createPanier, deletePanier, getAllPaniers, getPanierById, updatePanier } from "../database/panier.db.js";
+import { getUtilisateurById } from "../database/utilisateur.db.js";
 
 export async function createPanierControlleur(req,res) {// pas utilisable je crois
     try {

@@ -32,7 +32,7 @@ export const getPanierById = async (id) => {
 export const updatePanier = async (id, panier) => {
   const [result] = await db.query(
     `UPDATE panier SET 
-      IdUtilisateur = ?, 
+      IdUtilisateur = ? 
      WHERE Id = ?`,
     [
       panier.IdUtilisateur,

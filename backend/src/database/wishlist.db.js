@@ -32,7 +32,7 @@ export const getWishlistById = async (id) => {
 export const updateWishlist = async (id, wishlist) => {
   const [result] = await db.query(
     `UPDATE wishlist SET 
-      IdUtilisateur = ?, 
+      IdUtilisateur = ? 
      WHERE Id = ?`,
     [
       wishlist.IdUtilisateur,

@@ -4,7 +4,7 @@ import { Reservation } from "../modeles/reservation.model.js";
 export const createReservation = async (reservation) => {
     const [result] = await db.query(
         `INSERT INTO reservation (IdUtilisateur, IdProfil, IdAnimal, IdAnnonce, TypeService, DateDebut, DateFin, Statut, PrixFinal, Notes) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
             reservation.IdUtilisateur,
             reservation.IdProfil,

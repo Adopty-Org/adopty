@@ -5,7 +5,7 @@ import { Role } from "../modeles/role.model.js";
 import { Utilisateur } from "../modeles/utilisateur.model.js";
 
 export const createUtilisateur = async (user) => {
-  const [result] = await db.query(
+  const [result] = await db.query(  // todo: enleve les stripes d'ici a la fin du projet
     `INSERT INTO utilisateur 
     (clerkId, stripeCustomerId , stripeAccountId, Nom, Prenom, Addresse, AddresseEmail, Wilaya, MotDePasse, Photo, CreeLe, CreePar, stripeAccountStatus)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?, ?)`,

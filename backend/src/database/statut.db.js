@@ -32,7 +32,7 @@ export const getStatutById = async (id) => {
 export const updateStatut = async (id, statut) => {
   const [result] = await db.query(
     `UPDATE statut SET 
-      Statut = ?, 
+      Statut = ? 
      WHERE Id = ?`,
     [
       statut.Statut,

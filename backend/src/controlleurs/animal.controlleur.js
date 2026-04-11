@@ -47,8 +47,9 @@ export async function createAnimalControlleur(req,res) {
         });
 
         // les reponces des promesses
+        let uploadResults;
         try {
-            const uploadResults = await Promise.all(uploadPromises);
+            uploadResults = await Promise.all(uploadPromises);
         } catch (error) {
             return res.status(500).json({ message: "Erreur upload images" });
         }

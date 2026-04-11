@@ -1,4 +1,5 @@
 import { CreateProduit, deleteProduit, getAllProduits, getProduitById, updateProduit } from "../database/produit.db.js";
+import { getRefugeById} from "../database/refuge.db.js"
 import { getSousCommandeById } from "../database/sous_commande.db.js";
 
 export async function createProduitControlleur(req,res) {

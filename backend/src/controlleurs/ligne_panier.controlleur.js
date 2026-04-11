@@ -1,5 +1,6 @@
 import { createLignePanier, deleteLignePanier, getAllLignePaniers, getLignePanierById, updateLignePanier } from "../database/ligne_panier.db.js";
 import { getPanierById } from "../database/panier.db.js";
+import { getProduitById } from "../database/produit.db.js";
 
 export async function createLignePanierControlleur(req,res) {// pas utilisable je crois
     try {

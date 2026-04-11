@@ -1,6 +1,7 @@
 import { getCommandeById } from "../database/commande.db.js";
 import { getRefugeById } from "../database/refuge.db.js";
 import { createSousCommande, deleteSousCommande, getAllSousCommandes, getSousCommandeById, updateSousCommande } from "../database/sous_commande.db.js";
+import { getStatutById } from "../database/statut.db.js";
 
 export async function createSousCommandeControlleur(req,res) {
     try {

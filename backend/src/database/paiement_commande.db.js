@@ -4,7 +4,7 @@ import { PaiementCommande } from "../modeles/paiement_commande.model.js";
 export const createPaiementCommande = async (paiement_commande) => {
     const [result] = await db.query(
         `INSERT INTO paiement_commande (IdCommande, Montant, Statut, stripe_payment_intent_id, applicationFeeAmount) 
-        VALUES (?, ?, ?, ?)`,
+        VALUES (?, ?, ?, ?, ?)`,
         [
             paiement_commande.IdCommande,
             paiement_commande.Montant,

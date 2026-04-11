@@ -32,7 +32,7 @@ export const getTypeServiceById = async (id) => {
 export const updateTypeService = async (id, type_service) => {
   const [result] = await db.query(
     `UPDATE type_service SET 
-      Type = ?, 
+      Type = ? 
      WHERE Id = ?`,
     [
       type_service.Type,

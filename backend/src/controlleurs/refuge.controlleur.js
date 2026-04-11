@@ -1,4 +1,4 @@
-import { CreateRefuge, deleteRefuge, getAllRefuges, getRefugeAnimalsById, getRefugeById, updateRefuge } from "../database/refuge.db.js";
+import { addAnimalToRefugeByIds, CreateRefuge, deleteRefuge, getAllRefuges, getRefugeAnimalsById, getRefugeById, removeAnimalFromRefugeByIds, setAnimalToRefugeByIds, unsetAnimalToRefugeByIds, updateRefuge } from "../database/refuge.db.js";
 
 export async function createRefugeControlleur(req,res) {
     try {

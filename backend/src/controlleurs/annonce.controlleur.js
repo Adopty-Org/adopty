@@ -1,4 +1,6 @@
+import { getAnimalById } from "../database/animal.db.js";
 import { createAnnonce, deleteAnnonce, getAllAnnonces, getAnnonceById, updateAnnonce } from "../database/annonce.db.js";
+import { getStatutById } from "../database/statut.db.js";
 import { getTypeServiceById } from "../database/type_service.db.js";
 import { getUtilisateurById } from "../database/utilisateur.db.js";
 

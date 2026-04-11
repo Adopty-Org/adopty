@@ -138,8 +138,8 @@ export async function getUtilisateurRolesByIdControlleur (req,res) {
 
 export async function addRoleToUtilisateurByIdsControlleur (req,res) {
     try {
-        const { id } = req.params;
-        const utilisateur = await addRoleToUtilisateurByIds(id);
+        const { utilisateurId, roleId } = req.params;
+        const utilisateur = await addRoleToUtilisateurByIds(roleId, utilisateurId);
         
         
         res.status(200).json(utilisateur)
@@ -152,8 +152,8 @@ export async function addRoleToUtilisateurByIdsControlleur (req,res) {
 
 export async function removeRoleToUtilisateurByIdsControlleur (req,res) {
     try {
-        const { id } = req.params;
-        const utilisateur = await removeRoleToUtilisateurByIds(id);
+        const { utilisateurId, roleId } = req.params;
+        const utilisateur = await removeRoleToUtilisateurByIds(roleId, utilisateurId);
         
         
         res.status(200).json(utilisateur)
@@ -182,8 +182,8 @@ export async function getUtilisateurRefugesByIdControlleur (req,res) {
 
 export async function addRefugeToUtilisateurByIdsControlleur (req,res) {
     try {
-        const { id } = req.params;
-        const utilisateur = await addRefugeToUtilisateurByIds(id);
+        const { utilisateurId, refugeId } = req.params;
+        const utilisateur = await addRefugeToUtilisateurByIds(refugeId, utilisateurId);
         
         
         res.status(200).json(utilisateur)
@@ -196,8 +196,8 @@ export async function addRefugeToUtilisateurByIdsControlleur (req,res) {
 
 export async function removeRefugeToUtilisateurByIdsControlleur (req,res) {
     try {
-        const { id } = req.params;
-        const utilisateur = await removeRefugeToUtilisateurByIds(id);
+        const { utilisateurId, refugeId } = req.params;
+        const utilisateur = await removeRefugeToUtilisateurByIds(refugeId, utilisateurId);
         
         
         res.status(200).json(utilisateur)
@@ -226,8 +226,8 @@ export async function getUtilisateurAnimalsByIdControlleur (req,res) {
 
 export async function addAnimalToUtilisateurByIdsControlleur (req,res) {
     try {
-        const { id } = req.params;
-        const utilisateur = await addAnimalToUtilisateurByIds(id);
+        const { utilisateurId, animalId } = req.params;
+        const utilisateur = await addAnimalToUtilisateurByIds(animalId, utilisateurId);
         
         
         res.status(200).json(utilisateur)
@@ -240,8 +240,8 @@ export async function addAnimalToUtilisateurByIdsControlleur (req,res) {
 
 export async function removeAnimalFromUtilisateurByIdsControlleur (req,res) {
     try {
-        const { id } = req.params;
-        const utilisateur = await removeAnimalFromUtilisateurByIds(id);
+        const { utilisateurId, animalId } = req.params;
+        const utilisateur = await removeAnimalFromUtilisateurByIds(animalId, utilisateurId);
         
         
         res.status(200).json(utilisateur)
@@ -254,8 +254,8 @@ export async function removeAnimalFromUtilisateurByIdsControlleur (req,res) {
 
 export async function setAnimalToUtilisateurByIdsControlleur (req,res) {
     try {
-        const { id } = req.params;
-        const utilisateur = await setAnimalToUtilisateurByIds(id);
+        const { utilisateurId, animalId } = req.params;
+        const utilisateur = await setAnimalToUtilisateurByIds(animalId, utilisateurId);
         
         
         res.status(200).json(utilisateur)
@@ -268,8 +268,8 @@ export async function setAnimalToUtilisateurByIdsControlleur (req,res) {
 
 export async function unsetAnimalToUtilisateurByIdsControlleur (req,res) {
     try {
-        const { id } = req.params;
-        const utilisateur = await unsetAnimalToUtilisateurByIds(id);
+        const { utilisateurId, animalId } = req.params;
+        const utilisateur = await unsetAnimalToUtilisateurByIds(animalId, utilisateurId);
         
         
         res.status(200).json(utilisateur)

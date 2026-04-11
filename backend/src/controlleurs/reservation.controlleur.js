@@ -2,6 +2,7 @@ import { getAnimalById } from "../database/animal.db.js";
 import { getAnnonceById } from "../database/annonce.db.js";
 import { getProfilPrestataireById } from "../database/profil_prestataire.db.js";
 import { createReservation, deleteReservation, getAllReservations, getReservationById, updateReservation } from "../database/reservation.db.js";
+import { getStatutById } from "../database/statut.db.js";
 import { getTypeServiceById } from "../database/type_service.db.js";
 import { getUtilisateurById } from "../database/utilisateur.db.js";
 

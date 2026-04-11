@@ -1,4 +1,5 @@
 import { createProfilPrestataire, deleteProfilPrestataire, getAllProfilPrestataires, getProfilPrestataireById, updateProfilPrestataire } from "../database/profil_prestataire.db.js";
+import { getStatutById } from "../database/statut.db.js";
 import { getTypeServiceById } from "../database/type_service.db.js";
 import { getUtilisateurById } from "../database/utilisateur.db.js";
 

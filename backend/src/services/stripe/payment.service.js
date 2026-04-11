@@ -17,9 +17,19 @@ export const createProductPaymentIntent = async (commandeId, userId, totalAmount
   if (!users[0]?.stripeCustomerId) {
     throw new Error('Utilisateur pas encore configuré pour Stripe');
   }
+
+  const [existingRows] = await db.query(
+    'SELECT stripe_payment_intent_id FROM paiement_commande WHERE IdCommande = ?',
+    [commandeId]
+  );
+
+  if (existingRows[0]?.stripe_payment_intent_id) {
+    return await stripe.paymentIntents.retrieve(existingRows[0].stripe_payment_intent_id);
+  }
   
   const amountInCents = Math.round(totalAmount * 100);
   const platformFee = calculatePlatformFee(amountInCents);
+  const idempotencyKey = `product_order_${commandeId}_${userId}`;
   
   const paymentIntent = await stripe.paymentIntents.create({
     amount: amountInCents,
@@ -32,6 +42,8 @@ export const createProductPaymentIntent = async (commandeId, userId, totalAmount
       commandeId: commandeId.toString(),
       type: 'product_order',
     },
+  }, {
+    idempotencyKey,
   });
   
   await db.query(
@@ -153,7 +165,17 @@ export const createServicePaymentIntent = async (reservationId, userId, amount) 
     const amountInCents = Math.round(amount * 100);
     const platformFee = calculatePlatformFee(amountInCents);
 
+    const [existingRows] = await db.query(
+      'SELECT stripe_payment_intent_id FROM paiement_service WHERE IdReservation = ?',
+      [reservationId]
+    );
+
+    if (existingRows[0]?.stripe_payment_intent_id) {
+      return await stripe.paymentIntents.retrieve(existingRows[0].stripe_payment_intent_id);
+    }
+
     // 5. Stripe PaymentIntent (Connect)
+    const idempotencyKey = `service_booking_${reservationId}_${userId}`;
     const paymentIntent = await stripe.paymentIntents.create({
       amount: amountInCents,
       currency: 'eur',
@@ -174,14 +196,16 @@ export const createServicePaymentIntent = async (reservationId, userId, amount) 
         reservationId: reservationId.toString(),
         type: 'service_booking',
       },
+    }, {
+      idempotencyKey,
     });
 
     // 6. Save DB (propre)
     await db.query(
       `INSERT INTO paiement_service 
-       (IdReservation, Montant, Statut, stripe_payment_intent_id)
-       VALUES (?, ?, 1, ?)`,
-      [reservationId, amount, paymentIntent.id]
+       (IdReservation, Montant, Statut, stripe_payment_intent_id, connectedAccountId, applicationFeeAmount)
+       VALUES (?, ?, 1, ?, ?, ?)`,
+      [reservationId, amount, paymentIntent.id, profil[0].stripeAccountId, platformFee / 100]
     );
 
     // 7. Return client secret

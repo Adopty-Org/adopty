@@ -1,6 +1,7 @@
 import { createAvisService, deleteAvisService, getAllAvisServices, getAvisServiceById, updateAvisService } from "../database/avis_service.db.js";
 import { getReservationById } from "../database/reservation.db.js";
 import { getTypeServiceById } from "../database/type_service.db.js";
+import { getUtilisateurById } from "../database/utilisateur.db.js";
 
 export async function createAvisServiceControlleur(req,res) {
     try {

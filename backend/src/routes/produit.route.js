@@ -11,6 +11,6 @@ router.delete("/:id", produit.deleteProduitControlleur);
 
 // routes speciales
 
-router.get("/", produit.getRefugeOfProduitControlleur);
+router.get("/refuge/:Refuge", produit.getRefugeOfProduitControlleur);
 
 export default router;
