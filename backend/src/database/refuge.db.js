@@ -4,15 +4,17 @@ import { Refuge } from "../modeles/refuge.model.js";
 
 export const CreateRefuge = async (refuge) => {
     const [result] = await db.query(
-        `INSERT INTO refuge (Nom,Description,Addresse,AddresseGPS,Date_inscription,Telephone)
-        VALUES(?,?,?,?,NOW(),?)`,
+        `INSERT INTO refuge (Nom,Description,Addresse,AddresseGPS,Date_inscription,Telephone,stripeAccountId,stripeAccountStatus)
+        VALUES(?,?,?,?,NOW(),?,?,?)`,
         [
             refuge.Nom,
             refuge.Description,
             refuge.Addresse,
             refuge.AddresseGPS,
             
-            refuge.Telephone
+            refuge.Telephone,
+            refuge.stripeAccountId,
+            refuge.stripeAccountStatus
         ]
     );
 
@@ -43,7 +45,9 @@ export const updateRefuge = async (id, refuge) => {
       Addresse = ?,
       AddresseGPS = ?,
       
-      Telephone = ?
+      Telephone = ?,
+      stripeAccountId = ?,
+      stripeAccountStatus = ?
      WHERE Id = ?`,
     [
       refuge.Nom,
@@ -52,6 +56,8 @@ export const updateRefuge = async (id, refuge) => {
       refuge.AddresseGPS,
       
       refuge.Telephone,
+      refuge.stripeAccountId,
+      refuge.stripeAccountStatus,
       id
     ]
   );

@@ -7,5 +7,7 @@ export class Refuge{
         this.AddresseGPS = data.AddresseGPS;
         this.Date_inscription = data.Date_inscription;
         this.Telephone = data.Telephone;
+        this.stripeAccountId = data.stripeAccountId;
+        this.stripeAccountStatus = data.stripeAccountStatus;
     }
 }

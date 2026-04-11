@@ -1,8 +1,8 @@
-import { CreateRefuge, deleteRefuge, getAllRefuges, getRefugeById, updateRefuge } from "../database/refuge.db.js";
+import { addAnimalToRefugeByIds, CreateRefuge, deleteRefuge, getAllRefuges, getRefugeAnimalsById, getRefugeById, removeAnimalFromRefugeByIds, setAnimalToRefugeByIds, unsetAnimalToRefugeByIds, updateRefuge } from "../database/refuge.db.js";
 
 export async function createRefugeControlleur(req,res) {
     try {
-        const { Nom,Description,Addresse,AddresseGPS,Telephone } = req.body;
+        const { Nom,Description,Addresse,AddresseGPS,Telephone,stripeAccountId,stripeAccountStatus } = req.body;
 
         if(!Nom || !Addresse && !AddresseGPS || !Telephone){
             return res.status(400).json({ message: "Le strict minimun en information est requis! "})
@@ -13,7 +13,9 @@ export async function createRefugeControlleur(req,res) {
             Description,
             Addresse,
             AddresseGPS,
-            Telephone 
+            Telephone, 
+            stripeAccountId,
+            stripeAccountStatus
         })
 
         res.status(201).json({ message: "Refuge crée avec succès", id: requete });
@@ -26,7 +28,7 @@ export async function createRefugeControlleur(req,res) {
 export async function updateRefugeControlleur(req,res) {
     try {
         const { id } = req.params;
-        const { Nom,Description,Addresse,AddresseGPS,Telephone } = req.body;
+        const { Nom,Description,Addresse,AddresseGPS,Telephone,stripeAccountId,stripeAccountStatus } = req.body;
         const refuge = await getRefugeById(id);
         if (!refuge) {
             return res.status(404).json({ message: "Refuge non trouvé" });
@@ -36,7 +38,9 @@ export async function updateRefugeControlleur(req,res) {
             Description,
             Addresse,
             AddresseGPS,
-            Telephone
+            Telephone,
+            stripeAccountId,
+            stripeAccountStatus
         })
         
         res.status(200).json({ message: "Refuge modifié avec succès" });
@@ -85,6 +89,83 @@ export async function getAllRefugesControlleur(req,res) {
         
     } catch (error) {
         console.error("Erreur lors de l'obtention des refuges:", error);
+        res.status(500).json({ message: "Erreur interne du serveur" });
+    }
+}
+
+// controlleurs speciales
+
+export async function getRefugeAnimalsByIdControlleur(req,res) {
+    try {
+        const { id } = req.params;
+        const animals = await getRefugeAnimalsById(id);
+        if (!animals) {
+            return res.status(404).json({ message: "Ce refuge n'a pas d'animaux !(non trouvé)" });
+        }
+        res.status(200).json(animals);
+        
+    } catch (error) {
+        console.error("Erreur lors de l'obtention de l'animal de l'annonce:", error);
+        res.status(500).json({ message: "Erreur interne du serveur" });
+    }
+}
+
+export async function addAnimalToRefugeByIdsControlleur(req,res) {
+    try {
+        const { id } = req.params;
+        const animals = await addAnimalToRefugeByIds(id);
+        if (!animals) {
+            return res.status(404).json({ message: "Ce refuge n'a pas d'animaux !(non trouvé)" });
+        }
+        res.status(200).json(animals);
+        
+    } catch (error) {
+        console.error("Erreur lors de l'obtention de l'animal de l'annonce:", error);
+        res.status(500).json({ message: "Erreur interne du serveur" });
+    }
+}
+
+export async function removeAnimalFromRefugeByIdsControlleur(req,res) {
+    try {
+        const { id } = req.params;
+        const animals = await removeAnimalFromRefugeByIds(id);
+        if (!animals) {
+            return res.status(404).json({ message: "Ce refuge n'a pas d'animaux !(non trouvé)" });
+        }
+        res.status(200).json(animals);
+        
+    } catch (error) {
+        console.error("Erreur lors de l'obtention de l'animal de l'annonce:", error);
+        res.status(500).json({ message: "Erreur interne du serveur" });
+    }
+}
+
+export async function setAnimalToRefugeByIdsControlleur(req,res) {
+    try {
+        const { id } = req.params;
+        const animals = await setAnimalToRefugeByIds(id);
+        if (!animals) {
+            return res.status(404).json({ message: "Ce refuge n'a pas d'animaux !(non trouvé)" });
+        }
+        res.status(200).json(animals);
+        
+    } catch (error) {
+        console.error("Erreur lors de l'obtention de l'animal de l'annonce:", error);
+        res.status(500).json({ message: "Erreur interne du serveur" });
+    }
+}
+
+export async function unsetAnimalToRefugeByIdsControlleur(req,res) {
+    try {
+        const { id } = req.params;
+        const animals = await unsetAnimalToRefugeByIds(id);
+        if (!animals) {
+            return res.status(404).json({ message: "Ce refuge n'a pas d'animaux !(non trouvé)" });
+        }
+        res.status(200).json(animals);
+        
+    } catch (error) {
+        console.error("Erreur lors de l'obtention de l'animal de l'annonce:", error);
         res.status(500).json({ message: "Erreur interne du serveur" });
     }
 }

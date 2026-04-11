@@ -36,7 +36,7 @@ export const updateRace = async (id, race) => {
     `UPDATE race SET 
       Nom = ?, 
       Description = ?,
-      Espece = ?,
+      Espece = ?
      WHERE Id = ?`,
     [
       race.Nom,

@@ -5,13 +5,14 @@ import { Role } from "../modeles/role.model.js";
 import { Utilisateur } from "../modeles/utilisateur.model.js";
 
 export const createUtilisateur = async (user) => {
-  const [result] = await db.query(
+  const [result] = await db.query(  // todo: enleve les stripes d'ici a la fin du projet
     `INSERT INTO utilisateur 
-    (clerkId, stripeCustomerId, Nom, Prenom, Addresse, AddresseEmail, Wilaya, MotDePasse, Photo, CreeLe, CreePar)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?)`,
+    (clerkId, stripeCustomerId , stripeAccountId, Nom, Prenom, Addresse, AddresseEmail, Wilaya, MotDePasse, Photo, CreeLe, CreePar, stripeAccountStatus)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?, ?)`,
     [
       user.clerkId,
       user.stripeCustomerId,
+      user.stripeAccountId,
       user.Nom,
       user.Prenom,
       user.Addresse,
@@ -19,7 +20,8 @@ export const createUtilisateur = async (user) => {
       user.Wilaya,
       user.MotDePasse,
       user.Photo,
-      user.CreePar
+      user.CreePar,
+      user.stripeAccountStatus
     ]
   );
 
@@ -53,7 +55,10 @@ export const updateUtilisateur = async (id, user) => {
       Wilaya = ?, 
       Photo = ?, 
       ModifieeLe = NOW(),
-      ModifieePar = ?
+      ModifieePar = ?,
+      stripeAccountStatus = COALESCE(?, stripeAccountStatus),
+      stripeAccountId = COALESCE(?, stripeAccountId)
+
      WHERE Id = ?`,
     [
       user.Nom,
@@ -64,6 +69,8 @@ export const updateUtilisateur = async (id, user) => {
       user.Wilaya,
       user.Photo,
       user.ModifieePar,
+      user.stripeAccountStatus,
+      user.stripeAccountId,
       id
     ]
   );

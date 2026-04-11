@@ -9,4 +9,8 @@ router.get("/", animal.getAllAnimalsControlleur);
 router.put("/:id", animal.updateAnimalControlleur);
 router.delete("/:id", animal.deleteAnimalControlleur);
 
+// fonctions speciales
+router.get("/statut/:Statut", animal.getStatutOfAnimalControlleur);
+router.get("/race/:Race", animal.getRaceOfAnimalControlleur);
+
 export default router;
