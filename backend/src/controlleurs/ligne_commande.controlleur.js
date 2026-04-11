@@ -37,6 +37,16 @@ export async function updateLigneCommandeControlleur(req,res) {// just la au cas
         if (!ligne_commande) {
             return res.status(404).json({ message: "LigneCommande non trouvée" });
         }
+
+        if (
+            IdSousCommande == null ||
+            IdProduit == null ||
+            !Number.isInteger(Quantite) ||
+            Quantite <= 0
+        ) {
+            return res.status(400).json({ message: "Le strict minimun en information est requis! "});
+        }
+
         await updateLigneCommande( id ,{
             IdSousCommande, 
             IdProduit,

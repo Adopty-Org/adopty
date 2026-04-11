@@ -1,4 +1,4 @@
-import { CreateProduit, deleteProduit, getAllProduits, getProduitById, updateProduit } from "../database/produit.db.js";
+import { createProduit, deleteProduit, getAllProduits, getProduitById, updateProduit } from "../database/produit.db.js";
 import { getRefugeById} from "../database/refuge.db.js"
 import { getSousCommandeById } from "../database/sous_commande.db.js";
 
@@ -6,21 +6,24 @@ export async function createProduitControlleur(req,res) {
     try {
         const { IdRefuge,Nom,Prix,Stock,Disponibilite } = req.body;
 
+        const prix = Number(Prix);
+        const stock = Number(Stock);
+
         if (
             IdRefuge == null ||
             !Nom ||
-            Prix == null ||
-            Stock == null ||
+            !Number.isFinite(prix) || prix < 0 ||
+            !Number.isInteger(stock) || stock < 0 ||
             Disponibilite == null
         ) {
             return res.status(400).json({ message: "Le strict minimun en information est requis! "})
         }
 
-        const requete = await CreateProduit({
+        const requete = await createProduit({
             IdRefuge,
             Nom,
-            Prix,
-            Stock,
+            Prix: prix,
+            Stock: stock,
             Disponibilite 
         })
 

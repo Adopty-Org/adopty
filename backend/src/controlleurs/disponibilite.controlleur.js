@@ -5,7 +5,8 @@ export async function createDisponibiliteControlleur(req,res) {
     try {
         const { IdProfil,DateDebut,DateFin,Recurrence,Frequence,Disponibilite } = req.body;
 
-        if(!IdProfil || !DateFin && !Recurrence || !Disponibilite){
+        const isMissing = (v) => v === undefined || v === null || v === "";
+        if (isMissing(IdProfil) || (isMissing(DateFin) && isMissing(Recurrence)) || isMissing(Disponibilite)) {
             return res.status(400).json({ message: "Le strict minimun en information est requis! "})
         }
 
@@ -29,18 +30,18 @@ export async function updateDisponibiliteControlleur(req,res) {
     try {
         const { id } = req.params;
         const { IdProfil,DateDebut,DateFin,Recurrence,Frequence,Disponibilite } = req.body;
-        const disponibilite = await getDisponibiliteById(id);
-        if (!disponibilite) {
-            return res.status(404).json({ message: "Disponibilite non trouvée" });
-        }
-        await updateDisponibilite( id ,{
+        
+        const affectedRows = await updateDisponibilite(id, {
             IdProfil,
             DateDebut,
             DateFin,
             Recurrence,
             Frequence,
             Disponibilite
-        })
+        });
+        if (affectedRows === 0) {
+            return res.status(404).json({ message: "Disponibilite non trouvée" });
+        }
         
         res.status(200).json({ message: "Disponibilite modifiée avec succès" });
         
@@ -53,11 +54,10 @@ export async function updateDisponibiliteControlleur(req,res) {
 export async function deleteDisponibiliteControlleur(req,res) {
     try {
         const { id } = req.params;
-        const disponibilite = await getDisponibiliteById(id);
-        if (!disponibilite) {
+        const affectedRows = await deleteDisponibilite(id);
+        if (affectedRows === 0) {
             return res.status(404).json({ message: "Disponibilite non trouvée" });
         }
-        await deleteDisponibilite(id);
         res.status(200).json({ message: "Disponibilite supprimée avec succès" });
         
     } catch (error) {

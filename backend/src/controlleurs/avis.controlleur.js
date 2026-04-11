@@ -16,6 +16,21 @@ export async function createAvisControlleur(req,res) {
             return res.status(400).json({ message: "Le strict minimun en information est requis! "})
         }
 
+        const utilisateur = await getUtilisateurById(IdUtilisateur);
+        if (!utilisateur) {
+            return res.status(404).json({ message: "Utilisateur introuvable" });
+        }
+
+        const produit = await getProduitById(IdProduit);
+        if (!produit) {
+            return res.status(404).json({ message: "Produit introuvable" });
+        }
+
+        const sousCommande = await getSousCommandeById(IdSousCommande);
+        if (!sousCommande) {
+            return res.status(404).json({ message: "Sous-commande introuvable" });
+        }
+
         const requete = await createAvis({
             IdUtilisateur,
             IdProduit,
@@ -39,6 +54,17 @@ export async function updateAvisControlleur(req,res) {
         if (!avis) {
             return res.status(404).json({ message: "Avis non trouvé" });
         }
+
+        if (
+            IdUtilisateur == null ||
+            IdProduit == null ||
+            IdSousCommande == null ||
+            Note == null ||
+            !Commentaire
+        ) {
+            return res.status(400).json({ message: "Tous les champs sont requis pour modifier un avis" });
+        }
+
         await updateAvis( id ,{
             IdUtilisateur,
             IdProduit,

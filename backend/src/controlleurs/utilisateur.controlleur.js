@@ -156,6 +156,9 @@ export async function removeRoleToUtilisateurByIdsControlleur (req,res) {
         const utilisateur = await removeRoleToUtilisateurByIds(roleId, utilisateurId);
         
         
+        if (!utilisateur) {
+            return res.status(404).json({ message: "Relation introuvable" });
+        }
         res.status(200).json(utilisateur)
 
     } catch (error) {
