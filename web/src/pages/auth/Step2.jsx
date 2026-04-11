@@ -1,5 +1,7 @@
 import { useSignUp } from "@clerk/clerk-react";
 import { useState } from "react";
+import { useQuery} from "@tanstack/react-query"
+import { utilisateurApi } from "../../lib/api";
 //
 // regarde les commentaires de ./Step1 pour mieux comprendre
 //
@@ -10,6 +12,13 @@ export default function Step2({ signUp }) {
   const [code, setCode] = useState("");
   const [name, setName] = useState("");
   const [error, setError] = useState(null);
+
+  const { data:utilisateursData, isLoading } = useQuery({
+    queryKey: ["utilisateurs"],
+    queryFn: utilisateurApi.getAll
+  });
+
+  console.log("utilisateurs :   " , utilisateursData)
 
   if (!signUp) {
     return (

@@ -1,10 +1,20 @@
 import { useState } from "react";
 import Step1 from "./Step1";
 import Step2 from "./Step2";
+import { useQuery } from "@tanstack/react-query";
+import { utilisateurApi } from "../../lib/api";
 
 export default function SignUpPage() {
   const [step, setStep] = useState(1);
   const [signUpData, setSignUpData] = useState(null);
+
+  const { data:utilisateursData, isLoading } = useQuery({
+    queryKey: ["utilisateurs"],
+    queryFn: utilisateurApi.getAll
+  });
+
+  console.log("etat :   " , isLoading)
+  console.log("utilisateurs :   " , utilisateursData)
 
   return (
     <div className="h-screen flex items-center justify-center bg-base-200 overflow-hidden">

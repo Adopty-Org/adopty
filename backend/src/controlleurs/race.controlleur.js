@@ -1,3 +1,4 @@
+import { getEspeceById } from "../database/espece.db.js";
 import { createRace, deleteRace, getAllRaces, getRaceById, updateRace } from "../database/race.db.js";
 
 export async function createRaceControlleur(req,res) {// pas utilisable je crois
@@ -82,6 +83,23 @@ export async function getAllRacesControlleur(req,res) {
         
     } catch (error) {
         console.error("Erreur lors de l'obtention des races:", error);
+        res.status(500).json({ message: "Erreur interne du serveur" });
+    }
+}
+
+// requetes speciales 
+
+export async function getEspeceOfRaceControlleur(req,res) {
+    try {
+        const { Espece } = req.params;
+        const espece = await getEspeceById(Espece);
+        if (!espece) {
+            return res.status(404).json({ message: "Race a un espece inexistant !(non trouvé)" });
+        }
+        res.status(200).json(espece);
+        
+    } catch (error) {
+        console.error("Erreur lors de l'obtention de l'animal de l'annonce:", error);
         res.status(500).json({ message: "Erreur interne du serveur" });
     }
 }

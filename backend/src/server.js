@@ -19,11 +19,50 @@ import utilisateurRoutes from "./routes/utilisateur.route.js"
 import vaccinRoutes from "./routes/vaccin.route.js"
 
 
+import annonceRoutes from "./routes/annonce.route.js"
+import avis_servicesRoutes from "./routes/avis_service.route.js"
+import avisRoutes from "./routes/avis.route.js"
+import commandeRoutes from "./routes/commande.route.js"
+import disponibiliteRoutes from "./routes/disponibilite.route.js"
+import ligne_commandeRoutes from "./routes/ligne_commande.route.js"
+import ligne_panierRoutes from "./routes/Ligne_panier.route.js"
+import ligne_wishlistRoutes from "./routes/ligne_wishlist.route.js"
+import livraisonRoutes from "./routes/livraison.route.js"
+import paiement_commandeRoutes from "./routes/paiement_commande.route.js"
+import paiement_serviceRoutes from "./routes/paiement_service.route.js"
+import panierRoutes from "./routes/panier.route.js"
+import profil_prestataireRoutes from "./routes/profil_prestataire.route.js"
+
+import reservationRoutes from "./routes/reservation.route.js"
+import sous_commandeRoutes from "./routes/sous_commande.route.js"
+import specificationRoutes from "./routes/specification.route.js"
+import statutRoutes from "./routes/statut.route.js"
+import type_serviceRoutes from "./routes/type_service.route.js"
+import wishlistRoutes from "./routes/wishlist.route.js"
+
+// Au début, avec les autres imports
+import stripeRoutes from './routes/stripe.route.js';
+
+
+
 const app = express()
 
 
 
 const __dirname = path.resolve()
+
+
+
+
+
+// Pour le webhook, il faut que bodyParser ne touche pas à la route /webhook
+// Donc assure-toi que app.use(express.json()) est APRÈS la route webhook
+// Ou configure comme ça :
+
+// D'abord les routes qui ont besoin du body brut
+app.use('/api/stripe/webhook', express.raw({ type: 'application/json' }));
+
+
 
 app.use(express.json());// 3 heures de soucis.... 
 app.use(clerkMiddleware())
@@ -39,6 +78,10 @@ app.use(cors({origin : ENV.CLIENT_URL, credentials : true}))// cors() est un mid
   res.status(200).json({ ok: true });
 });*/
 
+
+// Puis les routes
+app.use('/api/stripe', stripeRoutes);
+
 app.use("/api/inngest", serve({ client: ingest, functions }));
 
 app.use("/api/web", webRoutes)
@@ -49,6 +92,27 @@ app.use("/api/vaccins", vaccinRoutes)
 app.use("/api/refuges", refugeRoutes)
 app.use("/api/roles", roleRoutes)
 app.use("/api/utilisateurs", utilisateurRoutes)
+
+app.use("/api/annonces", annonceRoutes)
+app.use("/api/avis_services", avis_servicesRoutes)
+app.use("/api/aviss", avisRoutes)
+app.use("/api/commandes", commandeRoutes)
+app.use("/api/disponibilites", disponibiliteRoutes)
+app.use("/api/ligne_commandes", ligne_commandeRoutes)
+app.use("/api/Ligne_paniers", ligne_panierRoutes)
+app.use("/api/ligne_wishlists", ligne_wishlistRoutes)
+app.use("/api/livraisons", livraisonRoutes)
+app.use("/api/paiement_commandes", paiement_commandeRoutes)
+app.use("/api/paiement_services", paiement_serviceRoutes)
+app.use("/api/paniers", panierRoutes)
+app.use("/api/profil_prestataires", profil_prestataireRoutes)
+
+app.use("/api/reservations", reservationRoutes)
+app.use("/api/sous_commandes", sous_commandeRoutes)
+app.use("/api/specifications", specificationRoutes)
+app.use("/api/statuts", statutRoutes)
+app.use("/api/type_services", type_serviceRoutes)
+app.use("/api/wishlists", wishlistRoutes)
 
 app.get("/api/calling", (req,res)=>{
     res.status(200).json({message: "oui ca fonctionne"})

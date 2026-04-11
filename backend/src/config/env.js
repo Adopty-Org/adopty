@@ -5,6 +5,7 @@ dotenv.config();
 export const ENV = {
     NODE_ENV:process.env.NODE_ENV,
     PORT:process.env.PORT,
+    FRONTEND_URL:process.env.FRONTEND_URL,
     DB_URL:process.env.DB_URL,
     DB_HOST:process.env.DB_HOST,
     DB_PORT:process.env.DB_PORT,
@@ -19,4 +20,8 @@ export const ENV = {
     CLOUDINARY_CLOUD_NAME:process.env.CLOUDINARY_CLOUD_NAME,
     ADMIN_EMAIL:process.env.ADMIN_EMAIL,
     CLIENT_URL:process.env.CLIENT_URL,
+    STRIPE_PUBLISHABLE_KEY:process.env.STRIPE_PUBLISHABLE_KEY,
+    STRIPE_SECRET_KEY:process.env.STRIPE_SECRET_KEY,
+    STRIPE_WEBHOOK_SECRET:process.env.STRIPE_WEBHOOK_SECRET,
+    STRIPE_CONNECT_CLIENT_ID:process.env.STRIPE_CONNECT_CLIENT_ID,
 }

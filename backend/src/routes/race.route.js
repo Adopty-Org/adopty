@@ -9,4 +9,8 @@ router.get("/", race.getAllRacesControlleur);
 router.put("/:id", race.updateRaceControlleur);
 router.delete("/:id", race.deleteRaceControlleur);
 
+// routes speciales
+
+router.get("/espece/:Espece", race.getEspeceOfRaceControlleur);
+
 export default router;

@@ -1,62 +1,113 @@
 import axiosInstance from "./axios"
 
+/*
+========================================================
+📡 FICHIER API FRONTEND
+========================================================
+
+👉 Ce fichier centralise toutes les requêtes vers le backend.
+
+💡 Pourquoi ?
+- éviter de répéter axios partout
+- garder un code propre et organisé
+- faciliter les modifications (changer URL, headers, etc.)
+
+⚠️ IMPORTANT :
+- Toujours passer par ces fonctions (NE PAS utiliser axios directement ailleurs)
+- Si vous modifiez une route backend → modifiez ici aussi
+
+📦 Structure :
+1 bloc = 1 entité backend (utilisateur, animal, etc.)
+Chaque bloc contient (fonctions ordinaires) :
+- getAll     → récupérer tout
+- getSpecific→ récupérer 1 élément
+- create     → créer
+- update     → modifier
+- delete     → supprimer
+
+========================================================
+*/
+
 export const utilisateurApi = {
-    getSpecific : async () => {
-        const { data } = await axiosInstance.get("/products");
+
+    // 🔹 récupérer un utilisateur par son Id (pas clerkId)
+    getSpecific : async (id) => {
+        const { data } = await axiosInstance.get(`/utilisateurs/${id}`);
         return data;
     },
 
+    // 🔹 récupérer tous les utilisateurs
     getAll : async () => {
         const { data } = await axiosInstance.get("/utilisateurs");
         return data;
     },
 
+    // 🔹 créer un utilisateur
     create : async (formData) =>  {
         const { data } = await axiosInstance.post("/utilisateurs", formData)
         return data;
     },
 
+    // 🔹 modifier un utilisateur
     update : async ({ id,formData }) =>  {
         const { data } = await axiosInstance.put(`/utilisateurs/${id}`, formData)
         return data;
     },
 
+    // 🔹 supprimer un utilisateur
     delete: async (utilisateurId) => {
         const { data } = await axiosInstance.delete(`/utilisateurs/${utilisateurId}`);
         return data;
     },
 }
 
+/*
+========================================================
+🐾 ANIMAUX
+========================================================
+*/
 export const animalApi = {
-    getSpecific : async () => {
-        const { data } = await axiosInstance.get("/animaux");
+
+    // ⚠️ normalement devrait prendre un id
+    getSpecific : async (id) => {
+        const { data } = await axiosInstance.get(`/animaux/${id}`);
         return data;
     },
 
+    // 🔹 récupérer tous les animaux
     getAll : async () => {
         const { data } = await axiosInstance.get("/animaux");
         return data;
     },
 
+    // 🔹 créer un animal
     create : async (formData) =>  {
         const { data } = await axiosInstance.post("/animaux", formData)
         return data;
     },
 
+    // 🔹 modifier un animal
     update : async ({ id,formData }) =>  {
         const { data } = await axiosInstance.put(`/animaux/${id}`, formData)
         return data;
     },
 
+    // 🔹 supprimer un animal
     delete: async (animalId) => {
         const { data } = await axiosInstance.delete(`/animaux/${animalId}`);
         return data;
     },
 }
 
+/*
+========================================================
+🧬 ESPECES
+========================================================
+*/
 export const especeApi = {
-    getSpecific : async () => {
-        const { data } = await axiosInstance.get("/especes");
+
+    getSpecific : async (id) => {
+        const { data } = await axiosInstance.get(`/especes/${id}`);
         return data;
     },
 
@@ -81,9 +132,15 @@ export const especeApi = {
     },
 }
 
+/*
+========================================================
+🐕 RACES
+========================================================
+*/
 export const raceApi = {
+
     getSpecific : async () => {
-        const { data } = await axiosInstance.get("/races");
+        const { data } = await axiosInstance.get(`/races/${id}`);
         return data;
     },
 
@@ -108,9 +165,15 @@ export const raceApi = {
     },
 }
 
+/*
+========================================================
+🏠 REFUGES
+========================================================
+*/
 export const refugeApi = {
+
     getSpecific : async () => {
-        const { data } = await axiosInstance.get("/refuges");
+        const { data } = await axiosInstance.get(`/refuges/${id}`);
         return data;
     },
 
@@ -135,9 +198,15 @@ export const refugeApi = {
     },
 }
 
+/*
+========================================================
+🛡️ ROLES
+========================================================
+*/
 export const roleApi = {
+
     getSpecific : async () => {
-        const { data } = await axiosInstance.get("/roles");
+        const { data } = await axiosInstance.get(`/roles/${id}`);
         return data;
     },
 
@@ -161,3 +230,17 @@ export const roleApi = {
         return data;
     },
 }
+
+/*
+========================================================
+💀 MESSAGE POUR LE FUTUR
+========================================================
+
+Si tu lis ça :
+
+- ne casse pas les routes sans vérifier le backend
+- respecte la structure (copier/coller propre)
+- teste toujours après modif
+
+Sinon bonne chance 🫡
+*/

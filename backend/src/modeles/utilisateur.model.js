@@ -35,6 +35,7 @@ export class Utilisateur {
     this.Id = data.Id;
     this.clerkId = data.clerkId;
     this.stripeCustomerId = data.stripeCustomerId;
+    this.stripeAccountId = data.stripeAccountId;
     this.Nom = data.Nom;
     this.Prenom = data.Prenom;
     this.Addresse = data.Addresse;
@@ -46,5 +47,6 @@ export class Utilisateur {
     this.CreePar = data.CreePar;
     this.ModifieeLe = data.ModifieeLe;
     this.ModifieePar = data.ModifieePar;
+    this.stripeAccountStatus = data.stripeAccountStatus;
   }
 }
