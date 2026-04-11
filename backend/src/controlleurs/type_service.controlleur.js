@@ -25,8 +25,8 @@ export async function updateTypeServiceControlleur(req,res) {// just la au cas o
         const { id } = req.params;
         const { Type } = req.body;
         const type_service = await getTypeServiceById(id);
-        if (!type_service) {
-            return res.status(404).json({ message: "TypeService non trouvé" });
+        if (Type == null || String(Type).trim() === "") {
+            return res.status(400).json({ message: "Le strict minimun en information est requis! " });
         }
         await updateTypeService( id ,{
             Type

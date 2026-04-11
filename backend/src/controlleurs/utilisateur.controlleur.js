@@ -109,7 +109,7 @@ export async function getUtilisateurByClerkIdControlleur (req,res) {
         const { id } = req.params;
         const utilisateur = await getUtilisateurByClerkId(id);
         if (!utilisateur){
-            res.status(404).json({ message: "Pas d'utilisateurs avec ce clerkId!"});
+            return res.status(404).json({ message: "Pas d'utilisateurs avec ce clerkId!"});
         }
         
         res.status(200).json(utilisateur)
@@ -125,7 +125,7 @@ export async function getUtilisateurRolesByIdControlleur (req,res) {
         const { id } = req.params;
         const roles = await getUtilisateurRolesById(id);
         if (!roles){
-            res.status(404).json({ message: "Pas d'roles pour cet utilisateur!"});
+            return res.status(404).json({ message: "Pas d'roles pour cet utilisateur!"});
         }
         
         res.status(200).json(roles)
@@ -169,7 +169,7 @@ export async function getUtilisateurRefugesByIdControlleur (req,res) {
         const { id } = req.params;
         const refuge = await getUtilisateurRefugesById(id);
         if (!refuge){
-            res.status(404).json({ message: "Pas d'refuges avec ce clerkId!"});
+            return res.status(404).json({ message: "Pas d'refuges avec ce clerkId!"});
         }
         
         res.status(200).json(refuge)
@@ -213,7 +213,7 @@ export async function getUtilisateurAnimalsByIdControlleur (req,res) {
         const { id } = req.params;
         const utilisateur = await getUtilisateurAnimalsById(id);
         if (!utilisateur){
-            res.status(404).json({ message: "Pas d'utilisateurs avec ce clerkId!"});
+            return res.status(404).json({ message: "Pas d'utilisateurs avec ce clerkId!"});
         }
         
         res.status(200).json(utilisateur)

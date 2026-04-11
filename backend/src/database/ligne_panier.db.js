@@ -2,6 +2,9 @@ import { db } from "../config/db.js";
 import { LignePanier } from "../modeles/ligne_panier.model.js";
 
 export const createLignePanier = async (ligne_panier) => {
+  if (!Number.isInteger(ligne_panier.Quantite) || ligne_panier.Quantite <= 0) {
+    throw new Error("Quantite must be a positive integer");
+  }
     const [result] = await db.query(
         `INSERT INTO ligne_panier (IdPanier, IdProduit, Quantite) 
         VALUES (?, ?, ?)`,
@@ -32,6 +35,9 @@ export const getLignePanierById = async (id) => {
 };
 
 export const updateLignePanier = async (id, ligne_panier) => {
+  if (!Number.isInteger(ligne_panier.Quantite) || ligne_panier.Quantite <= 0) {
+    throw new Error("Quantite must be a positive integer");
+  }
   const [result] = await db.query(
     `UPDATE ligne_panier SET 
       IdPanier = ?, 

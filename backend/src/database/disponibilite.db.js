@@ -41,7 +41,8 @@ export const updateDisponibilite = async (id, disponibilite) => {
       DateDebut = ?,
       DateFin = ?,
       Recurrence = ?,
-      Frequence = ?
+      Frequence = ?,
+      Disponibilite = ?
      WHERE Id = ?`,
     [
       disponibilite.IdProfil,
@@ -49,6 +50,7 @@ export const updateDisponibilite = async (id, disponibilite) => {
       disponibilite.DateFin,
       disponibilite.Recurrence,
       disponibilite.Frequence,
+      disponibilite.Disponibilite,
       id
     ]
   );

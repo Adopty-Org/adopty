@@ -25,8 +25,8 @@ export async function updateStatutControlleur(req,res) {// just la au cas ou
         const { id } = req.params;
         const { Statut } = req.body;
         const statut = await getStatutById(id);
-        if (!statut) {
-            return res.status(404).json({ message: "Statut non trouvé" });
+        if (Statut == null || String(Statut).trim() === "") {
+            return res.status(400).json({ message: "Le strict minimun en information est requis! " });
         }
         await updateStatut( id ,{
             Statut

@@ -3,7 +3,7 @@ import { getProfilPrestataireById } from "../database/profil_prestataire.db.js";
 
 export async function createDisponibiliteControlleur(req,res) {
     try {
-        const { IdProfil,DateDebut,DateFin,Recurrence,Disponibilite } = req.body;
+        const { IdProfil,DateDebut,DateFin,Recurrence,Frequence,Disponibilite } = req.body;
 
         if(!IdProfil || !DateFin && !Recurrence || !Disponibilite){
             return res.status(400).json({ message: "Le strict minimun en information est requis! "})
@@ -14,6 +14,7 @@ export async function createDisponibiliteControlleur(req,res) {
             DateDebut,
             DateFin,
             Recurrence,
+            Frequence,
             Disponibilite 
         })
 
@@ -27,7 +28,7 @@ export async function createDisponibiliteControlleur(req,res) {
 export async function updateDisponibiliteControlleur(req,res) {
     try {
         const { id } = req.params;
-        const { IdProfil,DateDebut,DateFin,Recurrence,Disponibilite } = req.body;
+        const { IdProfil,DateDebut,DateFin,Recurrence,Frequence,Disponibilite } = req.body;
         const disponibilite = await getDisponibiliteById(id);
         if (!disponibilite) {
             return res.status(404).json({ message: "Disponibilite non trouvée" });
@@ -37,6 +38,7 @@ export async function updateDisponibiliteControlleur(req,res) {
             DateDebut,
             DateFin,
             Recurrence,
+            Frequence,
             Disponibilite
         })
         

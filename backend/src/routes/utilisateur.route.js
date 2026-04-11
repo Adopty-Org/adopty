@@ -10,11 +10,11 @@ router.put("/:id", utilisateur.updateAccountControlleur);
 router.delete("/:id", utilisateur.deleteAccountControlleur);
 
 // routes speciales
-router.put("/animal/:id", utilisateur.unsetAnimalToUtilisateurByIdsControlleur);
-router.put("/animal/:id", utilisateur.setAnimalToUtilisateurByIdsControlleur);
+router.put("/animal/unset/:id", utilisateur.unsetAnimalToUtilisateurByIdsControlleur);
+router.put("/animal/set/:id", utilisateur.setAnimalToUtilisateurByIdsControlleur);
 router.delete("/animal/:id", utilisateur.removeAnimalFromUtilisateurByIdsControlleur);
 router.post("/animal/:id", utilisateur.addAnimalToUtilisateurByIdsControlleur);
-router.get("/animaaux/:id", utilisateur.getUtilisateurAnimalsByIdControlleur);
+router.get("/animaux/:id", utilisateur.getUtilisateurAnimalsByIdControlleur);
 router.delete("/refuge/:id", utilisateur.removeRefugeToUtilisateurByIdsControlleur);
 router.post("/refuge/:id", utilisateur.addRefugeToUtilisateurByIdsControlleur);
 router.get("/refuges/:id", utilisateur.getUtilisateurRefugesByIdControlleur);

@@ -56,8 +56,8 @@ export const updateUtilisateur = async (id, user) => {
       Photo = ?, 
       ModifieeLe = NOW(),
       ModifieePar = ?,
-      stripeAccountStatus = ?,
-      stripeAccountId = ?
+      stripeAccountStatus = COALESCE(?, stripeAccountStatus),
+      stripeAccountId = COALESCE(?, stripeAccountId)
 
      WHERE Id = ?`,
     [

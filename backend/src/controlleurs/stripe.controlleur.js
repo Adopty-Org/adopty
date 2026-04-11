@@ -29,7 +29,7 @@ export const createCustomer = async (req, res) => {
   try {
     const { userId, email, name } = req.body;
 
-    const customer = await stripe.customers.create({
+    /*const customer = await stripe.customers.create({
       email,
       name,
       metadata: { userId: userId.toString() },
@@ -37,10 +37,29 @@ export const createCustomer = async (req, res) => {
 
     const { db } = await import('../config/db.js');
 
-    await db.query(
+    await db.query(*/
+    const [rows] = await db.query(
+      'SELECT Id FROM utilisateur WHERE Id = ?',
+      [userId]
+    );
+    if (!rows[0]) {
+      return res.status(404).json({ error: 'Utilisateur non trouvé' });
+    }
+
+    const customer = await stripe.customers.create({
+      email,
+      name,
+      metadata: { userId: userId.toString() },
+    });
+
+    const [result] = await db.query(
       'UPDATE utilisateur SET stripeCustomerId = ? WHERE Id = ?',
       [customer.id, userId]
     );
+    if (result.affectedRows !== 1) {
+      await stripe.customers.del(customer.id);
+      return res.status(500).json({ error: 'Impossible de lier le client Stripe' });
+    }
 
     res.json({
       success: true,

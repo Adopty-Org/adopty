@@ -25,7 +25,7 @@ import avisRoutes from "./routes/avis.route.js"
 import commandeRoutes from "./routes/commande.route.js"
 import disponibiliteRoutes from "./routes/disponibilite.route.js"
 import ligne_commandeRoutes from "./routes/ligne_commande.route.js"
-import ligne_panierRoutes from "./routes/Ligne_panier.route.js"
+import ligne_panierRoutes from "./routes/ligne_panier.route.js"
 import ligne_wishlistRoutes from "./routes/ligne_wishlist.route.js"
 import livraisonRoutes from "./routes/livraison.route.js"
 import paiement_commandeRoutes from "./routes/paiement_commande.route.js"
@@ -99,7 +99,7 @@ app.use("/api/aviss", avisRoutes)
 app.use("/api/commandes", commandeRoutes)
 app.use("/api/disponibilites", disponibiliteRoutes)
 app.use("/api/ligne_commandes", ligne_commandeRoutes)
-app.use("/api/Ligne_paniers", ligne_panierRoutes)
+app.use("/api/ligne_paniers", ligne_panierRoutes)
 app.use("/api/ligne_wishlists", ligne_wishlistRoutes)
 app.use("/api/livraisons", livraisonRoutes)
 app.use("/api/paiement_commandes", paiement_commandeRoutes)

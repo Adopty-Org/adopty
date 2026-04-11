@@ -5,6 +5,6 @@ export class Produit {
         this.Nom = data.Nom;
         this.Prix = data.Prix;
         this.Stock = data.Stock;
-        this.Dismpnibilite = data.Dismpnibilite;
+        this.Disponibilite = data.Disponibilite;
     }
 }

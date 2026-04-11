@@ -6,7 +6,12 @@ export async function createLigneCommandeControlleur(req,res) {// pas utilisable
     try {
         const { IdSousCommande, IdProduit,Quantite } = req.body;
 
-        if(!IdSousCommande || !IdProduit || !Quantite ){
+        if (
+            IdSousCommande == null ||
+            IdProduit == null ||
+            !Number.isInteger(Quantite) ||
+            Quantite <= 0
+        ) {
             return res.status(400).json({ message: "Le strict minimun en information est requis! "})
         }
 

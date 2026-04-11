@@ -7,7 +7,13 @@ export async function createAvisServiceControlleur(req,res) {
     try {
         const { IdReservation,IdUtilisateur,Note,DateAvis,TypeAvis } = req.body;
 
-        if(!IdReservation || !Note && !DateAvis || !TypeAvis){
+        if (
+            IdReservation == null ||
+            IdUtilisateur == null ||
+            Note == null ||
+            DateAvis == null ||
+            TypeAvis == null
+        ) {
             return res.status(400).json({ message: "Le strict minimun en information est requis! "})
         }
 

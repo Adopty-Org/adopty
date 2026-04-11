@@ -32,30 +32,45 @@ async function handlePaymentSuccess(paymentIntent) {
   const metadata = paymentIntent.metadata;
   
   if (metadata.type === 'product_order') {
-    // Mettre à jour le statut de la commande
-    await db.query(
-      'UPDATE commande SET Statut = (SELECT Id FROM statut WHERE Statut = "payé") WHERE Id = ?',
-      [metadata.commandeId]
-    );
-    
-    // Mettre à jour le paiement
-    await db.query(
-      'UPDATE paiement_commande SET Statut = (SELECT Id FROM statut WHERE Statut = "payé") WHERE stripe_payment_intent_id = ?',
-      [paymentIntent.id]
-    );
-    
+    const connection = await db.getConnection();
+    try {
+      await connection.beginTransaction();
+      await connection.query(
+        'UPDATE commande SET Statut = (SELECT Id FROM statut WHERE Statut = "payé") WHERE Id = ?',
+        [metadata.commandeId]
+      );
+      await connection.query(
+        'UPDATE paiement_commande SET Statut = (SELECT Id FROM statut WHERE Statut = "payé") WHERE stripe_payment_intent_id = ?',
+        [paymentIntent.id]
+      );
+      await connection.commit();
+    } catch (error) {
+      await connection.rollback();
+      console.error('Erreur webhook payment_intent.succeeded (product_order) :', error);
+      throw error;
+    } finally {
+      connection.release();
+    }
   } else if (metadata.type === 'service_booking') {
-    // Mettre à jour le statut de la réservation
-    await db.query(
-      'UPDATE reservation SET Statut = (SELECT Id FROM statut WHERE Statut = "confirmé") WHERE Id = ?',
-      [metadata.reservationId]
-    );
-    
-    // Mettre à jour le paiement
-    await db.query(
-      'UPDATE paiement_service SET Statut = (SELECT Id FROM statut WHERE Statut = "payé") WHERE stripe_payment_intent_id = ?',
-      [paymentIntent.id]
-    );
+    const connection = await db.getConnection();
+    try {
+      await connection.beginTransaction();
+      await connection.query(
+        'UPDATE reservation SET Statut = (SELECT Id FROM statut WHERE Statut = "confirmé") WHERE Id = ?',
+        [metadata.reservationId]
+      );
+      await connection.query(
+        'UPDATE paiement_service SET Statut = (SELECT Id FROM statut WHERE Statut = "payé") WHERE stripe_payment_intent_id = ?',
+        [paymentIntent.id]
+      );
+      await connection.commit();
+    } catch (error) {
+      await connection.rollback();
+      console.error('Erreur webhook payment_intent.succeeded (service_booking) :', error);
+      throw error;
+    } finally {
+      connection.release();
+    }
   }
   
   console.log(`✅ Paiement réussi: ${paymentIntent.id}`);

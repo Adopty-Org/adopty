@@ -6,7 +6,13 @@ export async function createProduitControlleur(req,res) {
     try {
         const { IdRefuge,Nom,Prix,Stock,Disponibilite } = req.body;
 
-        if(!IdRefuge || !Prix && !Stock || !Disponibilite){
+        if (
+            IdRefuge == null ||
+            !Nom ||
+            Prix == null ||
+            Stock == null ||
+            Disponibilite == null
+        ) {
             return res.status(400).json({ message: "Le strict minimun en information est requis! "})
         }
 

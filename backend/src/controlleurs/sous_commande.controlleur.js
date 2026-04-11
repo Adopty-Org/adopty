@@ -5,9 +5,9 @@ import { getStatutById } from "../database/statut.db.js";
 
 export async function createSousCommandeControlleur(req,res) {
     try {
-        const { IdCommande,IdRefuge,Statut,TotalPrix,stripe_transfer_id } = req.body;
+        const { IdCommande,IdRefuge,Statut,Total_prix,stripe_transfer_id,platformFee } = req.body;
 
-        if(!IdCommande || !Statut && !TotalPrix || !stripe_transfer_id){
+        if(!IdCommande || !Statut && !Total_prix || !stripe_transfer_id){
             return res.status(400).json({ message: "Le strict minimun en information est requis! "})
         }
 
@@ -15,8 +15,9 @@ export async function createSousCommandeControlleur(req,res) {
             IdCommande,
             IdRefuge,
             Statut,
-            TotalPrix,
-            stripe_transfer_id 
+            Total_prix,
+            stripe_transfer_id,
+            platformFee
         })
 
         res.status(201).json({ message: "SousCommande crée avec succès", id: requete });
@@ -29,7 +30,7 @@ export async function createSousCommandeControlleur(req,res) {
 export async function updateSousCommandeControlleur(req,res) {
     try {
         const { id } = req.params;
-        const { IdCommande,IdRefuge,Statut,TotalPrix,stripe_transfer_id } = req.body;
+        const { IdCommande,IdRefuge,Statut,Total_prix,stripe_transfer_id,platformFee } = req.body;
         const sous_commande = await getSousCommandeById(id);
         if (!sous_commande) {
             return res.status(404).json({ message: "SousCommande non trouvée" });
@@ -38,8 +39,9 @@ export async function updateSousCommandeControlleur(req,res) {
             IdCommande,
             IdRefuge,
             Statut,
-            TotalPrix,
-            stripe_transfer_id
+            Total_prix,
+            stripe_transfer_id,
+            platformFee
         })
         
         res.status(200).json({ message: "SousCommande modifiée avec succès" });

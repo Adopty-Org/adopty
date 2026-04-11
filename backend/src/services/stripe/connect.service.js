@@ -18,10 +18,19 @@ export const createConnectAccountForRefuge = async (refugeId, email, name) => {
     metadata: { refugeId: refugeId.toString() },
   });
 
-  await db.query(
+  const [result] = await db.query(
     `UPDATE refuge SET stripeAccountId = ?, stripeAccountStatus = 'pending' WHERE Id = ?`,
     [account.id, refugeId]
   );
+
+  if (!result?.affectedRows || result.affectedRows !== 1) {
+    try {
+      await stripe.accounts.del(account.id);
+    } catch (cleanupError) {
+      console.error('Erreur lors de la suppression du compte Stripe après échec DB:', cleanupError);
+    }
+    throw new Error(`Impossible de lier le compte Stripe au refuge ${refugeId}`);
+  }
 
   return account;
 };
@@ -43,10 +52,19 @@ export const createConnectAccountForPrestataire = async (userId, email, name) =>
     metadata: { userId: userId.toString() },
   });
 
-  await db.query(
+  const [result] = await db.query(
     `UPDATE utilisateur SET stripeAccountId = ?, stripeAccountStatus = 'pending' WHERE Id = ?`,
     [account.id, userId]
   );
+
+  if (!result?.affectedRows || result.affectedRows !== 1) {
+    try {
+      await stripe.accounts.del(account.id);
+    } catch (cleanupError) {
+      console.error('Erreur lors de la suppression du compte Stripe après échec DB:', cleanupError);
+    }
+    throw new Error(`Impossible de lier le compte Stripe à l'utilisateur ${userId}`);
+  }
 
   return account;
 };
