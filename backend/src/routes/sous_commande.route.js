@@ -1,18 +1,21 @@
 import { Router } from "express";
 import * as sous_commande from "../controlleurs/sous_commande.controlleur.js"
+import { protectRoute } from "../midleware/auth.midleware.js";
 
 const router = Router()
 
-router.post("/", sous_commande.createSousCommandeControlleur);
-router.get("/:id", sous_commande.getSousCommandeControlleur);
-router.get("/", sous_commande.getAllSousCommandesControlleur);
-router.put("/:id", sous_commande.updateSousCommandeControlleur);
-router.delete("/:id", sous_commande.deleteSousCommandeControlleur);
+// Routes protégées - création, modification, suppression (utilisateurs authentifiés)
+router.post("/", protectRoute, sous_commande.createSousCommandeControlleur);
+router.put("/:id", protectRoute, sous_commande.updateSousCommandeControlleur);
+router.delete("/:id", protectRoute, sous_commande.deleteSousCommandeControlleur);
 
-// routes speciales
+// Routes de lecture protégées
+router.get("/:id", protectRoute, sous_commande.getSousCommandeControlleur);
+router.get("/", protectRoute, sous_commande.getAllSousCommandesControlleur);
 
-router.get("/statut/:Statut", sous_commande.getStatutOfSousCommandeControlleur);
-router.get("/refuge/:Refuge", sous_commande.getRefugeOfSousCommandeControlleur);
-router.get("/commande/:Commande", sous_commande.getCommandeOfSousCommandeControlleur);
+// Routes spéciales de lecture protégées
+router.get("/statut/:Statut", protectRoute, sous_commande.getStatutOfSousCommandeControlleur);
+router.get("/refuge/:Refuge", protectRoute, sous_commande.getRefugeOfSousCommandeControlleur);
+router.get("/commande/:Commande", protectRoute, sous_commande.getCommandeOfSousCommandeControlleur);
 
 export default router;

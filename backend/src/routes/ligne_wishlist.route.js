@@ -1,17 +1,20 @@
 import { Router } from "express";
 import * as ligne_wishlist from "../controlleurs/ligne_wishlist.controlleur.js"
+import { protectRoute } from "../midleware/auth.midleware.js";
 
 const router = Router()
 
-router.post("/", ligne_wishlist.createLigneWishlistControlleur);
-router.get("/:id", ligne_wishlist.getLigneWishlistControlleur);
-router.get("/", ligne_wishlist.getAllLigneWishlistsControlleur);
-router.put("/:id", ligne_wishlist.updateLigneWishlistControlleur);
-router.delete("/:id", ligne_wishlist.deleteLigneWishlistControlleur);
+// Routes protégées - création, modification, suppression (utilisateurs authentifiés)
+router.post("/", protectRoute, ligne_wishlist.createLigneWishlistControlleur);
+router.put("/:id", protectRoute, ligne_wishlist.updateLigneWishlistControlleur);
+router.delete("/:id", protectRoute, ligne_wishlist.deleteLigneWishlistControlleur);
 
-//routes speciales
+// Routes de lecture protégées
+router.get("/:id", protectRoute, ligne_wishlist.getLigneWishlistControlleur);
+router.get("/", protectRoute, ligne_wishlist.getAllLigneWishlistsControlleur);
 
-router.get("/produit/:Produit", ligne_wishlist.getProduitOfLigneWishlistControlleur);
-router.get("/wishlist/:Wishlist", ligne_wishlist.getWishlistOfLigneWishlistControlleur);
+// Routes spéciales de lecture protégées
+router.get("/produit/:Produit", protectRoute, ligne_wishlist.getProduitOfLigneWishlistControlleur);
+router.get("/wishlist/:Wishlist", protectRoute, ligne_wishlist.getWishlistOfLigneWishlistControlleur);
 
 export default router;

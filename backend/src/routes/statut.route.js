@@ -1,12 +1,16 @@
 import { Router } from "express";
 import * as statut from "../controlleurs/statut.contolleur.js"
+import { protectRoute, adminOnly } from "../midleware/auth.midleware.js";
 
 const router = Router()
 
-router.post("/", statut.createStatutControlleur);
+// Routes admin only - création, modification, suppression de statuts
+router.post("/", protectRoute, adminOnly, statut.createStatutControlleur);
+router.put("/:id", protectRoute, adminOnly, statut.updateStatutControlleur);
+router.delete("/:id", protectRoute, adminOnly, statut.deleteStatutControlleur);
+
+// Routes publiques - lecture des statuts
 router.get("/:id", statut.getStatutControlleur);
 router.get("/", statut.getAllStatutsControlleur);
-router.put("/:id", statut.updateStatutControlleur);
-router.delete("/:id", statut.deleteStatutControlleur);
 
 export default router;

@@ -1,12 +1,16 @@
 import { Router } from "express";
 import * as espece from "../controlleurs/espece.controlleur.js"
+import { protectRoute, adminOnly } from "../midleware/auth.midleware.js";
 
 const router = Router()
 
-router.post("/", espece.createEspeceControlleur);
+// Routes admin only - création, modification, suppression d'espèces
+router.post("/", protectRoute, adminOnly, espece.createEspeceControlleur);
+router.put("/:id", protectRoute, adminOnly, espece.updateEspeceControlleur);
+router.delete("/:id", protectRoute, adminOnly, espece.deleteEspeceControlleur);
+
+// Routes publiques - lecture des espèces
 router.get("/:id", espece.getEspeceControlleur);
 router.get("/", espece.getAllEspecesControlleur);
-router.put("/:id", espece.updateEspeceControlleur);
-router.delete("/:id", espece.deleteEspeceControlleur);
 
 export default router;
