@@ -1,18 +1,30 @@
 import { createMessage, deleteMessage, getAllMessages, getMessageById, updateMessage } from "../database/message.db.js";
 import { getConversationById } from "../database/conversation.db.js";
-import { getUtilisateurById } from "../database/utilisateur.db.js";
+import { isUserInConversation } from "../database/conversation_participant.db.js";
 
-export async function createMessageControlleur(req,res) {// pas utilisable je crois
+export async function createMessageControlleur(req,res) {
     try {
-        const { IdConversation, SenderId,Contenu } = req.body;
+        const { IdConversation, Contenu } = req.body;
+        const SenderId = req.user.Id; // Utiliser l'utilisateur connecté, pas du body!
 
         if (
             IdConversation == null ||
-            SenderId == null ||
             typeof Contenu !== 'string' ||
             Contenu.trim().length === 0
         ) {
-            return res.status(400).json({ message: "Le strict minimun en information est requis! "})
+            return res.status(400).json({ message: "Conversation ID et contenu requis!" })
+        }
+
+        // Vérifier que l'utilisateur est membre de la conversation
+        const isMember = await isUserInConversation(IdConversation, SenderId);
+        if (!isMember) {
+            return res.status(403).json({ message: "Vous n'êtes pas membre de cette conversation" });
+        }
+
+        // Vérifier que la conversation existe
+        const conversation = await getConversationById(IdConversation);
+        if (!conversation) {
+            return res.status(404).json({ message: "Conversation non trouvée" });
         }
 
         const requete = await createMessage({
@@ -21,42 +33,47 @@ export async function createMessageControlleur(req,res) {// pas utilisable je cr
             Contenu
         })
 
-        res.status(201).json({ message: "Message crée avec succès", id: requete });
+        res.status(201).json({ message: "Message créé avec succès", id: requete });
         
     } catch (error) {
-        console.error("Erreur lors de la création de la message:", error);
+        console.error("Erreur lors de la création du message:", error);
         res.status(500).json({ message: "Erreur interne du serveur" });
     }
 }
 
-export async function updateMessageControlleur(req,res) {// just la au cas ou 
+export async function updateMessageControlleur(req,res) {
     try {
         const { id } = req.params;
-        const { IdConversation, SenderId, Contenu } = req.body;
-        const message = await getMessageById(id);
-        if (!message) {
-            return res.status(404).json({ message: "Message non trouvée" });
-        }
+        const { Contenu } = req.body;
+        const userId = req.user.Id; //  Middleware isOwnerOrAdmin garantit déjà la propriété
 
         if (
-            IdConversation == null ||
-            SenderId == null ||
             typeof Contenu !== 'string' ||
             Contenu.trim().length === 0
         ) {
-            return res.status(400).json({ message: "Le strict minimun en information est requis! "});
+            return res.status(400).json({ message: "Contenu valide requis!" });
         }
 
-        await updateMessage( id ,{
-            IdConversation, 
-            SenderId,
+        const message = await getMessageById(id);
+        if (!message) {
+            return res.status(404).json({ message: "Message non trouvé" });
+        }
+
+        // Vérifier que c'est l'auteur du message
+        if (message.SenderId !== userId) {
+            return res.status(403).json({ message: "Vous ne pouvez modifier que vos propres messages" });
+        }
+
+        await updateMessage(id, {
+            IdConversation: message.IdConversation,
+            SenderId: message.SenderId,
             Contenu
         })
         
         res.status(200).json({ message: "Message modifié avec succès" });
         
     } catch (error) {
-        console.error("Erreur lors de la modification de la message:", error);
+        console.error("Erreur lors de la modification du message:", error);
         res.status(500).json({ message: "Erreur interne du serveur" });
     }
 }
@@ -64,15 +81,23 @@ export async function updateMessageControlleur(req,res) {// just la au cas ou
 export async function deleteMessageControlleur(req,res) {
     try {
         const { id } = req.params;
+        const userId = req.user.Id; // Middleware garantit propriété
+
         const message = await getMessageById(id);
         if (!message) {
-            return res.status(404).json({ message: "Message non trouvée" });
+            return res.status(404).json({ message: "Message non trouvé" });
         }
+
+        // Vérifier propriété
+        if (message.SenderId !== userId) {
+            return res.status(403).json({ message: "Vous ne pouvez supprimer que vos propres messages" });
+        }
+
         await deleteMessage(id);
         res.status(200).json({ message: "Message supprimé avec succès" });
         
     } catch (error) {
-        console.error("Erreur lors de la suppression de la message:", error);
+        console.error("Erreur lors de la suppression du message:", error);
         res.status(500).json({ message: "Erreur interne du serveur" });
     }
 }
@@ -80,14 +105,23 @@ export async function deleteMessageControlleur(req,res) {
 export async function getMessageControlleur(req,res) {
     try {
         const { id } = req.params;
+        const userId = req.user.Id;
+
         const message = await getMessageById(id);
         if(!message){
-            return res.status(404).json({message:"Message non trouvée"})
+            return res.status(404).json({message:"Message non trouvé"})
         }
+
+        // Vérifier que l'utilisateur est membre de la conversation
+        const isMember = await isUserInConversation(message.IdConversation, userId);
+        if (!isMember) {
+            return res.status(403).json({ message: "Vous n'avez pas accès à ce message" });
+        }
+
         res.status(200).json(message);
         
     } catch (error) {
-        console.error("Erreur lors de l'obtention de la message:", error);
+        console.error("Erreur lors de l'obtention du message:", error);
         res.status(500).json({ message: "Erreur interne du serveur" });
     }
 }
