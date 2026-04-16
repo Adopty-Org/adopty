@@ -28,7 +28,7 @@ function ServicesPage() {
             </div>
             <h1 className="font-['Chewy'] text-5xl md:text-7xl text-white mb-4 leading-tight">
               Des services de<br />
-              <span className="text-secondary-container">confiance</span>
+              <span className="text-[#fe9e72]">confiance</span>
             </h1>
             <p className="text-white/80 max-w-xl text-lg font-body">
               Des prestataires certifiés et passionnés prennent soin de votre compagnon quand vous en avez besoin.
@@ -43,7 +43,7 @@ function ServicesPage() {
               { icon: 'event_available', label: 'Réservations réussies', value: '1,240+' },
             ].map(stat => (
               <div key={stat.label} className="flex items-center gap-3 bg-white/10 border-2 border-white/30 px-5 py-3 rounded-xl">
-                <span className="material-symbols-outlined text-secondary-container text-2xl">{stat.icon}</span>
+                <span className="material-symbols-outlined text-[#fe9e72] text-2xl">{stat.icon}</span>
                 <div>
                   <p className="font-['Plus_Jakarta_Sans'] font-extrabold text-white text-xl">{stat.value}</p>
                   <p className="text-white/70 text-xs font-bold uppercase tracking-wider">{stat.label}</p>
@@ -88,7 +88,7 @@ function ServicesPage() {
         )*/}
 
         {/* Devenir prestataire */}
-        <FadeIn delay={0.3} className="mt-20 bg-secondary-fixed border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-10 rounded-xl">
+        <FadeIn delay={0.3} className="mt-20 bg-[#ffdbcd] border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-10 rounded-xl">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
             <div>
               <span className="text-5xl mb-4 block">🐾</span>

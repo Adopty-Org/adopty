@@ -4,6 +4,10 @@ import { protectRoute } from "../midleware/auth.midleware.js";
 
 const router = Router()
 
+// Routes spéciales de lecture protégées
+router.get("/statut/:Statut", protectRoute, livraison.getStatutOfLivraisonControlleur);
+router.get("/sous_commande/:SousCommande", protectRoute, livraison.getSousCommandeOfLivraisonControlleur);
+
 // Routes protégées - création, modification, suppression (utilisateurs authentifiés)
 router.post("/", protectRoute, livraison.createLivraisonControlleur);
 router.put("/:id", protectRoute, livraison.updateLivraisonControlleur);
@@ -13,8 +17,6 @@ router.delete("/:id", protectRoute, livraison.deleteLivraisonControlleur);
 router.get("/:id", protectRoute, livraison.getLivraisonControlleur);
 router.get("/", protectRoute, livraison.getAllLivraisonsControlleur);
 
-// Routes spéciales de lecture protégées
-router.get("/statut/:Statut", protectRoute, livraison.getStatutOfLivraisonControlleur);
-router.get("/sous_commande/:SousCommande", protectRoute, livraison.getSousCommandeOfLivraisonControlleur);
+
 
 export default router;

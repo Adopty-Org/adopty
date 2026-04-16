@@ -5,7 +5,7 @@ import LoginPage from './pages/auth/LoginPage'
 import LobbyPage from './pages/LobbyPage'
 import ShopPage from './pages/shop/ShopPage'
 import ServicesPage from './pages/services/ServicesPage'
-import RefugesNAnimals from './pages/RefugesNAnimalsPage'
+import RefugesNAnimals from './pages/refugesAnimals/RefugesNAnimalsPage'
 import ConserningPage from './pages/conserning/ConserningPage'
 import LobbyLayout from './layouts/LobbyLayout'
 import LoadingLayout from './components/Loadingpage'
@@ -16,11 +16,18 @@ import Encyclopedie from './pages/encyclopedie/enciclopedie'
 import Profil from './pages/profil/profil'
 import UserProfile from './pages/profil/userProfile'
 
+import { useEffect } from "react";
+import { setAuthTokenGetter } from "./lib/axios.js";
+
 
 
 function App() {
 
-  const { isSignedIn,isLoaded } = useAuth()
+  const { isSignedIn,isLoaded,getToken } = useAuth()
+
+  useEffect(() => {
+    setAuthTokenGetter(getToken);
+  }, []);
 
   if(!isLoaded) return <LoadingLayout/>;
 

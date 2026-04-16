@@ -7,10 +7,10 @@ import { AnimatePresence, motion } from 'framer-motion'
 
 export const NAVIGATION = [
   {name: "Lobby", path: "/lobby", icon: <HomeIcon className="size-5"/> },
+  {name: "Refuges & Animals", path: "/refanimal", icon: <MapPinHouseIcon className="size-5"/> },
   {name: "Encyclopedie", path: "/encyclopedie", icon: <HomeIcon className="size-5"/> },
   {name: "Shop", path: "/shop", icon: <ShoppingBagIcon className="size-5"/> },
   {name: "Services", path: "/services", icon: <PawPrintIcon className="size-5"/> },
-  {name: "Refuges & Animals", path: "/refanimal", icon: <MapPinHouseIcon className="size-5"/> },
   {name: "Conserning us", path: "/conserning", icon: <InfoIcon className="size-5"/> },
   {name: "Signalement", path: "/signalement", icon: <PawPrintIcon className="size-5"/> },
 ]
@@ -38,7 +38,7 @@ function Navbar() {
         
             <div className="navbar bg-[#fbfbe2] w-full flex items-center justify-between w-full px-6 py-2">
                 <div className="flex-none lg:hidden">
-                    <label htmlFor="my-drawer-2" aria-label="open sidebar" className="btn btn-square btn-ghost">
+                    <label htmlFor="my-drawer-2" aria-label="open sidebar" className="btn btn-square btn-ghost bg-[#fbfbe2]">
                     <PanelLeftIcon className='size-7'/>
                     </label>
                 </div>

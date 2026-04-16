@@ -26,7 +26,7 @@ function ShopPage() {
             <span className="material-symbols-outlined text-white text-3xl" style={{ fontVariationSettings: "'FILL' 1" }}>eco</span>
             <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-white text-xl md:text-2xl tracking-tight uppercase">Éveil Éco-Responsable : -20% sur les jouets en corde !</h2>
           </div>
-          <button className="bg-primary-fixed text-on-primary-fixed border-[3px] border-black px-6 py-2 font-['Plus_Jakarta_Sans'] font-bold uppercase shadow-[4px_4px_0px_0px_rgba(35,80,30,1)] hover:translate-x-2px hover:translate-y-2px hover:shadow-none transition-all active:scale-95 shrink-0">
+          <button className="bg-[#bcf0ae] text-on-[#bcf0ae] border-[3px] border-black px-6 py-2 font-['Plus_Jakarta_Sans'] font-bold uppercase shadow-[4px_4px_0px_0px_rgba(35,80,30,1)] hover:translate-x-2px hover:translate-y-2px hover:shadow-none transition-all active:scale-95 shrink-0">
             J'en profite
           </button>
         </div>
@@ -70,7 +70,7 @@ function ShopPage() {
               </div>
             </FadeIn>
 
-            <FadeIn delay={0.1} className="bg-tertiary-fixed text-on-tertiary-fixed p-5 rounded-xl border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+            <FadeIn delay={0.1} className="bg-[#ffdad3] text-[#3e0500] p-5 rounded-xl border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
               <span className="material-symbols-outlined text-tertiary mb-2 block">lightbulb</span>
               <h4 className="font-['Plus_Jakarta_Sans'] font-bold text-base mb-2">Le saviez-vous ?</h4>
               <p className="text-sm opacity-90 leading-relaxed">Les jouets en corde naturelle aident à nettoyer les dents de votre compagnon tout en respectant l'environnement.</p>

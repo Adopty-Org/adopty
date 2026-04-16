@@ -4,6 +4,11 @@ import { protectRoute, prestataireOnly, isOwnerOrAdmin } from "../midleware/auth
 
 const router = Router()
 
+// Routes spéciales de lecture publiques
+router.get("/statut/:Statut", profil_prestataire.getStatutOfProfilPrestataireControlleur);
+router.get("/type_service/:TypeService", profil_prestataire.getTypeServiceOfProfilPrestataireControlleur);
+router.get("/utilisateur/:Utilisateur", profil_prestataire.getUtilisateurOfProfilPrestataireControlleur);
+
 // Routes protégées - réservées aux prestataires (création)
 router.post("/", protectRoute, prestataireOnly, profil_prestataire.createProfilPrestataireControlleur);
 
@@ -15,9 +20,6 @@ router.delete("/:id", protectRoute, prestataireOnly, isOwnerOrAdmin, profil_pres
 router.get("/:id", profil_prestataire.getProfilPrestataireControlleur);
 router.get("/", profil_prestataire.getAllProfilPrestatairesControlleur);
 
-// Routes spéciales de lecture publiques
-router.get("/statut/:Statut", profil_prestataire.getStatutOfProfilPrestataireControlleur);
-router.get("/type_service/:TypeService", profil_prestataire.getTypeServiceOfProfilPrestataireControlleur);
-router.get("/utilisateur/:Utilisateur", profil_prestataire.getUtilisateurOfProfilPrestataireControlleur);
+
 
 export default router;

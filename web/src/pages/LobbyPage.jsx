@@ -23,7 +23,7 @@ function LobbyPage() {
             <h1 className="font-['Chewy'] text-6xl md:text-8xl text-primary leading-none mb-8">
               Trouvez votre <span className="text-secondary">nouveau</span> meilleur ami
             </h1>
-            <p className="text-xl text-on-surface-variant mb-10 max-w-xl leading-relaxed">
+            <p className="text-xl text-on-[#e4e4cc] mb-10 max-w-xl leading-relaxed">
               Adopty connecte les cœurs solitaires avec des animaux en quête d'un foyer aimant. Une adoption
               responsable pour une vie de bonheur partagé.
             </p>
@@ -88,7 +88,7 @@ function LobbyPage() {
             ].map((item, i) => (
               <FadeIn key={item.titre} delay={i * 0.15} className="bg-white/10 border-2 border-white/20 rounded-xl p-7 hover:bg-white/15 transition-colors">
                 <div className="w-12 h-12 bg-secondary border-2 border-black rounded-lg flex items-center justify-center mb-5">
-                  <span className="material-symbols-outlined text-on-secondary-container text-2xl">{item.icon}</span>
+                  <span className="material-symbols-outlined text-[#773310] text-2xl">{item.icon}</span>
                 </div>
                 <h3 className="font-['Plus_Jakarta_Sans'] font-extrabold text-xl text-white mb-3">{item.titre}</h3>
                 <p className="text-white/70 text-sm leading-relaxed">{item.texte}</p>
@@ -108,7 +108,7 @@ function LobbyPage() {
               <div className="absolute -bottom-2 left-0 w-full h-6 bg-secondary/50 -rotate-1 z-0"></div>
             </FadeIn>
             <FadeIn delay={0.1}>
-              <p className="font-['Plus_Jakarta_Sans'] text-lg text-on-surface-variant max-w-2xl mx-auto mt-4 leading-relaxed">
+              <p className="font-['Plus_Jakarta_Sans'] text-lg text-on-[#e4e4cc] max-w-2xl mx-auto mt-4 leading-relaxed">
                   Découvrez les quatre étapes simples pour rencontrer votre nouveau compagnon pour la vie.
               </p>
             </FadeIn>
@@ -124,7 +124,7 @@ function LobbyPage() {
                   <span className="material-symbols-outlined text-primary text-3xl">pets</span>
                 </div>
                 <h3 className="font-['Plus_Jakarta_Sans'] font-extrabold text-3xl text-primary mb-4">Choix de l'animal</h3>
-                <p className="text-on-surface-variant text-base leading-relaxed max-w-md">
+                <p className="text-on-[#e4e4cc] text-base leading-relaxed max-w-md">
                   Explorez notre galerie de compagnons en attente d'une famille. Filtrez par espèce, âge ou caractère pour trouver celui qui correspond à votre mode de vie.
                 </p>
               </div>
@@ -137,11 +137,11 @@ function LobbyPage() {
             <FadeIn delay={0.3} className="md:col-span-5 bg-secondary/30 rounded-xl p-8 border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] relative overflow-hidden group">
               <div className="absolute top-4 right-8 font-['Chewy'] text-8xl text-black/5 select-none transition-transform group-hover:scale-110">2</div>
               <div className="relative z-10">
-                <div className="w-16 h-16 bg-secondary-fixed border-2 border-black rounded-xl flex items-center justify-center mb-6 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+                <div className="w-16 h-16 bg-[#ffdbcd] border-2 border-black rounded-xl flex items-center justify-center mb-6 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
                   <span className="material-symbols-outlined text-secondary text-3xl">chat</span>
                 </div>
                 <h3 className="font-['Plus_Jakarta_Sans'] font-extrabold text-3xl text-secondary mb-4">Premier contact</h3>
-                <p className="text-on-surface-variant text-base leading-relaxed">
+                <p className="text-on-[#e4e4cc] text-base leading-relaxed">
                   Remplissez notre formulaire de pré-adoption. Notre équipe étudiera votre profil pour s'assurer que les besoins de l'animal et vos attentes sont en parfaite harmonie.
                 </p>
                 <div className="mt-8 p-6 bg-white rounded-xl border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
@@ -166,7 +166,7 @@ function LobbyPage() {
                   <span className="material-symbols-outlined text-tertiary text-3xl">home_pin</span>
                 </div>
                 <h3 className="font-['Plus_Jakarta_Sans'] font-extrabold text-3xl text-tertiary mb-4">Visite au refuge</h3>
-                <p className="text-on-surface-variant text-base leading-relaxed">
+                <p className="text-on-[#e4e4cc] text-base leading-relaxed">
                   La rencontre magique ! Venez passer du temps avec l'animal. C'est le moment de laisser opérer le coup de foudre avant l'adoption.
                 </p>
                 <div className="mt-8 flex justify-center">
@@ -208,7 +208,7 @@ function LobbyPage() {
                   </div>
                   <div className="flex items-end justify-between mt-auto pt-4">
                     <div className="w-12 h-12 bg-[#bcf0ae] rounded-xl border-2 border-primary"></div>
-                    <div className="font-['Chewy'] text-xs text-on-surface-variant">Sceau Adopty</div>
+                    <div className="font-['Chewy'] text-xs text-on-[#e4e4cc]">Sceau Adopty</div>
                   </div>
                 </div>
               </div>
@@ -221,14 +221,14 @@ function LobbyPage() {
               <span className="material-symbols-outlined text-secondary text-3xl">info</span>
               <div>
                 <h5 className="font-['Plus_Jakarta_Sans'] font-bold text-lg text-primary mb-1">Quels documents préparer ?</h5>
-                <p className="text-on-surface-variant text-sm">Une pièce d'identité et un justificatif de domicile de moins de 3 mois sont nécessaires pour finaliser l'adoption.</p>
+                <p className="text-on-[#e4e4cc] text-sm">Une pièce d'identité et un justificatif de domicile de moins de 3 mois sont nécessaires pour finaliser l'adoption.</p>
               </div>
             </div>
             <div className="p-6 bg-white border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] rounded-xl flex gap-6 items-start">
               <span className="material-symbols-outlined text-secondary text-3xl">payments</span>
               <div>
                 <h5 className="font-['Plus_Jakarta_Sans'] font-bold text-lg text-primary mb-1">Frais de participation</h5>
-                <p className="text-on-surface-variant text-sm">Ces frais servent à couvrir les soins vétérinaires, l'identification, les vaccins et la stérilisation.</p>
+                <p className="text-on-[#e4e4cc] text-sm">Ces frais servent à couvrir les soins vétérinaires, l'identification, les vaccins et la stérilisation.</p>
               </div>
             </div>
           </FadeIn>
@@ -240,12 +240,12 @@ function LobbyPage() {
         <div className="max-w-7xl mx-auto">
           <FadeIn className="mb-12">
             <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-4xl text-primary mb-2">Recherche rapide</h2>
-            <p className="text-on-surface-variant text-lg">Quel type de compagnon recherchez-vous aujourd'hui ?</p>
+            <p className="text-on-[#e4e4cc] text-lg">Quel type de compagnon recherchez-vous aujourd'hui ?</p>
           </FadeIn>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             {/* Chiens — grande carte */}
-            <FadeIn delay={0.1} className="md:col-span-2 group relative overflow-hidden border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] bg-[#efefd7] p-8 cursor-pointer hover:bg-primary hover:text-white transition-colors duration-200">
+            <FadeIn delay={0.1} className="md:col-span-2 group relative overflow-hidden border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] bg-[#ffffff] p-8 cursor-pointer hover:bg-primary hover:text-white transition-colors duration-200">
               <div className="flex justify-between items-start mb-14">
                 <span className="material-symbols-outlined text-5xl">pets</span>
               </div>
@@ -264,17 +264,18 @@ function LobbyPage() {
             <Link to="/animaux" className="group relative overflow-hidden border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] bg-secondary p-8 cursor-pointer hover:-translate-x-1 hover:-translate-y-1 hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all duration-200 block">
               <FadeIn delay={0.2} className="h-full flex flex-col">
                 <div className="flex justify-between items-start mb-14">
-                  <span className="material-symbols-outlined text-5xl text-on-secondary-container">pets</span>
+                  <span className="material-symbols-outlined text-5xl text-[#773310]">pets</span>
                 </div>
-                <h3 className="font-['Chewy'] text-4xl mb-auto text-on-secondary-container">Chats</h3>
+                <h3 className="font-['Chewy'] text-4xl mb-auto text-[#773310]">Chats</h3>
+                <p className="text-sm opacity-80">Des chouchous avec un coeur aussi doux que leurs pelage tout renplie d'ammoure, qui n'attendent qu'un maitre pour devercer.</p>
                 <div className="mt-6 w-12 h-12 rounded-xl border-2 border-black flex items-center justify-center group-hover:bg-black group-hover:text-white transition-colors">
-                  <span className="material-symbols-outlined text-on-secondary-container group-hover:text-white">north_east</span>
+                  <span className="material-symbols-outlined text-[#773310] group-hover:text-white">north_east</span>
                 </div>
               </FadeIn>
             </Link>
 
             {/* NAC */}
-            <Link to="/animaux" className="group relative overflow-hidden border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] bg-tertiary-container text-on-tertiary-container p-8 cursor-pointer hover:bg-tertiary hover:text-white transition-colors duration-200 block">
+            <Link to="/animaux" className="group relative overflow-hidden border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] bg-[#8d3220] text-[#ffaf9e] p-8 cursor-pointer hover:bg-tertiary hover:text-white transition-colors duration-200 block">
               <FadeIn delay={0.3} className="h-full flex flex-col">
                 <div className="flex justify-between items-start mb-14">
                   <span className="material-symbols-outlined text-5xl">pet_supplies</span>
@@ -308,9 +309,9 @@ function LobbyPage() {
               className="w-full h-48 object-cover border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] rounded-xl"
               src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+ip1sAAAAASUVORK5CYII="
             />
-            <div className="bg-secondary-fixed border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] rounded-xl p-6 flex flex-col justify-center items-center">
+            <div className="bg-[#ffdbcd] border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] rounded-xl p-6 flex flex-col justify-center items-center">
               <p className="font-['Chewy'] text-5xl text-primary">15+</p>
-              <p className="text-xs font-bold uppercase tracking-widest text-on-surface-variant text-center">Ans d'engagement</p>
+              <p className="text-xs font-bold uppercase tracking-widest text-on-[#e4e4cc] text-center">Ans d'engagement</p>
             </div>
           </FadeIn>
 
@@ -320,7 +321,7 @@ function LobbyPage() {
               Le Refuge Adopty :<br />
               <span className="text-secondary">L'Éveil Naturel</span>
             </h2>
-            <p className="text-on-surface-variant text-lg leading-relaxed mb-6">
+            <p className="text-on-[#e4e4cc] text-lg leading-relaxed mb-6">
               Plus qu'un simple refuge, Adopty est un sanctuaire de 5 hectares où la nature et le bien-être animal se rencontrent. Nous croyons que chaque animal mérite une seconde chance dans un environnement qui respecte ses instincts sauvages tout en le préparant à la vie de famille.
             </p>
             <ul className="space-y-3 mb-10">
@@ -347,11 +348,11 @@ function LobbyPage() {
       </section>
 
       {/* ── 6. COUP DE FOUDRE ASSURÉ ─────────────────────────────── */}
-      <section className="bg-surface-variant py-24 px-6">
+      <section className="bg-[#e4e4cc] py-24 px-6">
         <div className="max-w-7xl mx-auto">
           <FadeIn className="text-center mb-16">
             <h2 className="font-['Chewy'] text-5xl md:text-6xl text-primary mb-4">Coup de foudre assuré</h2>
-            <p className="text-on-surface-variant text-xl">Ces petits cœurs n'attendent que vous pour commencer une nouvelle vie.</p>
+            <p className="text-on-[#e4e4cc] text-xl">Ces petits cœurs n'attendent que vous pour commencer une nouvelle vie.</p>
           </FadeIn>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -377,7 +378,7 @@ function LobbyPage() {
                       ))}
                     </div>
                   </div>
-                  <p className="text-on-surface-variant mb-6 line-clamp-2 text-sm leading-relaxed flex-1">{animal.description}</p>
+                  <p className="text-on-[#e4e4cc] mb-6 line-clamp-2 text-sm leading-relaxed flex-1">{animal.description}</p>
                   <Link
                     to={`/profil/${animal.id}`}
                     className="w-full py-4 border-4 border-black font-['Plus_Jakarta_Sans'] font-black text-primary hover:bg-primary hover:text-white transition-all flex items-center justify-center gap-2 text-sm uppercase tracking-wider"
@@ -406,7 +407,7 @@ function LobbyPage() {
         <div className="max-w-7xl mx-auto">
           <FadeIn className="text-center mb-16">
             <h2 className="font-['Chewy'] text-5xl md:text-6xl text-primary mb-4">Nos Services</h2>
-            <p className="text-on-surface-variant text-xl">Nous prenons soin de vos compagnons, même après l'adoption.</p>
+            <p className="text-on-[#e4e4cc] text-xl">Nous prenons soin de vos compagnons, même après l'adoption.</p>
           </FadeIn>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto mb-12">
@@ -416,7 +417,7 @@ function LobbyPage() {
                 <span className="material-symbols-outlined text-white text-3xl">directions_run</span>
               </div>
               <h3 className="font-['Chewy'] text-4xl text-primary mb-3">Promenade</h3>
-              <p className="text-on-surface-variant text-sm leading-relaxed mb-6">
+              <p className="text-on-[#e4e4cc] text-sm leading-relaxed mb-6">
                 Pour que votre chien garde les pattes en forme et le cœur en joie avec nos promeneurs passionnés.
               </p>
               <Link
@@ -428,12 +429,12 @@ function LobbyPage() {
             </FadeIn>
 
             {/* Pet-sitting */}
-            <FadeIn delay={0.2} className="bg-secondary-fixed border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-8 group hover:-translate-x-1 hover:-translate-y-1 hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all duration-200">
+            <FadeIn delay={0.2} className="bg-[#ffdbcd] border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-8 group hover:-translate-x-1 hover:-translate-y-1 hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all duration-200">
               <div className="w-14 h-14 bg-secondary border-2 border-black flex items-center justify-center mb-6 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] group-hover:rotate-6 transition-transform">
                 <span className="material-symbols-outlined text-white text-3xl">home</span>
               </div>
               <h3 className="font-['Chewy'] text-4xl text-primary mb-3">Pet-sitting</h3>
-              <p className="text-on-surface-variant text-sm leading-relaxed mb-6">
+              <p className="text-on-[#e4e4cc] text-sm leading-relaxed mb-6">
                 Une garde attentionnée à domicile ou au refuge quand vous êtes absent et devez vous absenter.
               </p>
               <Link

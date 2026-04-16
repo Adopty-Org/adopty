@@ -24,7 +24,7 @@ const Encyclopedie = () => {
 
   return (
     <PageTransition>
-      <div className="max-w-7xl mx-auto px-6 py-12">
+      <div className="max-w-7xl mx-auto px-6 py-12 ">
         {/* Header Section */}
         <FadeIn className="mb-16">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">

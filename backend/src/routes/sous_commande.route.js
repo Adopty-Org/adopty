@@ -4,6 +4,11 @@ import { protectRoute } from "../midleware/auth.midleware.js";
 
 const router = Router()
 
+// Routes spéciales de lecture protégées
+router.get("/statut/:Statut", protectRoute, sous_commande.getStatutOfSousCommandeControlleur);
+router.get("/refuge/:Refuge", protectRoute, sous_commande.getRefugeOfSousCommandeControlleur);
+router.get("/commande/:Commande", protectRoute, sous_commande.getCommandeOfSousCommandeControlleur);
+
 // Routes protégées - création, modification, suppression (utilisateurs authentifiés)
 router.post("/", protectRoute, sous_commande.createSousCommandeControlleur);
 router.put("/:id", protectRoute, sous_commande.updateSousCommandeControlleur);
@@ -13,9 +18,6 @@ router.delete("/:id", protectRoute, sous_commande.deleteSousCommandeControlleur)
 router.get("/:id", protectRoute, sous_commande.getSousCommandeControlleur);
 router.get("/", protectRoute, sous_commande.getAllSousCommandesControlleur);
 
-// Routes spéciales de lecture protégées
-router.get("/statut/:Statut", protectRoute, sous_commande.getStatutOfSousCommandeControlleur);
-router.get("/refuge/:Refuge", protectRoute, sous_commande.getRefugeOfSousCommandeControlleur);
-router.get("/commande/:Commande", protectRoute, sous_commande.getCommandeOfSousCommandeControlleur);
+
 
 export default router;

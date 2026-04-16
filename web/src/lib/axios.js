@@ -10,5 +10,33 @@ const axiosInstance = axios.create({
     withCredentials : true,
 })
 
+// 🔐 variable interne pour stocker getToken
+let getTokenFn = null;
+
+// 👉 fonction pour injecter getToken depuis React
+export const setAuthTokenGetter = (fn) => {
+  getTokenFn = fn;
+};
+
+// 🔐 interceptor automatique
+axiosInstance.interceptors.request.use(
+  async (config) => {
+    if (getTokenFn) {
+      try {
+        const token = await getTokenFn();
+
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+      } catch (err) {
+        console.error("Erreur récupération token Clerk:", err);
+      }
+    }
+
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
 
 export default axiosInstance;

@@ -18,8 +18,9 @@ router.delete("/supprime_animal/:id", protectRoute, refugeOnly, refuge.removeAni
 router.post("/ajout_animal/:id", protectRoute, refugeOnly, refuge.addAnimalToRefugeByIdsControlleur);
 
 // Routes de lecture publiques
+router.get("/animaaux/:id", refuge.getRefugeAnimalsByIdControlleur);
 router.get("/:id", refuge.getRefugeControlleur);
 router.get("/", refuge.getAllRefugesControlleur);
-router.get("/animaaux/:id", refuge.getRefugeAnimalsByIdControlleur);
+
 
 export default router;

@@ -4,6 +4,9 @@ import { protectRoute, prestataireOnly } from "../midleware/auth.midleware.js";
 
 const router = Router()
 
+// Routes spéciales de lecture protégées
+router.get("/profil_prestataire/:Profil", protectRoute, disponibilite.getProfilOfDisponibiliteControlleur);
+
 // Routes protégées - création, modification, suppression (prestataires seulement)
 router.post("/", protectRoute, prestataireOnly, disponibilite.createDisponibiliteControlleur);
 router.put("/:id", protectRoute, prestataireOnly, disponibilite.updateDisponibiliteControlleur);
@@ -13,7 +16,6 @@ router.delete("/:id", protectRoute, prestataireOnly, disponibilite.deleteDisponi
 router.get("/:id", protectRoute, disponibilite.getDisponibiliteControlleur);
 router.get("/", protectRoute, disponibilite.getAllDisponibilitesControlleur);
 
-// Routes spéciales de lecture protégées
-router.get("/profil_prestataire/:Profil", protectRoute, disponibilite.getProfilOfDisponibiliteControlleur);
+
 
 export default router;

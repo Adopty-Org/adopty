@@ -4,6 +4,12 @@ import { protectRoute, isOwnerOrAdmin } from "../midleware/auth.midleware.js";
 
 const router = Router()
 
+// Routes spéciales de lecture (publiques)
+router.get("/type_service/:TypeService", annonce.getTypeServiceOfAnnonceControlleur);
+router.get("/animal/:Animal", annonce.getAnimalOfAnnonceControlleur);
+router.get("/utilisateur/:Utilisateur", annonce.getUtilisateurOfAnnonceControlleur);
+router.get("/statut/:Statut", annonce.getStatutOfAnnonceControlleur);
+
 // Routes protégées - création, modification, suppression (utilisateurs authentifiés)
 router.post("/", protectRoute, annonce.createAnnonceControlleur);
 router.put("/:id", protectRoute, isOwnerOrAdmin, annonce.updateAnnonceControlleur);
@@ -13,10 +19,6 @@ router.delete("/:id", protectRoute, isOwnerOrAdmin, annonce.deleteAnnonceControl
 router.get("/:id", annonce.getAnnonceControlleur);
 router.get("/", annonce.getAllAnnoncesControlleur);
 
-// Routes spéciales de lecture (publiques)
-router.get("/type_service/:TypeService", annonce.getTypeServiceOfAnnonceControlleur);
-router.get("/animal/:Animal", annonce.getAnimalOfAnnonceControlleur);
-router.get("/utilisateur/:Utilisateur", annonce.getUtilisateurOfAnnonceControlleur);
-router.get("/statut/:Statut", annonce.getStatutOfAnnonceControlleur);
+
 
 export default router;

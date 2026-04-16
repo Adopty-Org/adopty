@@ -5,37 +5,37 @@ import { PageTransition, FadeIn } from '../../components/Animations'
 const valeurs = [
   {
     icon: 'favorite',
-    couleur: 'bg-secondary-fixed',
+    couleur: 'bg-[#ffdbcd]',
     titre: 'Le Respect du Vivant',
     texte: "Chez Adopty, chaque animal est un être sensible à part entière. Nous refusons toute forme de maltraitance et militons pour une cohabitation harmonieuse entre l'humain et l'animal. Respecter la vie animale, c'est respecter la vie tout court.",
   },
   {
     icon: 'nature',
-    couleur: 'bg-primary-fixed',
+    couleur: 'bg-[#bcf0ae]',
     titre: "L'Éveil par la Nature",
     texte: "Le nom «\u00a0L'Éveil Naturel\u00a0» n'est pas un hasard. Nous croyons que le contact avec la nature et les animaux éveille en l'humain ses meilleures qualités : empathie, patience, bienveillance. Notre refuge est conçu comme un espace de reconnexion profonde.",
   },
   {
     icon: 'handshake',
-    couleur: 'bg-tertiary-fixed',
+    couleur: 'bg-[#ffdad3]',
     titre: 'La Responsabilité Partagée',
     texte: "Adopter c'est s'engager. Nous accompagnons chaque adoptant tout au long de l'aventure, en avant comme en après. L'abandon ne doit jamais être une option — nous existons pour que ça ne le soit jamais.",
   },
   {
     icon: 'groups',
-    couleur: 'bg-surface-container-high',
+    couleur: 'bg-[#eaead1]',
     titre: 'La Force de la Communauté',
     texte: "Seuls, nous sauvons quelques vies. Ensemble, nous transformons tout un écosystème. Bénévoles, vétérinaires, familles d'accueil, prestataires et donateurs forment la grande famille Adopty. Chaque geste compte.",
   },
   {
     icon: 'lightbulb',
-    couleur: 'bg-primary-fixed',
+    couleur: 'bg-[#bcf0ae]',
     titre: "L'Innovation au Service du Bien",
     texte: "Adopty est la preuve que la technologie peut être mise au service des causes qui comptent. Notre plateforme digitale modernise un secteur longtemps laissé à l'abandon en Algérie et offre transparence, efficacité et traçabilité à toutes les parties prenantes.",
   },
   {
     icon: 'balance',
-    couleur: 'bg-secondary-fixed',
+    couleur: 'bg-[#ffdbcd]',
     titre: 'L\'Équité & L\'Inclusion',
     texte: "Chaque animal mérite une chance, quelle que soit son espèce, son âge ou son état de santé. Chaque humain mérite un compagnon, quelle que soit sa situation. Adopty œuvre pour que l'adoption soit accessible, juste et humaine.",
   },
@@ -67,18 +67,18 @@ function ConserningPage() {
     <PageTransition>
 
       {/* ── HERO ──────────────────────────────────────────────── */}
-      <section className="bg-primary py-20 px-6 border-b-4 border-black relative overflow-hidden">
+      <section className="bg-[#154212] py-20 px-6 border-b-4 border-black relative overflow-hidden">
         <div className="absolute inset-0 opacity-5 pointer-events-none">
           <div className="absolute top-4 right-16 text-[200px] font-['Chewy'] text-white rotate-12 leading-none">🌿</div>
         </div>
         <div className="max-w-4xl mx-auto text-center relative">
           <FadeIn>
             <div className="inline-flex items-center gap-2 bg-white/10 border-2 border-white/30 px-4 py-2 rounded-full mb-6">
-              <span className="material-symbols-outlined text-secondary-container text-lg">eco</span>
+              <span className="material-symbols-outlined text-[#fe9e72] text-lg">eco</span>
               <span className="text-white/80 text-sm font-bold uppercase tracking-widest">L'Éveil Naturel</span>
             </div>
             <h1 className="font-['Chewy'] text-6xl md:text-8xl text-white mb-6 leading-tight">
-              Qui sommes-<span className="text-secondary-container">nous</span> ?
+              Qui sommes-<span className="text-[#fe9e72]">nous</span> ?
             </h1>
             <p className="text-white/75 text-xl leading-relaxed max-w-2xl mx-auto">
               Adopty est née d'un constat simple et douloureux : en Algérie, des milliers d'animaux
@@ -95,7 +95,7 @@ function ConserningPage() {
               { value: '97%', label: 'Adoptions réussies' },
             ].map(stat => (
               <div key={stat.label} className="text-center">
-                <p className="font-['Chewy'] text-5xl text-secondary-container">{stat.value}</p>
+                <p className="font-['Chewy'] text-5xl text-[#fe9e72]">{stat.value}</p>
                 <p className="text-white/60 text-xs font-bold uppercase tracking-wider mt-1">{stat.label}</p>
               </div>
             ))}
@@ -190,7 +190,7 @@ function ConserningPage() {
       </section>
 
       {/* ── ENGAGEMENT / CTA ──────────────────────────────────── */}
-      <section className="bg-primary py-20 px-6 border-t-4 border-black">
+      <section className="bg-[#154212] py-20 px-6 border-t-4 border-black">
         <div className="max-w-4xl mx-auto text-center">
           <FadeIn>
             <span className="text-6xl mb-6 block">🐾</span>

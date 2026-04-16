@@ -4,6 +4,9 @@ import { protectRoute, isOwnerOrAdmin } from "../midleware/auth.midleware.js";
 
 const router = Router()
 
+// Routes spéciales de lecture protégées
+router.get("/utilisateur/:Utilisateur", protectRoute, wishlist.getUtilisateurOfWishlistControlleur);
+
 // Routes protégées - création, modification, suppression (utilisateurs authentifiés)
 router.post("/", protectRoute, wishlist.createWishlistControlleur);
 router.put("/:id", protectRoute, isOwnerOrAdmin, wishlist.updateWishlistControlleur);
@@ -13,7 +16,6 @@ router.delete("/:id", protectRoute, isOwnerOrAdmin, wishlist.deleteWishlistContr
 router.get("/:id", protectRoute, wishlist.getWishlistControlleur);
 router.get("/", protectRoute, wishlist.getAllWishlistsControlleur);
 
-// Routes spéciales de lecture protégées
-router.get("/utilisateur/:Utilisateur", protectRoute, wishlist.getUtilisateurOfWishlistControlleur);
+
 
 export default router;
