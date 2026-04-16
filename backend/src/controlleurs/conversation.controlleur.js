@@ -1,26 +1,23 @@
 import { createConversation, deleteConversation, getAllConversations, getConversationById, updateConversation } from "../database/conversation.db.js";
-import { getUtilisateurById } from "../database/utilisateur.db.js";
 
-export async function createConversationControlleur(req,res) {// pas utilisable je crois
+export async function createConversationControlleur(req,res) {
     try {
-        const { Type, CreatedAt,CreatedBy } = req.body;
+        const { Type } = req.body;
+        const CreatedBy = req.user.Id; // Utiliser l'utilisateur connecté
 
         if (
             Type == null ||
-            CreatedAt == null ||
-            !Number.isInteger(CreatedBy) ||
-            CreatedBy <= 0
+            Type.trim().length === 0
         ) {
-            return res.status(400).json({ message: "Le strict minimun en information est requis! "})
+            return res.status(400).json({ message: "Type de conversation requis!" })
         }
 
         const requete = await createConversation({
             Type, 
-            CreatedAt,
             CreatedBy
         })
 
-        res.status(201).json({ message: "Conversation crée avec succès", id: requete });
+        res.status(201).json({ message: "Conversation créée avec succès", id: requete });
         
     } catch (error) {
         console.error("Erreur lors de la création de la conversation:", error);
@@ -28,31 +25,35 @@ export async function createConversationControlleur(req,res) {// pas utilisable 
     }
 }
 
-export async function updateConversationControlleur(req,res) {// just la au cas ou 
+export async function updateConversationControlleur(req,res) {
     try {
         const { id } = req.params;
-        const { Type, CreatedAt, CreatedBy } = req.body;
+        const { Type } = req.body;
+        const userId = req.user.Id;
+
         const conversation = await getConversationById(id);
         if (!conversation) {
             return res.status(404).json({ message: "Conversation non trouvée" });
         }
 
-        if (
-            Type == null ||
-            CreatedAt == null ||
-            !Number.isInteger(CreatedBy) ||
-            CreatedBy <= 0
-        ) {
-            return res.status(400).json({ message: "Le strict minimun en information est requis! "});
+        // Vérifier que c'est le créateur
+        if (conversation.CreatedBy !== userId) {
+            return res.status(403).json({ message: "Vous ne pouvez modifier que vos conversations" });
         }
 
-        await updateConversation( id ,{
+        if (
+            Type == null ||
+            Type.trim().length === 0
+        ) {
+            return res.status(400).json({ message: "Type valide requis!" });
+        }
+
+        await updateConversation(id, {
             Type, 
-            CreatedAt,
-            CreatedBy
+            CreatedBy: conversation.CreatedBy
         })
         
-        res.status(200).json({ message: "Conversation modifié avec succès" });
+        res.status(200).json({ message: "Conversation modifiée avec succès" });
         
     } catch (error) {
         console.error("Erreur lors de la modification de la conversation:", error);
@@ -63,12 +64,20 @@ export async function updateConversationControlleur(req,res) {// just la au cas 
 export async function deleteConversationControlleur(req,res) {
     try {
         const { id } = req.params;
+        const userId = req.user.Id;
+
         const conversation = await getConversationById(id);
         if (!conversation) {
             return res.status(404).json({ message: "Conversation non trouvée" });
         }
+
+        //  Vérifier que c'est le créateur
+        if (conversation.CreatedBy !== userId) {
+            return res.status(403).json({ message: "Vous ne pouvez supprimer que vos conversations" });
+        }
+
         await deleteConversation(id);
-        res.status(200).json({ message: "Conversation supprimé avec succès" });
+        res.status(200).json({ message: "Conversation supprimée avec succès" });
         
     } catch (error) {
         console.error("Erreur lors de la suppression de la conversation:", error);

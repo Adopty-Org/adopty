@@ -9,7 +9,7 @@ import { serve } from "inngest/express"
 import cors from "cors"
 
 import { functions, ingest} from "./config/inngest.js";
-import { initSocket } from "./socket/socket.js";
+import { initSocket } from "./midleware/socket.midleware.js";  // Import de la fonction d'initialisation de Socket.io dans le middleware dédié
 
 import webRoutes from "./routes/web.route.js"
 import animalRoutes from "./routes/animal.route.js"
@@ -43,6 +43,9 @@ import type_serviceRoutes from "./routes/type_service.route.js"
 import wishlistRoutes from "./routes/wishlist.route.js"
 
 import signalementRoutes from "./routes/signalement.route.js"
+import conversationRoutes from "./routes/conversation.route.js"
+import conversation_participantRoutes from "./routes/conversation_participant.route.js"
+import messageRoutes from "./routes/message.route.js"
 
 // Au début, avec les autres imports
 import stripeRoutes from './routes/stripe.route.js';
@@ -119,6 +122,9 @@ app.use("/api/type_services", type_serviceRoutes)
 app.use("/api/wishlists", wishlistRoutes)
 
 app.use("/api/signalements", signalementRoutes)
+app.use("/api/conversations", conversationRoutes)
+app.use("/api/conversation_participants", conversation_participantRoutes)
+app.use("/api/messages", messageRoutes)
 
 app.get("/api/calling", (req,res)=>{
     res.status(200).json({message: "oui ca fonctionne"})
