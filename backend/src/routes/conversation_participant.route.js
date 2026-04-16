@@ -1,19 +1,20 @@
 import { Router } from "express";
 import * as conversation_participant from "../controlleurs/conversation_participant.controlleur.js"
+import { protectRoute, isOwnerOrAdmin } from "../midleware/auth.midleware.js";
 
 const router = Router()
 
-// routes speciales
+// Routes protégées - création, modification, suppression (utilisateurs authentifiés)
+router.post("/", protectRoute, conversation_participant.createConversationParticipantControlleur);
+router.put("/:id", protectRoute, isOwnerOrAdmin, conversation_participant.updateConversationParticipantControlleur);
+router.delete("/:id", protectRoute, isOwnerOrAdmin, conversation_participant.deleteConversationParticipantControlleur);
 
-router.get("/conversation/:Conversation", conversation_participant.getConversationOfConversationParticipantControlleur);
-router.get("/statut/:Statut", conversation_participant.getStatutOfConversationParticipantControlleur);
+// Routes de lecture protégées
+router.get("/:id", protectRoute, conversation_participant.getConversationParticipantControlleur);
+router.get("/", protectRoute, conversation_participant.getAllConversationParticipantsControlleur);
 
-
-router.post("/", conversation_participant.createConversationParticipantControlleur);
-router.get("/:id", conversation_participant.getConversationParticipantControlleur);
-router.get("/", conversation_participant.getAllConversationParticipantsControlleur);
-router.put("/:id", conversation_participant.updateConversationParticipantControlleur);
-router.delete("/:id", conversation_participant.deleteConversationParticipantControlleur);
-
+// Routes spéciales de lecture protégées
+router.get("/conversation/:Conversation", protectRoute, conversation_participant.getConversationOfConversationParticipantControlleur);
+router.get("/statut/:Statut", protectRoute, conversation_participant.getStatutOfConversationParticipantControlleur);
 
 export default router;

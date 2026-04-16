@@ -1,18 +1,19 @@
 import { Router } from "express";
 import * as conversation from "../controlleurs/conversation.controlleur.js"
+import { protectRoute, isOwnerOrAdmin } from "../midleware/auth.midleware.js";
 
 const router = Router()
 
-// routes speciales
+// Routes protégées - création, modification, suppression (utilisateurs authentifiés)
+router.post("/", protectRoute, conversation.createConversationControlleur);
+router.put("/:id", protectRoute, isOwnerOrAdmin, conversation.updateConversationControlleur);
+router.delete("/:id", protectRoute, isOwnerOrAdmin, conversation.deleteConversationControlleur);
 
-router.get("/utilisateur/:Utilisateur", conversation.getUtilisateurOfConversationControlleur);
+// Routes de lecture protégées
+router.get("/:id", protectRoute, isOwnerOrAdmin, conversation.getConversationControlleur);
+router.get("/", protectRoute, conversation.getAllConversationsControlleur);
 
-router.post("/", conversation.createConversationControlleur);
-router.get("/:id", conversation.getConversationControlleur);
-router.get("/", conversation.getAllConversationsControlleur);
-router.put("/:id", conversation.updateConversationControlleur);
-router.delete("/:id", conversation.deleteConversationControlleur);
-
-
+// Routes spéciales de lecture protégées
+router.get("/utilisateur/:Utilisateur", protectRoute, conversation.getUtilisateurOfConversationControlleur);
 
 export default router;
