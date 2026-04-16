@@ -31,6 +31,20 @@ export const getConversationParticipantById = async (id) => {
   return new ConversationParticipant(rows[0]);
 };
 
+export const isUserInConversation = async (conversationId, utilisateurId) => {
+  try {
+    const [rows] = await db.query(
+      "SELECT * FROM conversation_participant WHERE IdConversation = ? AND IdUtilisateur = ?",
+      [conversationId, utilisateurId]
+    );
+
+    return rows.length > 0;
+  } catch (error) {
+    console.error("Erreur lors de la vérification de l'appartenance à la conversation :", error);
+    return false;
+  }
+};
+
 export const updateConversationParticipant = async (id, conversation_participant) => {
   const [result] = await db.query(
     `UPDATE conversation_participant SET 

@@ -1,6 +1,5 @@
 import { createMessage, deleteMessage, getAllMessages, getMessageById, updateMessage } from "../database/message.db.js";
-import { getSenderIdById } from "../database/produit.db.js";
-import { getConversationById } from "../database/sous_commande.db.js";
+import { getConversationById } from "../database/conversation.db.js";
 import { getUtilisateurById } from "../database/utilisateur.db.js";
 
 export async function createMessageControlleur(req,res) {// pas utilisable je crois
@@ -10,8 +9,8 @@ export async function createMessageControlleur(req,res) {// pas utilisable je cr
         if (
             IdConversation == null ||
             SenderId == null ||
-            !Number.isInteger(Contenu) ||
-            Contenu <= 0
+            typeof Contenu !== 'string' ||
+            Contenu.trim().length === 0
         ) {
             return res.status(400).json({ message: "Le strict minimun en information est requis! "})
         }
@@ -42,8 +41,8 @@ export async function updateMessageControlleur(req,res) {// just la au cas ou
         if (
             IdConversation == null ||
             SenderId == null ||
-            !Number.isInteger(Contenu) ||
-            Contenu <= 0
+            typeof Contenu !== 'string' ||
+            Contenu.trim().length === 0
         ) {
             return res.status(400).json({ message: "Le strict minimun en information est requis! "});
         }

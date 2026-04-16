@@ -1,6 +1,4 @@
-import { createConversation, deleteConversation, getAllConversations, getConversationById, updateConversation } from "../database/ligne_commande.db.js";
-import { getProduitById } from "../database/produit.db.js";
-import { getSousCommandeById } from "../database/sous_commande.db.js";
+import { createConversation, deleteConversation, getAllConversations, getConversationById, updateConversation } from "../database/conversation.db.js";
 import { getUtilisateurById } from "../database/utilisateur.db.js";
 
 export async function createConversationControlleur(req,res) {// pas utilisable je crois
@@ -25,7 +23,7 @@ export async function createConversationControlleur(req,res) {// pas utilisable 
         res.status(201).json({ message: "Conversation crée avec succès", id: requete });
         
     } catch (error) {
-        console.error("Erreur lors de la création de la ligne_commande:", error);
+        console.error("Erreur lors de la création de la conversation:", error);
         res.status(500).json({ message: "Erreur interne du serveur" });
     }
 }
@@ -34,8 +32,8 @@ export async function updateConversationControlleur(req,res) {// just la au cas 
     try {
         const { id } = req.params;
         const { Type, CreatedAt, CreatedBy } = req.body;
-        const ligne_commande = await getConversationById(id);
-        if (!ligne_commande) {
+        const conversation = await getConversationById(id);
+        if (!conversation) {
             return res.status(404).json({ message: "Conversation non trouvée" });
         }
 
@@ -57,7 +55,7 @@ export async function updateConversationControlleur(req,res) {// just la au cas 
         res.status(200).json({ message: "Conversation modifié avec succès" });
         
     } catch (error) {
-        console.error("Erreur lors de la modification de la ligne_commande:", error);
+        console.error("Erreur lors de la modification de la conversation:", error);
         res.status(500).json({ message: "Erreur interne du serveur" });
     }
 }
@@ -65,15 +63,15 @@ export async function updateConversationControlleur(req,res) {// just la au cas 
 export async function deleteConversationControlleur(req,res) {
     try {
         const { id } = req.params;
-        const ligne_commande = await getConversationById(id);
-        if (!ligne_commande) {
+        const conversation = await getConversationById(id);
+        if (!conversation) {
             return res.status(404).json({ message: "Conversation non trouvée" });
         }
         await deleteConversation(id);
         res.status(200).json({ message: "Conversation supprimé avec succès" });
         
     } catch (error) {
-        console.error("Erreur lors de la suppression de la ligne_commande:", error);
+        console.error("Erreur lors de la suppression de la conversation:", error);
         res.status(500).json({ message: "Erreur interne du serveur" });
     }
 }
@@ -81,25 +79,25 @@ export async function deleteConversationControlleur(req,res) {
 export async function getConversationControlleur(req,res) {
     try {
         const { id } = req.params;
-        const ligne_commande = await getConversationById(id);
-        if(!ligne_commande){
+        const conversation = await getConversationById(id);
+        if(!conversation){
             return res.status(404).json({message:"Conversation non trouvée"})
         }
-        res.status(200).json(ligne_commande);
+        res.status(200).json(conversation);
         
     } catch (error) {
-        console.error("Erreur lors de l'obtention de la ligne_commande:", error);
+        console.error("Erreur lors de l'obtention de la conversation:", error);
         res.status(500).json({ message: "Erreur interne du serveur" });
     }
 }
 
 export async function getAllConversationsControlleur(req,res) {
     try {
-        const ligne_commandes = await getAllConversations();
-        res.status(200).json(ligne_commandes);
+        const conversations = await getAllConversations();
+        res.status(200).json(conversations);
         
     } catch (error) {
-        console.error("Erreur lors de l'obtention des ligne_commandes:", error);
+        console.error("Erreur lors de l'obtention des conversations:", error);
         res.status(500).json({ message: "Erreur interne du serveur" });
     }
 }

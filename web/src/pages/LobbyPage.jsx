@@ -17,7 +17,7 @@ function LobbyPage() {
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
           {/* Left */}
           <FadeIn className="z-10">
-            <span className="inline-block px-4 py-1.5 bg-secondary text-secondary-container font-bold text-xs uppercase tracking-widest mb-6 border-2 border-black shadow-3px_3px_0px_0px_rgba(0,0,0,1)">
+            <span className="inline-block px-4 py-1.5 bg-secondary text-secondary-container font-bold text-xs uppercase tracking-widest mb-6 border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
               Plus de 500 compagnons attendent
             </span>
             <h1 className="font-['Chewy'] text-6xl md:text-8xl text-primary leading-none mb-8">
@@ -30,14 +30,14 @@ function LobbyPage() {
             <div className="flex flex-wrap gap-5">
               <Link
                 to="/animaux"
-                className="bg-primary text-white px-8 py-4 font-['Plus_Jakarta_Sans'] font-extrabold text-sm md:text-lg border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-3px hover:translate-y-3px hover:shadow-none transition-all flex items-center gap-3 uppercase"
+                className="bg-primary text-white px-8 py-4 font-['Plus_Jakarta_Sans'] font-extrabold text-sm md:text-lg border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none transition-all flex items-center gap-3 uppercase"
               >
                 Découvrir les animaux
                 <span className="material-symbols-outlined">pets</span>
               </Link>
               <button
                 onClick={scrollToAdoption}
-                className="bg-[#efefd7]-highest text-primary px-8 py-4 font-['Plus_Jakarta_Sans'] font-extrabold text-sm md:text-lg border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-3px hover:translate-y-3px hover:shadow-none transition-all uppercase"
+                className="bg-[#efefd7] text-primary px-8 py-4 font-['Plus_Jakarta_Sans'] font-extrabold text-sm md:text-lg border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none transition-all uppercase"
               >
                 Comment adopter ?
               </button>
@@ -50,7 +50,7 @@ function LobbyPage() {
             <div className="relative z-10 border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden rounded-xl rotate-2 hover:rotate-0 transition-transform duration-500">
               <img
                 alt="Compagnon Adopty"
-                className="w-full h-480px object-cover"
+                className="w-full h-[480px] object-cover"
                 src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+ip1sAAAAASUVORK5CYII="
               />
             </div>
@@ -192,7 +192,7 @@ function LobbyPage() {
                   <p className="text-white/80 text-base leading-relaxed">
                     Félicitations ! Après signature du contrat, votre nouveau compagnon peut rejoindre son foyer. Nous restons à vos côtés pour le suivi.
                   </p>
-                  <Link to="/animaux" className="inline-block mt-8 bg-secondary text-white px-8 py-4 font-['Plus_Jakarta_Sans'] font-extrabold text-sm uppercase tracking-widest border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-2px hover:translate-y-2px hover:shadow-none transition-all">
+                  <Link to="/animaux" className="inline-block mt-8 bg-secondary text-white px-8 py-4 font-['Plus_Jakarta_Sans'] font-extrabold text-sm uppercase tracking-widest border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all">
                     Démarrer mon projet
                   </Link>
                 </div>
@@ -236,7 +236,7 @@ function LobbyPage() {
       </section>
 
       {/* ── 4. RECHERCHE RAPIDE ─────────────────────────────────── */}
-      <section className="bg-[#efefd7]-low py-20 px-6">
+      <section className="bg-[#efefd7] py-20 px-6">
         <div className="max-w-7xl mx-auto">
           <FadeIn className="mb-12">
             <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-4xl text-primary mb-2">Recherche rapide</h2>
@@ -245,7 +245,7 @@ function LobbyPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             {/* Chiens — grande carte */}
-            <FadeIn delay={0.1} className="md:col-span-2 group relative overflow-hidden border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] bg-[#efefd7]-lowest p-8 cursor-pointer hover:bg-primary hover:text-white transition-colors duration-200">
+            <FadeIn delay={0.1} className="md:col-span-2 group relative overflow-hidden border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] bg-[#efefd7] p-8 cursor-pointer hover:bg-primary hover:text-white transition-colors duration-200">
               <div className="flex justify-between items-start mb-14">
                 <span className="material-symbols-outlined text-5xl">pets</span>
               </div>
@@ -337,7 +337,7 @@ function LobbyPage() {
             </ul>
             <Link
               to="/apropos"
-              className="inline-flex items-center gap-3 bg-primary text-white px-8 py-4 font-['Plus_Jakarta_Sans'] font-extrabold text-lg border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-3px hover:translate-y-3px hover:shadow-none transition-all uppercase tracking-wider"
+              className="inline-flex items-center gap-3 bg-primary text-white px-8 py-4 font-['Plus_Jakarta_Sans'] font-extrabold text-lg border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none transition-all uppercase tracking-wider"
             >
               Découvrir nos valeurs
               <span className="material-symbols-outlined">arrow_forward</span>
@@ -421,7 +421,7 @@ function LobbyPage() {
               </p>
               <Link
                 to="/services"
-                className="inline-flex items-center gap-2 bg-primary text-white px-5 py-3 font-['Plus_Jakarta_Sans'] font-bold text-sm border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-2px hover:translate-y-2px hover:shadow-none transition-all"
+                className="inline-flex items-center gap-2 bg-primary text-white px-5 py-3 font-['Plus_Jakarta_Sans'] font-bold text-sm border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all"
               >
                 RÉSERVER <span className="material-symbols-outlined text-base">calendar_today</span>
               </Link>
@@ -438,7 +438,7 @@ function LobbyPage() {
               </p>
               <Link
                 to="/services"
-                className="inline-flex items-center gap-2 bg-secondary text-white px-5 py-3 font-['Plus_Jakarta_Sans'] font-bold text-sm border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-2px hover:translate-y-2px hover:shadow-none transition-all"
+                className="inline-flex items-center gap-2 bg-secondary text-white px-5 py-3 font-['Plus_Jakarta_Sans'] font-bold text-sm border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all"
               >
                 EN SAVOIR PLUS <span className="material-symbols-outlined text-base">favorite</span>
               </Link>
@@ -448,7 +448,7 @@ function LobbyPage() {
           <FadeIn delay={0.3} className="text-center">
             <Link
               to="/services"
-              className="inline-flex items-center gap-3 bg-primary text-white px-10 py-5 font-['Plus_Jakarta_Sans'] font-extrabold text-xl border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:translate-x-4px hover:translate-y-4px hover:shadow-none transition-all"
+              className="inline-flex items-center gap-3 bg-primary text-white px-10 py-5 font-['Plus_Jakarta_Sans'] font-extrabold text-xl border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-none transition-all"
             >
               DÉCOUVRIR TOUS NOS SERVICES
               <span className="material-symbols-outlined text-2xl">arrow_forward</span>
@@ -471,7 +471,7 @@ function LobbyPage() {
           </div>
           <Link
             to="/signalement"
-            className="shrink-0 bg-white text-[#ba1a1a] px-7 py-3 font-['Plus_Jakarta_Sans'] font-extrabold text-sm border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-2px hover:translate-y-2px hover:shadow-none transition-all uppercase tracking-wider"
+            className="shrink-0 bg-white text-[#ba1a1a] px-7 py-3 font-['Plus_Jakarta_Sans'] font-extrabold text-sm border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all uppercase tracking-wider"
           >
             Signaler maintenant →
           </Link>

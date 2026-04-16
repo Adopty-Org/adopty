@@ -136,7 +136,8 @@ if(ENV.NODE_ENV == "production"){
 const server = http.createServer(app);
 
 // init websocket
-initSocket(server);
+//initSocket(server);
+initSocket(server, { origin: ENV.CLIENT_URL });
 
 server.listen(ENV.PORT, () => {
     console.log(ENV.NODE_ENV + ENV.PORT + " Le serveur roule ma boule !");
