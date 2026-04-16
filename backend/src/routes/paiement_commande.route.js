@@ -1,19 +1,20 @@
 import { Router } from "express";
 import * as paiement_commande from "../controlleurs/paiement_commande.controlleur.js"
+import { protectRoute } from "../midleware/auth.midleware.js";
 
 const router = Router()
 
-router.post("/", paiement_commande.createPaiementCommandeControlleur);
-router.get("/:id", paiement_commande.getPaiementCommandeControlleur);
-router.get("/", paiement_commande.getAllPaiementCommandesControlleur);
-router.put("/:id", paiement_commande.updatePaiementCommandeControlleur);
-router.delete("/:id", paiement_commande.deletePaiementCommandeControlleur);
+// Routes protégées - création, modification, suppression (utilisateurs authentifiés)
+router.post("/", protectRoute, paiement_commande.createPaiementCommandeControlleur);
+router.put("/:id", protectRoute, paiement_commande.updatePaiementCommandeControlleur);
+router.delete("/:id", protectRoute, paiement_commande.deletePaiementCommandeControlleur);
 
-// routes speciales
+// Routes de lecture protégées
+router.get("/:id", protectRoute, paiement_commande.getPaiementCommandeControlleur);
+router.get("/", protectRoute, paiement_commande.getAllPaiementCommandesControlleur);
 
-router.get("/statut/:Statut", paiement_commande.getStatutOfPaiementCommandeControlleur);
-router.get("/commande/:Commande", paiement_commande.getCommandeOfPaiementCommandeControlleur);
-
-// todo: meme chose que son controlleur (vas voir)
+// Routes spéciales de lecture protégées
+router.get("/statut/:Statut", protectRoute, paiement_commande.getStatutOfPaiementCommandeControlleur);
+router.get("/commande/:Commande", protectRoute, paiement_commande.getCommandeOfPaiementCommandeControlleur);
 
 export default router;

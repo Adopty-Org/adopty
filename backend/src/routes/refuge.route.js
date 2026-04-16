@@ -1,20 +1,25 @@
 import { Router } from "express";
 import * as refuge from "../controlleurs/refuge.controlleur.js"
+import { protectRoute, refugeOnly, isOwnerOrAdmin } from "../midleware/auth.midleware.js";
 
 const router = Router()
 
-router.post("/", refuge.createRefugeControlleur);
+// Routes protégées - réservées aux refuges (création)
+router.post("/", protectRoute, refugeOnly, refuge.createRefugeControlleur);
+
+// Routes protégées - modification/suppression (propriétaire ou admin)
+router.put("/:id", protectRoute, refugeOnly, isOwnerOrAdmin, refuge.updateRefugeControlleur);
+router.delete("/:id", protectRoute, refugeOnly, isOwnerOrAdmin, refuge.deleteRefugeControlleur);
+
+// Routes protégées - gestion des animaux (refuge only)
+router.put("/unset_animal/:id", protectRoute, refugeOnly, refuge.unsetAnimalToRefugeByIdsControlleur);
+router.put("/set_animal/:id", protectRoute, refugeOnly, refuge.setAnimalToRefugeByIdsControlleur);
+router.delete("/supprime_animal/:id", protectRoute, refugeOnly, refuge.removeAnimalFromRefugeByIdsControlleur);
+router.post("/ajout_animal/:id", protectRoute, refugeOnly, refuge.addAnimalToRefugeByIdsControlleur);
+
+// Routes de lecture publiques
 router.get("/:id", refuge.getRefugeControlleur);
 router.get("/", refuge.getAllRefugesControlleur);
-router.put("/:id", refuge.updateRefugeControlleur);
-router.delete("/:id", refuge.deleteRefugeControlleur);
-
-// routes speciales
-
-router.put("/unset_animal/:id", refuge.unsetAnimalToRefugeByIdsControlleur);
-router.put("/set_animal/:id", refuge.setAnimalToRefugeByIdsControlleur);
-router.delete("/supprime_animal/:id", refuge.removeAnimalFromRefugeByIdsControlleur);
-router.post("/ajout_animal/:id", refuge.addAnimalToRefugeByIdsControlleur);
 router.get("/animaaux/:id", refuge.getRefugeAnimalsByIdControlleur);
 
 export default router;

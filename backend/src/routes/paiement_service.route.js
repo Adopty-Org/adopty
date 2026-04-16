@@ -1,17 +1,20 @@
 import { Router } from "express";
 import * as paiement_service from "../controlleurs/paiement_service.controlleur.js"
+import { protectRoute } from "../midleware/auth.midleware.js";
 
 const router = Router()
 
-router.post("/", paiement_service.createPaiementServiceControlleur);
-router.get("/:id", paiement_service.getPaiementServiceControlleur);
-router.get("/", paiement_service.getAllPaiementServicesControlleur);
-router.put("/:id", paiement_service.updatePaiementServiceControlleur);
-router.delete("/:id", paiement_service.deletePaiementServiceControlleur);
+// Routes protégées - création, modification, suppression (utilisateurs authentifiés)
+router.post("/", protectRoute, paiement_service.createPaiementServiceControlleur);
+router.put("/:id", protectRoute, paiement_service.updatePaiementServiceControlleur);
+router.delete("/:id", protectRoute, paiement_service.deletePaiementServiceControlleur);
 
-// routes speciales
+// Routes de lecture protégées
+router.get("/:id", protectRoute, paiement_service.getPaiementServiceControlleur);
+router.get("/", protectRoute, paiement_service.getAllPaiementServicesControlleur);
 
-router.get("/reservation/:Reservation", paiement_service.getReservationOfPaiementServiceControlleur);
-router.get("/statut/:Statut", paiement_service.getStatutOfPaiementServiceControlleur);
+// Routes spéciales de lecture protégées
+router.get("/reservation/:Reservation", protectRoute, paiement_service.getReservationOfPaiementServiceControlleur);
+router.get("/statut/:Statut", protectRoute, paiement_service.getStatutOfPaiementServiceControlleur);
 
 export default router;

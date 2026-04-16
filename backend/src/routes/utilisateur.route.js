@@ -1,27 +1,37 @@
 import { Router } from "express";
 import * as utilisateur from "../controlleurs/utilisateur.controlleur.js"
+import { protectRoute, adminOnly, isOwnerOrAdmin } from "../midleware/auth.midleware.js";
 
 const router = Router()
 
-router.post("/", utilisateur.createAccountControlleur);
-router.get("/:id", utilisateur.getAccountControlleur);
-router.get("/", utilisateur.getAllAccountsControlleur);
-router.put("/:id", utilisateur.updateAccountControlleur);
-router.delete("/:id", utilisateur.deleteAccountControlleur);
+// Routes protégées - modification du propre compte (propriétaire ou admin)
+router.post("/", protectRoute, utilisateur.createAccountControlleur);
+router.put("/:id", protectRoute, isOwnerOrAdmin, utilisateur.updateAccountControlleur);
+router.delete("/:id", protectRoute, isOwnerOrAdmin, utilisateur.deleteAccountControlleur);
 
-// routes speciales
-router.put("/animal/unset/:id", utilisateur.unsetAnimalToUtilisateurByIdsControlleur);
-router.put("/animal/set/:id", utilisateur.setAnimalToUtilisateurByIdsControlleur);
-router.delete("/animal/:id", utilisateur.removeAnimalFromUtilisateurByIdsControlleur);
-router.post("/animal/:id", utilisateur.addAnimalToUtilisateurByIdsControlleur);
-router.get("/animaux/:id", utilisateur.getUtilisateurAnimalsByIdControlleur);
-router.delete("/refuge/:id", utilisateur.removeRefugeToUtilisateurByIdsControlleur);
-router.post("/refuge/:id", utilisateur.addRefugeToUtilisateurByIdsControlleur);
-router.get("/refuges/:id", utilisateur.getUtilisateurRefugesByIdControlleur);
-router.delete("/role/:id", utilisateur.removeRoleToUtilisateurByIdsControlleur);
-router.post("/role/:id", utilisateur.addRoleToUtilisateurByIdsControlleur);
-router.get("/roles/:id", utilisateur.getUtilisateurRolesByIdControlleur);
-router.get("/clerk/:id", utilisateur.getUtilisateurByClerkIdControlleur);
+// Routes de lecture protégées (propriétaire ou admin)
+router.get("/:id", protectRoute, isOwnerOrAdmin, utilisateur.getAccountControlleur);
+router.get("/animaux/:id", protectRoute, isOwnerOrAdmin, utilisateur.getUtilisateurAnimalsByIdControlleur);
+router.get("/refuges/:id", protectRoute, isOwnerOrAdmin, utilisateur.getUtilisateurRefugesByIdControlleur);
+router.get("/roles/:id", protectRoute, isOwnerOrAdmin, utilisateur.getUtilisateurRolesByIdControlleur);
+router.get("/clerk/:id", protectRoute, utilisateur.getUtilisateurByClerkIdControlleur);
 
+// Routes protégées - gestion des animaux de l'utilisateur
+router.put("/animal/unset/:id", protectRoute, utilisateur.unsetAnimalToUtilisateurByIdsControlleur);
+router.put("/animal/set/:id", protectRoute, utilisateur.setAnimalToUtilisateurByIdsControlleur);
+router.delete("/animal/:id", protectRoute, utilisateur.removeAnimalFromUtilisateurByIdsControlleur);
+router.post("/animal/:id", protectRoute, utilisateur.addAnimalToUtilisateurByIdsControlleur);
+
+// Routes protégées - gestion des refuges de l'utilisateur
+router.delete("/refuge/:id", protectRoute, utilisateur.removeRefugeToUtilisateurByIdsControlleur);
+router.post("/refuge/:id", protectRoute, utilisateur.addRefugeToUtilisateurByIdsControlleur);
+
+// Routes admin only - gestion des rôles (admin uniquement)
+router.delete("/role/:id", protectRoute, adminOnly, utilisateur.removeRoleToUtilisateurByIdsControlleur);
+router.post("/role/:id", protectRoute, adminOnly, utilisateur.addRoleToUtilisateurByIdsControlleur);
+
+// Route admin only - liste tous les utilisateurs
+router.get("/", protectRoute, adminOnly, utilisateur.getAllAccountsControlleur);
 
 export default router;
+
