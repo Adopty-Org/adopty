@@ -1,5 +1,6 @@
 import express from "express"
 import path from "path"
+import http from "http";
 import { clerkMiddleware } from '@clerk/express'
 
 import { ENV } from "./config/env.js"
@@ -8,6 +9,7 @@ import { serve } from "inngest/express"
 import cors from "cors"
 
 import { functions, ingest} from "./config/inngest.js";
+import { initSocket } from "./socket/socket.js";
 
 import webRoutes from "./routes/web.route.js"
 import animalRoutes from "./routes/animal.route.js"
@@ -39,6 +41,8 @@ import specificationRoutes from "./routes/specification.route.js"
 import statutRoutes from "./routes/statut.route.js"
 import type_serviceRoutes from "./routes/type_service.route.js"
 import wishlistRoutes from "./routes/wishlist.route.js"
+
+import signalementRoutes from "./routes/signalement.route.js"
 
 // Au début, avec les autres imports
 import stripeRoutes from './routes/stripe.route.js';
@@ -114,9 +118,13 @@ app.use("/api/statuts", statutRoutes)
 app.use("/api/type_services", type_serviceRoutes)
 app.use("/api/wishlists", wishlistRoutes)
 
+app.use("/api/signalements", signalementRoutes)
+
 app.get("/api/calling", (req,res)=>{
     res.status(200).json({message: "oui ca fonctionne"})
 })
+
+
 
 if(ENV.NODE_ENV == "production"){
     app.use(express.static(path.join(__dirname, "../web/dist")))
@@ -125,9 +133,18 @@ if(ENV.NODE_ENV == "production"){
     })
 }
 
+const server = http.createServer(app);
 
+// init websocket
+initSocket(server);
 
+server.listen(ENV.PORT, () => {
+    console.log(ENV.NODE_ENV + ENV.PORT + " Le serveur roule ma boule !");
+    connectDB();
+});
+
+/*
 app.listen(ENV.PORT, () => {
     console.log(ENV.NODE_ENV+ENV.PORT+"Le serveur roule ma boule !")
     connectDB();
-});
+});*/

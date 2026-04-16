@@ -1,0 +1,86 @@
+import { useEffect, useState } from "react";
+import { io } from "socket.io-client";
+
+const socket = io("http://localhost:3000");
+
+export default function TestChat() {
+    const [conversation, setRoom] = useState("conversation1");
+    const [message, setMessage] = useState("");
+    const [messages, setMessages] = useState([]);
+
+    /*useEffect(() => {
+        socket.emit("join_conversation", conversation);
+
+        const handler = (data) => {
+            setMessages((prev) => [...prev, data]);
+        };
+
+        socket.on("new_message", handler);
+        socket.on("new_message", (data) => {
+            console.log("📩 FRONT RECOIT:", data);
+            setMessages((prev) => [...prev, data]);
+        });
+
+        return () => {
+            socket.off("new_message", handler);
+        };
+    }, [conversation]);*/
+    useEffect(() => {
+    socket.emit("join_conversation", conversation);
+
+    const handler = (data) => {
+        console.log("📩 FRONT RECOIT:", data);
+
+        setMessages((prev) => {
+            // 🔥 anti doublon (très important)
+            const exists = prev.some(
+                (m) => m.message === data.message && m.sender === data.sender
+            );
+
+            if (exists) return prev;
+
+            return [...prev, data];
+        });
+    };
+
+    socket.off("new_message"); // 🔥 clean brutal avant rebind
+    socket.on("new_message", handler);
+
+    return () => {
+        socket.off("new_message", handler);
+    };
+}, [conversation]);
+
+    const sendMessage = () => {
+        if (!message) return;
+
+        socket.emit("send_message", {
+            conversationId: conversation,
+            message,
+            sender: "user_test"
+        });
+
+        setMessage("");
+        
+    };
+
+    return (
+        <div style={{ padding: 20 }}>
+            <h2>💬 Chat test</h2>
+
+            <input value={conversation} onChange={(e) => setRoom(e.target.value)} />
+            <br /><br />
+
+            <input value={message} onChange={(e) => setMessage(e.target.value)} />
+            <button onClick={sendMessage}>Send</button>
+
+            <ul>
+                {messages.map((msg, i) => (
+                    <li key={i}>
+                        {msg.sender}: {msg.message}
+                    </li>
+                ))}
+            </ul>
+        </div>
+    );
+}
