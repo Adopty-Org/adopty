@@ -1,10 +1,10 @@
 import { Server } from "socket.io";
 import { authenticateRequest } from "@clerk/express";
-import { AuthStatus } from "@clerk/backend";
+//mport { AuthStatus } from "@clerk/backend";
 import { getUtilisateurByClerkId } from "../database/utilisateur.db.js";
 import { isUserInConversation } from "../database/conversation_participant.db.js";
 
-let io;
+let io;  //todo:(refactorer ca dans midleware/auth.js)
 
 export const initSocket = (server, { origin }) => {
    io = new Server(server, {
@@ -18,7 +18,7 @@ export const initSocket = (server, { origin }) => {
     try {
       const requestState = await authenticateRequest({ request: socket.request });
 
-      if (requestState.status !== AuthStatus.SignedIn) {
+      if (requestState.status !== true){//AuthStatus.SignedIn) {
         return next(new Error("Unauthorized"));
       }
 
