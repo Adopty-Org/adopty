@@ -1,7 +1,7 @@
 import { db } from "../config/db.js";
-import { Conservation } from "../modeles/conversation.model.js";
+import { Conversation } from "../modeles/conversation.model.js";
 
-export const createConservation = async (conversation) => {
+export const createConversation = async (conversation) => {
     const [result] = await db.query(
         `INSERT INTO conversation (Type, CreatedAt, CreatedBy) 
         VALUES (?, NOW(), ?)`,
@@ -15,12 +15,12 @@ export const createConservation = async (conversation) => {
     return result.insertId;
 }
 
-export const getAllConservations = async () => {
+export const getAllConversations = async () => {
   const [rows] = await db.query("SELECT * FROM conversation");
-  return rows.map(row => new Conservation(row));
+  return rows.map(row => new Conversation(row));
 };
 
-export const getConservationById = async (id) => {
+export const getConversationById = async (id) => {
   const [rows] = await db.query(
     "SELECT * FROM conversation WHERE Id = ?",
     [id]
@@ -28,10 +28,10 @@ export const getConservationById = async (id) => {
 
   if (!rows[0]) return null;
 
-  return new Conservation(rows[0]);
+  return new Conversation(rows[0]);
 };
 
-export const updateConservation = async (id, conversation) => {
+export const updateConversation = async (id, conversation) => {
   const [result] = await db.query(
     `UPDATE conversation SET 
       Type = ?, 
@@ -49,7 +49,7 @@ export const updateConservation = async (id, conversation) => {
   return result.affectedRows;
 };
 
-export const deleteConservation = async (id) => {
+export const deleteConversation = async (id) => {
   const [result] = await db.query(
     "DELETE FROM conversation WHERE Id = ?",
     [id]

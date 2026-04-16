@@ -26,30 +26,41 @@ export default function TestChat() {
         };
     }, [conversation]);*/
     useEffect(() => {
-    socket.emit("join_conversation", conversation);
+        setMessages([]);
+        socket.emit("join_conversation", conversation);
 
-    const handler = (data) => {
-        console.log("📩 FRONT RECOIT:", data);
+        const handler = (data) => {
+            console.log("📩 FRONT RECOIT:", data);
 
-        setMessages((prev) => {
-            // 🔥 anti doublon (très important)
-            const exists = prev.some(
-                (m) => m.message === data.message && m.sender === data.sender
-            );
+            setMessages((prev) => {
+                // 🔥 anti doublon (très important)
+                const exists = prev.some((m) => {
+                    if (m.conversationId !== data.conversationId) return false;
 
-            if (exists) return prev;
+                    if (data.id != null || m.id != null) {
+                        return m.id === data.id;
+                    }
 
-            return [...prev, data];
-        });
-    };
+                    if (data.timestamp != null || m.timestamp != null) {
+                        return m.timestamp === data.timestamp;
+                    }
 
-    socket.off("new_message"); // 🔥 clean brutal avant rebind
-    socket.on("new_message", handler);
+                    return m.message === data.message && m.sender === data.sender;
+                });
 
-    return () => {
-        socket.off("new_message", handler);
-    };
-}, [conversation]);
+                if (exists) return prev;
+
+                return [...prev, data];
+            });
+        };
+
+        //socket.off("new_message"); // 🔥 clean brutal avant rebind
+        socket.on("new_message", handler);
+
+        return () => {
+            socket.off("new_message", handler);
+        };
+    }, [conversation]);
 
     const sendMessage = () => {
         if (!message) return;
@@ -68,7 +79,13 @@ export default function TestChat() {
         <div style={{ padding: 20 }}>
             <h2>💬 Chat test</h2>
 
-            <input value={conversation} onChange={(e) => setRoom(e.target.value)} />
+            <input
+                value={conversation}
+                onChange={(e) => {
+                    setRoom(e.target.value);
+                    setMessages([]);
+                }}
+            />
             <br /><br />
 
             <input value={message} onChange={(e) => setMessage(e.target.value)} />

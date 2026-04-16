@@ -1,4 +1,4 @@
-export class Conversation_participant {
+export class ConversationParticipant {
     constructor(data){
         this.Id = data.Id;
         this.IdConversation = data.IdConversation;

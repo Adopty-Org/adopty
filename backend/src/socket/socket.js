@@ -12,14 +12,21 @@ export const initSocket = (server) => {
   io.on("connection", (socket) => {
     console.log("🟢 User connecté:", socket.id);
 
-    // 🔥 AJOUT DEBUG GLOBAL
-  socket.onAny((event, ...args) => {
-    console.log("📡 EVENT RECU:", event, args);
-  });
+    // 🔥 AJOUT DEBUG GLOBAL (dev only)
+    if (process.env.NODE_ENV === "development") {
+      socket.onAny((event, ...args) => {
+        console.log("📡 EVENT RECU:", event, args);
+      });
+    }
 
     // rejoindre une conversation
     socket.on("join_conversation", (conversationId) => {
+      if (socket.currentConversationId) {
+        socket.leave(`conv_${socket.currentConversationId}`);
+      }
+
       socket.join(`conv_${conversationId}`);
+      socket.currentConversationId = conversationId;
     });
 
     // envoyer message

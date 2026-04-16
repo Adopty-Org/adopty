@@ -5,7 +5,7 @@ import { getUtilisateurById } from "../database/utilisateur.db.js";
 
 export async function createSignalementControlleur(req,res) {// pas utilisable je crois
     try {
-        const { IdUtilisateur, TypeCible,IdCible,Statut,connectedAccountId,applicationFeeAmount } = req.body;
+        const { IdUtilisateur, TypeCible,IdCible,Statut,Raison,DateSignalement } = req.body;
 
         if(!IdUtilisateur || !TypeCible || !IdCible || !Statut ){
             return res.status(400).json({ message: "Le strict minimun en information est requis! "})
@@ -16,8 +16,8 @@ export async function createSignalementControlleur(req,res) {// pas utilisable j
             TypeCible,
             IdCible,
             Statut,
-            connectedAccountId,
-            applicationFeeAmount
+            Raison,
+            DateSignalement
         })
 
         res.status(201).json({ message: "Signalement crée avec succès", id: requete });
@@ -31,7 +31,7 @@ export async function createSignalementControlleur(req,res) {// pas utilisable j
 export async function updateSignalementControlleur(req,res) {// just la au cas ou 
     try {
         const { id } = req.params;
-        const { IdUtilisateur, TypeCible, IdCible ,Statut ,connectedAccountId,applicationFeeAmount } = req.body;
+        const { IdUtilisateur, TypeCible, IdCible ,Statut ,Raison,DateSignalement } = req.body;
         const paiement_commande = await getSignalementById(id);
         if (!paiement_commande) {
             return res.status(404).json({ message: "Signalement non trouvé" });
@@ -41,8 +41,8 @@ export async function updateSignalementControlleur(req,res) {// just la au cas o
             TypeCible,
             IdCible,
             Statut,
-            connectedAccountId,
-            applicationFeeAmount
+            Raison,
+            DateSignalement
         })
         
         res.status(200).json({ message: "Signalement modifié avec succès" });
