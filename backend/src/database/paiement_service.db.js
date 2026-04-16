@@ -4,7 +4,7 @@ import { PaiementService } from "../modeles/paiement_service.model.js";
 export const createPaiementService = async (paiement_service) => {
     const [result] = await db.query(
         `INSERT INTO paiement_service (IdReservation, Montant, Statut, stripe_payment_intent_id, connectedAccountId, applicationFeeAmount) 
-        VALUES (?, ?, ?, ?, ?)`,
+        VALUES (?, ?, ?, ?, ?, ?)`,
         [
             paiement_service.IdReservation,
             paiement_service.Montant,

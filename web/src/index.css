@@ -1,4 +1,74 @@
 @import "tailwindcss";
-@plugin "daisyui" {
-  themes: caramellatte;
+@plugin "daisyui";
+@plugin "daisyui/theme" {
+  name: "mytheme";
+  default: true; /* set as default */
+  prefersdark: false; /* set as default dark mode (prefers-color-scheme:dark) */
+  color-scheme: light; /* color of browser-provided UI */
+
+  /* Dark mode configuration */
+  --dark-mode: class;
+
+  /* Border radius */
+  --radius: 0.125rem;
+  --radius-lg: 0.25rem;
+  --radius-xl: 0.5rem;
+  --radius-full: 0.75rem;
+
+  /* Font families */
+  --font-headline: "Plus Jakarta Sans", sans-serif;
+  --font-body: "Manrope", sans-serif;
+  --font-label: "Manrope", sans-serif;
+  --font-chewy: "Chewy", cursive;
+  --font-sora: "Sora", sans-serif;
+
+  /* Colors */
+  --color-inverse-on-surface: #f2f2d9;
+  --color-inverse-primary: #a1d494;
+  --color-on-primary-container: #9dd090;
+  --color-primary-fixed: #bcf0ae;
+  --color-on-tertiary-fixed-variant: #802918;
+  --color-secondary: #944925;
+  --color-tertiary-fixed-dim: #ffb4a5;
+  --color-secondary-container: #fe9e72;
+  --color-on-primary-fixed: #002201;
+  --color-on-error: #ffffff;
+  --color-on-secondary-fixed-variant: #76320f;
+  --color-inverse-surface: #303221;
+  --color-outline-variant: #c2c9bb;
+  --color-on-surface: #1b1d0e;
+  --color-on-error-container: #93000a;
+  --color-error: #ba1a1a;
+  --color-tertiary: #6e1c0c;
+  --color-surface-tint: #3b6934;
+  --color-secondary-fixed: #ffdbcd;
+  --color-error-container: #ffdad6;
+  --color-surface-dim: #dbdcc3;
+  --color-primary-container: #2d5a27;
+  --color-on-background: #1b1d0e;
+  --color-tertiary-fixed: #ffdad3;
+  --color-on-surface-variant: #42493e;
+  --color-on-tertiary: #ffffff;
+  --color-secondary-fixed-dim: #ffb596;
+  --color-surface-container-low: #f5f5dc;
+  --color-tertiary-container: #8d3220;
+  --color-on-primary: #ffffff;
+  --color-surface-bright: #fbfbe2;
+  --color-surface-container: #efefd7;
+  --color-on-primary-fixed-variant: #23501e;
+  --color-primary-fixed-dim: #a1d494;
+  --color-background: #fbfbe2;
+  --color-surface: #fbfbe2;
+  --color-on-tertiary-container: #ffaf9e;
+  --color-on-secondary: #ffffff;
+  --color-surface-container-lowest: #ffffff;
+  --color-on-secondary-fixed: #360f00;
+  --color-on-tertiary-fixed: #3e0500;
+  --color-surface-variant: #e4e4cc;
+  --color-primary: #154212;
+  --color-on-secondary-container: #773310;
+  --color-surface-container-high: #eaead1;
+  --color-surface-container-highest: #e4e4cc;
+  --color-outline: #72796e;
+
 }

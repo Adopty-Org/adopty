@@ -1,0 +1,60 @@
+import { db } from "../config/db.js";
+import { ConversationParticipant } from "../modeles/conversation_participant.model.js";
+
+export const createConversationParticipant = async (conversation_participant) => {
+    const [result] = await db.query(
+        `INSERT INTO conversation_participant (IdConversation, Statut, Role, JoinedAt) 
+        VALUES (?, ?, ?, NOW())`,
+        [
+            conversation_participant.IdConversation,
+            conversation_participant.Statut,
+            conversation_participant.Role
+        ]
+    );
+
+    return result.insertId;
+}
+
+export const getAllConversationParticipants = async () => {
+  const [rows] = await db.query("SELECT * FROM conversation_participant");
+  return rows.map(row => new ConversationParticipant(row));
+};
+
+export const getConversationParticipantById = async (id) => {
+  const [rows] = await db.query(
+    "SELECT * FROM conversation_participant WHERE Id = ?",
+    [id]
+  );
+
+  if (!rows[0]) return null;
+
+  return new ConversationParticipant(rows[0]);
+};
+
+export const updateConversationParticipant = async (id, conversation_participant) => {
+  const [result] = await db.query(
+    `UPDATE conversation_participant SET 
+      IdConversation = ?, 
+      Statut = ?,
+      Role = ?
+     WHERE Id = ?`,
+    [
+      conversation_participant.IdConversation,
+      conversation_participant.Statut,
+      conversation_participant.Role,
+      id
+    ]
+  );
+
+  return result.affectedRows;
+};
+
+export const deleteConversationParticipant = async (id) => {
+  const [result] = await db.query(
+    "DELETE FROM conversation_participant WHERE Id = ?",
+    [id]
+  );
+
+  return result.affectedRows;
+};
+
