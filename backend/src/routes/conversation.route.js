@@ -4,6 +4,9 @@ import { protectRoute, isOwnerOrAdmin } from "../midleware/auth.midleware.js";
 
 const router = Router()
 
+// Routes spéciales de lecture protégées
+router.get("/utilisateur/:Utilisateur", protectRoute, conversation.getUtilisateurOfConversationControlleur);
+
 // Routes protégées - création, modification, suppression (utilisateurs authentifiés)
 router.post("/", protectRoute, conversation.createConversationControlleur);
 router.put("/:id", protectRoute, isOwnerOrAdmin, conversation.updateConversationControlleur);
@@ -13,7 +16,6 @@ router.delete("/:id", protectRoute, isOwnerOrAdmin, conversation.deleteConversat
 router.get("/:id", protectRoute, isOwnerOrAdmin, conversation.getConversationControlleur);
 router.get("/", protectRoute, conversation.getAllConversationsControlleur);
 
-// Routes spéciales de lecture protégées
-router.get("/utilisateur/:Utilisateur", protectRoute, conversation.getUtilisateurOfConversationControlleur);
+
 
 export default router;

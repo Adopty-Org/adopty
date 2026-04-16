@@ -4,17 +4,15 @@ import { protectRoute, adminOnly, isOwnerOrAdmin } from "../midleware/auth.midle
 
 const router = Router()
 
-// Routes protégées - modification du propre compte (propriétaire ou admin)
-router.post("/", protectRoute, utilisateur.createAccountControlleur);
-router.put("/:id", protectRoute, isOwnerOrAdmin, utilisateur.updateAccountControlleur);
-router.delete("/:id", protectRoute, isOwnerOrAdmin, utilisateur.deleteAccountControlleur);
+// Route admin only - liste tous les utilisateurs
+router.get("/", protectRoute, adminOnly, utilisateur.getAllAccountsControlleur);
 
 // Routes de lecture protégées (propriétaire ou admin)
-router.get("/:id", protectRoute, isOwnerOrAdmin, utilisateur.getAccountControlleur);
 router.get("/animaux/:id", protectRoute, isOwnerOrAdmin, utilisateur.getUtilisateurAnimalsByIdControlleur);
 router.get("/refuges/:id", protectRoute, isOwnerOrAdmin, utilisateur.getUtilisateurRefugesByIdControlleur);
 router.get("/roles/:id", protectRoute, isOwnerOrAdmin, utilisateur.getUtilisateurRolesByIdControlleur);
 router.get("/clerk/:id", protectRoute, utilisateur.getUtilisateurByClerkIdControlleur);
+router.get("/:id", protectRoute, isOwnerOrAdmin, utilisateur.getAccountControlleur);
 
 // Routes protégées - gestion des animaux de l'utilisateur
 router.put("/animal/unset/:id", protectRoute, utilisateur.unsetAnimalToUtilisateurByIdsControlleur);
@@ -30,8 +28,12 @@ router.post("/refuge/:id", protectRoute, utilisateur.addRefugeToUtilisateurByIds
 router.delete("/role/:id", protectRoute, adminOnly, utilisateur.removeRoleToUtilisateurByIdsControlleur);
 router.post("/role/:id", protectRoute, adminOnly, utilisateur.addRoleToUtilisateurByIdsControlleur);
 
-// Route admin only - liste tous les utilisateurs
-router.get("/", protectRoute, adminOnly, utilisateur.getAllAccountsControlleur);
+// Routes protégées - modification du propre compte (propriétaire ou admin)
+router.post("/", protectRoute, utilisateur.createAccountControlleur);
+router.put("/:id", protectRoute, isOwnerOrAdmin, utilisateur.updateAccountControlleur);
+router.delete("/:id", protectRoute, isOwnerOrAdmin, utilisateur.deleteAccountControlleur);
+
+
 
 export default router;
 
