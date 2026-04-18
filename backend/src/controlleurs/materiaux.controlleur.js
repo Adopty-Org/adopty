@@ -25,6 +25,9 @@ export async function updateMateriauxControlleur(req,res) {// just la au cas ou
     try {
         const { id } = req.params;
         const { Nom, Description } = req.body;
+        if(!Nom || !Description ){
+            return res.status(400).json({ message: "Le strict minimun en information est requis! "})
+        }
         const materiaux = await getMateriauxById(id);
         if (!materiaux) {
             return res.status(404).json({ message: "Materiaux non trouvé" });

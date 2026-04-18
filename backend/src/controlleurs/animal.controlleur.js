@@ -213,11 +213,11 @@ export async function getPhotosOfAnimalControlleur(req, res) {
 
         console.log("Photos trouvées:", photos); // 👈 ET ÇA
 
-        if (!photos || photos.length === 0) {
+        /*if (!photos || photos.length === 0) {
             return res.status(404).json({ message: "Aucune photo trouvée pour cet animal" });
-        }
+        }*/
 
-        res.status(200).json(photos);
+        res.status(200).json(photos ?? []);
 
     } catch (error) {
         console.error("Erreur lors de la récupération des photos:", error);
@@ -233,10 +233,10 @@ export async function getCaracteristiquesOfAnimalIdControlleur(req, res) {
             return res.status(404).json({ message: "Animal non trouvé" });
         }
         const caracteristiques = await getCaracteristiquesByAnimalId(id);
-        if (!caracteristiques || caracteristiques.length === 0) {
+        /*if (!caracteristiques || caracteristiques.length === 0) {
             return res.status(404).json({ message: "Aucune caractéristique trouvée pour cet animal" });
-        }
-        res.status(200).json(caracteristiques);
+        }*/
+        res.status(200).json(caracteristiques ?? []);
     } catch (error) {
         console.error("Erreur lors de la récupération des caractéristiques:", error);
         res.status(500).json({ message: "Erreur interne du serveur" });

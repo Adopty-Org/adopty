@@ -32,20 +32,6 @@ export const getCaracteristiqueById = async (id) => {
   return new Caracteristique(rows[0]);
 };
 
-export const isUserInConversation = async (conversationId, utilisateurId) => {
-  try {
-    const [rows] = await db.query(
-      "SELECT * FROM caracteristique WHERE I = ? AND IdUtilisateur = ?",
-      [conversationId, utilisateurId]
-    );
-
-    return rows.length > 0;
-  } catch (error) {
-    console.error("Erreur lors de la vérification de l'appartenance à la conversation :", error);
-    return false;
-  }
-};
-
 export const updateCaracteristique = async (id, caracteristique) => {
   const [result] = await db.query(
     `UPDATE caracteristique SET  

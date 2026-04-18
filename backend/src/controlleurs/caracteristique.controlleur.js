@@ -6,11 +6,10 @@ export async function createCaracteristiqueControlleur(req,res) {
         const { IdAnimal, IdRace, Nom, Description } = req.body;
         const userId = req.user.Id;
 
-        if (
-            IdAnimal == null &&
-            IdRace == null ||
-            Nom == null 
-        ) {
+        const hasAnimalTarget = IdAnimal != null;
+        const hasRaceTarget = IdRace != null;
+
+        if (hasAnimalTarget === hasRaceTarget || Nom == null) {
             return res.status(400).json({ message: "Informations requises manquantes!" })
         }
 
@@ -49,11 +48,6 @@ export async function updateCaracteristiqueControlleur(req,res) {
         const participant = await getCaracteristiqueById(id);
         if (!participant) {
             return res.status(404).json({ message: "Participant non trouvé" });
-        }
-
-        const conversation = await getConversationById(participant.IdAnimal);
-        if (!conversation) {
-            return res.status(404).json({ message: "Conversation non trouvée" });
         }
 
         // ✅ Seulement le créateur ou le participant lui-même

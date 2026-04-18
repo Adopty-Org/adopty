@@ -12,6 +12,8 @@ const AnimalCard = ({ animal, delay = 0 }) => {
     enabled: !!animal.Id // évite bug au début
   })
 
+  console.log("Animal :   ", animal)
+
   console.log(" photo :   ", photos)
 
   return (

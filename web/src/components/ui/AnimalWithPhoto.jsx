@@ -5,9 +5,17 @@ import { useQuery } from "@tanstack/react-query"
 const AnimalWithPhoto = ({ animal, onClose }) => {
 
   const { data: photos = [] } = useQuery({
-    queryKey: ["photos", animal.Id],
-    queryFn: () => animalApi.getPhotos(animal.Id),
-    enabled: !!animal.Id
+    queryKey: ["animalPhotos", animal.Id],
+    queryFn: async () => {
+      try {
+        return await animalApi.getPhotos(animal.Id)
+      } catch (error) {
+        if (error?.response?.status === 404) return []
+        throw error
+      }
+    },
+    enabled: !!animal.Id,
+    retry: (failureCount, error) => error?.response?.status !== 404 && failureCount < 3
   })
 
   return (

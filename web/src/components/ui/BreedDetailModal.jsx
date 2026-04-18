@@ -78,7 +78,7 @@ const BreedDetailModal = ({ breed, isOpen, onClose }) => {
 
 
   // Find animals currently at the shelter of this breed
-  const availableAnimals = animals.filter(a => a.Race.Nom === breed.Nom)
+  const availableAnimals = animals.filter(a => a?.Race?.Nom === breed.Nom)
 
   return (
     <AnimatePresence>

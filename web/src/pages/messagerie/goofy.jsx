@@ -1,78 +1,88 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { io } from "socket.io-client";
-
-const socket = io("http://localhost:3000");
+import { useAuth } from "@clerk/clerk-react";
 
 export default function TestChat() {
     const [conversation, setRoom] = useState("conversation1");
     const [message, setMessage] = useState("");
     const [messages, setMessages] = useState([]);
 
-    /*useEffect(() => {
-        socket.emit("join_conversation", conversation);
+    const { getToken } = useAuth();
+    const socketRef = useRef(null); // 🔥 IMPORTANT
 
-        const handler = (data) => {
-            setMessages((prev) => [...prev, data]);
-        };
-
-        socket.on("new_message", handler);
-        socket.on("new_message", (data) => {
-            console.log("📩 FRONT RECOIT:", data);
-            setMessages((prev) => [...prev, data]);
-        });
-
-        return () => {
-            socket.off("new_message", handler);
-        };
-    }, [conversation]);*/
     useEffect(() => {
-        setMessages([]);
-        socket.emit("join_conversation", conversation);
+        const init = async () => {
+            const token = await getToken();
 
-        const handler = (data) => {
-            console.log("📩 FRONT RECOIT:", data);
-
-            setMessages((prev) => {
-                // 🔥 anti doublon (très important)
-                const exists = prev.some((m) => {
-                    if (m.conversationId !== data.conversationId) return false;
-
-                    if (data.id != null || m.id != null) {
-                        return m.id === data.id;
-                    }
-
-                    if (data.timestamp != null || m.timestamp != null) {
-                        return m.timestamp === data.timestamp;
-                    }
-
-                    return m.message === data.message && m.sender === data.sender;
-                });
-
-                if (exists) return prev;
-
-                return [...prev, data];
+            // 🔥 créer socket UNE fois
+            /*socketRef.current = io("http://localhost:3000", {
+                extraHeaders: {
+                    Authorization: `Bearer ${token}`
+                }
+            });*/
+            socketRef.current = io("http://localhost:3000", {
+                auth: {
+                    token
+                }
             });
+
+            const socket = socketRef.current;
+
+            setMessages([]);
+            socket.emit("join_conversation", conversation);
+
+            const handler = (data) => {
+                console.log("📩 FRONT RECOIT:", data);
+
+                setMessages((prev) => {
+                    const exists = prev.some((m) => {
+                        if (m.conversationId !== data.conversationId) return false;
+
+                        if (data.id != null || m.id != null) {
+                            return m.id === data.id;
+                        }
+
+                        if (data.timestamp != null || m.timestamp != null) {
+                            return m.timestamp === data.timestamp;
+                        }
+
+                        return m.message === data.message && m.sender === data.sender;
+                    });
+
+                    if (exists) return prev;
+                    return [...prev, data];
+                });
+            };
+
+            socket.on("new_message", handler);
+
+            return () => {
+                socket.off("new_message", handler);
+                socket.disconnect();
+            };
         };
 
-        //socket.off("new_message"); // 🔥 clean brutal avant rebind
-        socket.on("new_message", handler);
-
-        return () => {
-            socket.off("new_message", handler);
-        };
+        init();
     }, [conversation]);
 
     const sendMessage = () => {
-        if (!message) return;
+        if (!message || !socketRef.current) return;
 
-        socket.emit("send_message", {
+        if (!socketRef.current.connected) {
+            console.log("❌ Socket not connected");
+            return;
+        }
+
+        socketRef.current.emit("send_message", {
             conversationId: conversation,
-            message,
-            sender: "user_test"
+            message
         });
 
+        console.log("📤 sending message");
+
         setMessage("");
-        
+
+        console.log("SOCKET STATE:", socketRef.current?.connected);
     };
 
     return (
@@ -88,7 +98,10 @@ export default function TestChat() {
             />
             <br /><br />
 
-            <input value={message} onChange={(e) => setMessage(e.target.value)} />
+            <input
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+            />
             <button onClick={sendMessage}>Send</button>
 
             <ul>

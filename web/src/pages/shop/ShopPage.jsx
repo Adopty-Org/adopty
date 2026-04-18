@@ -10,7 +10,7 @@ function ShopPage() {
   const [categorie, setCategorie] = useState('Tous')
   const [tri, setTri] = useState('nouveautes')
 
-  const { data:ProduitsData, IsLoading:ProduitsLoading} = useQuery({
+  const { data:ProduitsData, isLoading:ProduitsLoading} = useQuery({
     queryKey:['produits'],
     queryFn: produitApi.getAll
   })
@@ -22,7 +22,7 @@ function ShopPage() {
   console.log("Les produits :   ", produits)
 
   const filtered = produits
-    .filter(p => categorie === 'Tous')// || p.categorie === categorie)
+    .filter(p => categorie === 'Tous' || p.Categorie === categorie)
     .sort((a, b) => {
       if (tri === 'prix-asc') return a.Prix - b.Prix
       if (tri === 'prix-desc') return b.Prix - a.Prix

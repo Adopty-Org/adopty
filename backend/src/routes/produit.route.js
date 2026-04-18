@@ -6,7 +6,7 @@ const router = Router()
 
 // Routes spéciales de lecture publiques
 router.get("/materiaux/:id", produit.getMateriauxOfProduitControlleur);
-router.get("/materiaux/ids/:id", produit.getMateriauxOfProduitByIdsControlleur);
+router.get("/materiaux/ids/:id/:materiauxId", produit.getMateriauxOfProduitByIdsControlleur);
 router.get("/refuge/:Refuge", produit.getRefugeOfProduitControlleur);
 router.get("/:id/photos", produit.getPhotosOfProduitControlleur)
 

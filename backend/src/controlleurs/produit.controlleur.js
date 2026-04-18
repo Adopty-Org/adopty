@@ -1,5 +1,6 @@
 import { getProduitPhotosById } from "../database/photo.db.js";
-import { addMateriauxToProduit, createProduit, deleteProduit, getAllProduits, getMateriauxOfProduit, getMateriauxOfProduitByIds, getProduitById, updateProduit } from "../database/produit.db.js";
+import { addMateriauxToProduit, createProduit, deleteProduit, getAllProduits, getMateriauxOfProduit, getMateriauxOfProduitByIds, getProduitById, removeMateriauxFromProduit, updateProduit } from "../database/produit.db.js";
+import { getMateriauxById } from "../database/materiaux.db.js";
 import { getRefugeById} from "../database/refuge.db.js"
 import { getSousCommandeById } from "../database/sous_commande.db.js";
 
@@ -160,8 +161,11 @@ export async function getMateriauxOfProduitControlleur(req,res) {
 
 export async function getMateriauxOfProduitByIdsControlleur(req,res) {
     try {
-        const { id } = req.params;
-        const materiaux = await getMateriauxOfProduitByIds(id);
+        const { id, materiauxId } = req.params;
+        if (!materiauxId) {
+            return res.status(400).json({ message: "L'ID du materiau est requis" });
+        }
+        const materiaux = await getMateriauxOfProduitByIds(id, materiauxId);
         if (!materiaux || materiaux.length === 0) {
             return res.status(404).json({ message: "Aucun materiau trouvé pour ce produit" });
         }
@@ -182,6 +186,14 @@ export async function addMateriauxToProduitControlleur(req,res) {
         const produit = await getProduitById(id);
         if (!produit) {
             return res.status(404).json({ message: "Produit non trouvée" });
+        }
+        const materiau = await getMateriauxById(materiauxId);
+        if (!materiau) {
+            return res.status(404).json({ message: "Materiau non trouvé" });
+        }
+        const existing = await getMateriauxOfProduitByIds(id, materiauxId);
+        if (existing && existing.length > 0) {
+            return res.status(409).json({ message: "L'association existe déjà" });
         }
         await addMateriauxToProduit(id, materiauxId);
         res.status(200).json({ message: "Materiau ajouté au produit avec succès" });
@@ -206,6 +218,8 @@ export async function RemoveMateriauxFromProduitControlleur(req,res) {
         if (!materiaux_produit || materiaux_produit.length === 0) {
             return res.status(404).json({ message: "Materiaux pour produit non trouvée" });
         }
+        await removeMateriauxFromProduit(id, materiauxId);
+        res.status(200).json({ message: "Materiau retiré du produit avec succès" });
     } catch (error) {
         console.error("Erreur lors de la suppression du materiau au produit:", error);
         res.status(500).json({ message: "Erreur interne du serveur" });
