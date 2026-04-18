@@ -35,7 +35,7 @@ function App() {
     <Routes>
       <Route path="/login" element={ isSignedIn ? <Navigate to = {"/lobby"}/> : <LoginPage/> }/>
       {/* on l'a fait sortir car le navbar et le sidebar se metais a travers de notre chemin */}
-      <Route path="/sign-up" element={<SignUpPage/>}/>
+      {/*<Route path="/sign-up" element={<SignUpPage/>}/>*/}
       <Route path="/testChat" element={<TestChat/>}/>
       {/* pas de isSignedIn car debile */}
       <Route path="/" element={<LobbyLayout/>}>

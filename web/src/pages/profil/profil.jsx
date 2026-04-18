@@ -75,7 +75,10 @@ const Profil = () => {
     enabled: !!id // évite bug au début
   })
 
-  console.log("L'animal :   ", animal)
+  //console.log("L'animal :   ", animal)
+  if (AnimalLoading || !animal) {
+    return <PageTransition><div className="p-12 text-center">Chargement…</div></PageTransition>
+  }
 
 
   // Find animal by id or fallback to Barnabé

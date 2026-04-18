@@ -1367,7 +1367,7 @@ export const produitApi = {
     },
 
     removeMateriaux: async (id, materiauxId) => {
-        const { data } = await axiosInstance.post(`/produits/materiaux/supprime/${id}/${materiauxId}`);
+        const { data } = await axiosInstance.delete(`/produits/materiaux/supprime/${id}/${materiauxId}`);
         return data;
     },
 
