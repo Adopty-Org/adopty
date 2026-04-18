@@ -3,13 +3,15 @@ import { Produit } from "../modeles/produit.model.js";
 
 export const createProduit = async (produit) => {
     const [result] = await db.query(
-        `INSERT INTO produit (IdRefuge, Nom, Prix, Stock, Disponibilite) 
-        VALUES (?, ?, ?, ?, ?)`,
+        `INSERT INTO produit (IdRefuge, Nom, Prix, Stock, Categorie, Reduction, Disponibilite) 
+        VALUES (?, ?, ?, ?, ?, ?, ?)`,
         [
             produit.IdRefuge,
             produit.Nom,
             produit.Prix,
             produit.Stock,
+            produit.Categorie,
+            produit.Reduction,
             produit.Disponibilite
         ]
     );
@@ -40,6 +42,8 @@ export const updateProduit = async (id, produit) => {
       Nom = ?,
       Prix = ?,
       Stock =?,
+      Categorie = ?,
+      Reduction = ?,
       Disponibilite = ?
      WHERE Id = ?`,
     [
@@ -47,6 +51,8 @@ export const updateProduit = async (id, produit) => {
       produit.Nom,
       produit.Prix,
       produit.Stock,
+      produit.Categorie,
+      produit.Reduction,
       produit.Disponibilite,
       id
     ]
@@ -64,3 +70,46 @@ export const deleteProduit = async (id) => {
   return result.affectedRows;
 };
 
+
+export const getMateriauxOfProduit = async (produitId) => {
+    const [rows] = await db.query(
+        `SELECT m.* FROM materiaux m
+         JOIN materiaux_produit mp ON m.Id = mp.IdMateriaux
+         WHERE mp.IdProduit = ?`,
+        [produitId]
+    );
+    return rows.map(row => new Materiaux(row));
+};
+
+export const getMateriauxOfProduitByIds = async (produitId, materiauxId) => {
+    const [rows] = await db.query(
+        `SELECT m.* FROM materiaux m
+         JOIN materiaux_produit mp ON m.Id = mp.IdMateriaux
+         WHERE mp.IdProduit = ? AND mp.IdMateriaux = ?`,
+        [
+          produitId,
+          materiauxId
+        ]
+    );
+    return rows.map(row => new Materiaux(row));
+};
+
+export const addMateriauxToProduit = async (produitId, materiauxId) => {
+    const [result] = await db.query(
+        `INSERT INTO materiaux_produit (IdProduit, IdMateriaux) VALUES (?, ?)`,
+        [
+          produitId, 
+          materiauxId
+        ]
+    );
+    return result.insertId;
+};
+
+export const removeMateriauxFromProduit = async (produitId, materiauxId) => {
+    const [result] = await db.query(
+        `DELETE FROM materiaux_produit WHERE IdProduit = ? AND IdMateriaux = ?`,
+        [          produitId, 
+          materiauxId]
+    );
+    return result.affectedRows;
+};

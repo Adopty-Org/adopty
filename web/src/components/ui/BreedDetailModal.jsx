@@ -1,12 +1,84 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { Link } from 'react-router'
+import { animalApi, especeApi, raceApi } from '../../lib/api'
+import { useQuery } from '@tanstack/react-query'
+import AnimalWithPhoto from './AnimalWithPhoto'
 //import { animaux } from '../../data/mockData'
 
 const BreedDetailModal = ({ breed, isOpen, onClose }) => {
   if (!breed) return null
 
+
+  const {data:AnimauxData, isLoading:AnimauxLoading} = useQuery({
+    queryKey: ["animaux"],
+    queryFn: animalApi.getAll,
+  })
+
+  const {data:RacesData, isLoading:RacesLoading} = useQuery({
+    queryKey: ["races"],
+    queryFn: raceApi.getAll,
+  })
+
+  const {data:EspecesData, isLoading:EspecesLoading} = useQuery({
+    queryKey: ["especes"],
+    queryFn: especeApi.getAll,
+  }) 
+
+
+
+  const animalsRaw = AnimauxData ?? []
+  const races = RacesData ?? []
+  const especes = EspecesData ?? []
+
+  const raceMap = new Map(races.map(r => [r.Id, r]))
+  const especeMap = new Map(especes.map(e => [e.Id, e]))
+
+  const getTailleLabel = (cm) => {
+    if (cm <= 30) return 'Petit'
+    if (cm <= 60) return 'Moyen'
+    return 'Grand'
+  }
+
+  const animals = animalsRaw.map(a => {
+    const race = raceMap.get(a.Race)
+    const espece = race ? especeMap.get(race.Espece) : undefined
+
+    return {
+      ...a,
+      TailleLabel: getTailleLabel(a.Taille), // 👈 ICI
+      Race: race
+        ? {
+            Id: race.Id,
+            Nom: race.Nom,
+            Description: race.Description,
+            Origine: race.Origine,
+            EsperanceVie: race.EsperanceVie,
+            Maintenance: race.Maintenance,
+            TailleMoyenne: race.TailleMoyenne,
+            PoidsMoyen: race.PoidsMoyen,
+            Couleurs: race.Couleurs,
+            Classification: race.Classification,
+            Pelage: race.Pelage,
+            TaillePelageMoyen: race.TaillePelageMoyen,
+            Habitat: race.Habitat,
+            Inteligence: race.Inteligence,
+            Imunite: race.Imunite,
+            Alergies: race.Alergies,
+            Espece: espece
+              ? {
+                  Id: espece.Id,
+                  Nom: espece.Nom,
+                  Description: espece.Description
+                }
+              : null
+          }
+        : null
+    }
+  })
+
+
   // Find animals currently at the shelter of this breed
- // const availableAnimals = animaux.filter(a => a.race === breed.nom)
+  const availableAnimals = animals.filter(a => a.Race.Nom === breed.Nom)
 
   return (
     <AnimatePresence>
@@ -39,9 +111,9 @@ const BreedDetailModal = ({ breed, isOpen, onClose }) => {
               <div className="grid grid-cols-1 lg:grid-cols-2">
                 {/* Visual */}
                 <div className="h-64 lg:h-full relative border-b-4 lg:border-b-0 lg:border-r-4 border-black">
-                  <img src={breed.photo} alt={breed.nom} className="w-full h-full object-cover" />
+                  {/*<img src={photos[0]?.Url} alt={breed.Nom} className="w-full h-full object-cover" />*/}
                   <div className="absolute bottom-6 left-6 bg-secondary text-white px-6 py-2 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] -rotate-2">
-                    <span className="font-['Chewy'] text-3xl">{breed.nom}</span>
+                    <span className="font-['Chewy'] text-3xl">{breed.Nom}</span>
                   </div>
                 </div>
 
@@ -49,24 +121,24 @@ const BreedDetailModal = ({ breed, isOpen, onClose }) => {
                 <div className="p-8 lg:p-12 space-y-10">
                   <div>
                     <span className="bg-primary-fixed text-primary font-black px-4 py-1.5 rounded-full border-2 border-black text-xs uppercase tracking-widest mb-4 inline-block">Fiche Encyclopédie</span>
-                    <h2 className="font-['Chewy'] text-5xl text-primary mb-6">Tout savoir sur le {breed.nom}</h2>
+                    <h2 className="font-['Chewy'] text-5xl text-primary mb-6">Tout savoir sur le {breed.Nom}</h2>
                     <p className="font-['Plus_Jakarta_Sans'] text-lg text-on-surface-variant leading-relaxed">
-                      {breed.description}
+                      {breed?.Description}
                     </p>
                   </div>
 
                   <div className="grid grid-cols-2 gap-6">
                     <div className="bg-white border-2 border-black p-4 rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
                       <p className="text-xs font-black uppercase tracking-tighter text-on-surface-variant mb-1">Origine</p>
-                      <p className="font-bold text-lg">{breed.origine}</p>
+                      <p className="font-bold text-lg">{breed?.Origine}</p>
                     </div>
                     <div className="bg-white border-2 border-black p-4 rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
                       <p className="text-xs font-black uppercase tracking-tighter text-on-surface-variant mb-1">Espérance de vie</p>
-                      <p className="font-bold text-lg">{breed.esperanceVie}</p>
+                      <p className="font-bold text-lg">{breed?.EsperanceVie}</p>
                     </div>
                     <div className="bg-white border-2 border-black p-4 rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] col-span-2">
                       <p className="text-xs font-black uppercase tracking-tighter text-on-surface-variant mb-1">Caractéristique majeure</p>
-                      <p className="font-bold text-lg">{breed.traits?.[0] || 'Sociable'}</p>
+                      <p className="font-bold text-lg">{breed?.traits?.[0] || 'Sociable'}</p>
                     </div>
                   </div>
 
@@ -75,7 +147,7 @@ const BreedDetailModal = ({ breed, isOpen, onClose }) => {
                       <span className="material-symbols-outlined text-xl">medical_services</span> SANTÉ & SOINS
                     </h3>
                     <p className="text-sm text-on-surface-variant leading-relaxed">
-                      {breed.soins}
+                      {breed?.Maintenance || 'Aucun soin particulier requis, juste beaucoup d\'amour et d\'attention !'}
                     </p>
                   </div>
 
@@ -86,27 +158,15 @@ const BreedDetailModal = ({ breed, isOpen, onClose }) => {
                       Ils attendent une famille
                     </h3>
                     
-                    {/*availableAnimals.length > 0 ? (
+                    {availableAnimals.length > 0 ? (
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {availableAnimals.map(animal => (
-                          <Link 
-                            key={animal.id} 
-                            to={`/profil/${animal.id}`}
-                            onClick={onClose}
-                            className="bg-white border-4 border-black p-3 rounded-2xl flex items-center gap-4 hover:-translate-y-1 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all group"
-                          >
-                            <img src={animal.photo} alt={animal.nom} className="w-16 h-16 object-cover rounded-xl border-2 border-black flex-shrink-0" />
-                            <div>
-                              <p className="font-black text-primary group-hover:text-secondary transition-colors">{animal.nom}</p>
-                              <p className="text-xs font-bold text-on-surface-variant opacity-70">{animal.ageLabel} • {animal.caractere[0]}</p>
-                            </div>
-                            <span className="material-symbols-outlined ml-auto text-on-surface-variant/30 group-hover:text-secondary opacity-0 group-hover:opacity-100 transition-all">arrow_forward</span>
-                          </Link>
-                        ))}
+                          <AnimalWithPhoto key={animal.Id} animal={animal} onClose={onClose}/>
+                          ))}
                       </div>
                     ) : (
                       <div className="bg-surface-container rounded-2xl p-8 text-center border-2 border-black border-dashed">
-                        <p className="font-bold text-on-surface-variant text-sm mb-4">Nous n'avons aucun {breed.nom} au refuge actuellement.</p>
+                        <p className="font-bold text-on-surface-variant text-sm mb-4">Nous n'avons aucun {breed.Nom} au refuge actuellement.</p>
                         <Link 
                           to="/animaux" 
                           onClick={onClose}
@@ -115,7 +175,7 @@ const BreedDetailModal = ({ breed, isOpen, onClose }) => {
                           Découvrir nos autres compagnons →
                         </Link>
                       </div>
-                    )*/}
+                    )}
                   </div>
                 </div>
               </div>

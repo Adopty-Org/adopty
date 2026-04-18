@@ -3,11 +3,24 @@ import { Race } from "../modeles/race.model.js";
 
 export const createRace = async (race) => {
     const [result] = await db.query(
-        `INSERT INTO race (Nom, Description, Espece) 
-        VALUES (?, ?, ?)`,
+        `INSERT INTO race (Nom, Description, Origine, EsperanceVie, Maintenance, TailleMoyenne, PoidsMoyen, Couleurs, Classification, Pelage, TaillePelageMoyen, Habitat, Inteligence, Imunite, Alergies, Espece)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
             race.Nom,
             race.Description,
+            race.Origine,
+            race.EsperanceVie,
+            race.Maintenance,
+            race.TailleMoyenne,
+            race.PoidsMoyen,
+            race.Couleurs,
+            race.Classification,
+            race.Pelage,
+            race.TaillePelageMoyen,
+            race.Habitat,
+            race.Inteligence,
+            race.Imunite,
+            race.Alergies,
             race.Espece
         ]
     );
@@ -36,11 +49,37 @@ export const updateRace = async (id, race) => {
     `UPDATE race SET 
       Nom = ?, 
       Description = ?,
+      Origine = ?,
+      EsperanceVie = ?,
+      Maintenance = ?,
+      TailleMoyenne = ?,
+      PoidsMoyen = ?,
+      Couleurs = ?,
+      Classification = ?,
+      Pelage = ?,
+      TaillePelageMoyen = ?,
+      Habitat = ?,
+      Inteligence = ?,
+      Imunite = ?,
+      Alergies = ?,
       Espece = ?
      WHERE Id = ?`,
     [
       race.Nom,
       race.Description,
+      race.Origine,
+      race.EsperanceVie,
+      race.Maintenance,
+      race.TailleMoyenne,
+      race.PoidsMoyen,
+      race.Couleurs,
+      race.Classification,
+      race.Pelage,
+      race.TaillePelageMoyen,
+      race.Habitat,
+      race.Inteligence,
+      race.Imunite,
+      race.Alergies,
       race.Espece,
       id
     ]

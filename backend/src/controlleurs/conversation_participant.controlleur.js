@@ -1,5 +1,6 @@
 import { createConversationParticipant, deleteConversationParticipant, getAllConversationParticipants, getConversationParticipantById, updateConversationParticipant } from "../database/conversation_participant.db.js";
 import { getConversationById } from "../database/conversation.db.js";
+import { getStatutById } from "../database/statut.db.js";
 
 export async function createConversationParticipantControlleur(req,res) {
     try {

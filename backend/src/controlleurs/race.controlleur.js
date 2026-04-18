@@ -3,7 +3,7 @@ import { createRace, deleteRace, getAllRaces, getRaceById, updateRace } from "..
 
 export async function createRaceControlleur(req,res) {// pas utilisable je crois
     try {
-        const { Nom, Description,Espece } = req.body;
+        const { Nom, Description, Origine, EsperanceVie, Maintenance, TailleMoyenne, PoidsMoyen, Couleurs, Classification, Pelage, TaillePelageMoyen, Habitat, Inteligence, Imunite, Alergies, Espece } = req.body;
 
         if(!Nom || !Description || !Espece ){
             return res.status(400).json({ message: "Le strict minimun en information est requis! "})
@@ -12,6 +12,19 @@ export async function createRaceControlleur(req,res) {// pas utilisable je crois
         const requete = await createRace({
             Nom, 
             Description,
+            Origine,
+            EsperanceVie,
+            Maintenance,
+            TailleMoyenne,
+            PoidsMoyen,
+            Couleurs,
+            Classification,
+            Pelage,
+            TaillePelageMoyen,
+            Habitat,
+            Inteligence,
+            Imunite,
+            Alergies,
             Espece
         })
 
@@ -26,7 +39,7 @@ export async function createRaceControlleur(req,res) {// pas utilisable je crois
 export async function updateRaceControlleur(req,res) {// just la au cas ou 
     try {
         const { id } = req.params;
-        const { Nom, Description, Espece } = req.body;
+        const { Nom, Description, Origine, EsperanceVie, Maintenance, TailleMoyenne, PoidsMoyen, Couleurs, Classification, Pelage, TaillePelageMoyen, Habitat, Inteligence, Imunite, Alergies, Espece } = req.body;
         const race = await getRaceById(id);
         if (!race) {
             return res.status(404).json({ message: "Race non trouvé" });
@@ -34,6 +47,19 @@ export async function updateRaceControlleur(req,res) {// just la au cas ou
         await updateRace( id ,{
             Nom, 
             Description,
+            Origine,
+            EsperanceVie,
+            Maintenance,
+            TailleMoyenne,
+            PoidsMoyen,
+            Couleurs,
+            Classification,
+            Pelage,
+            TaillePelageMoyen,
+            Habitat,
+            Inteligence,
+            Imunite,
+            Alergies,
             Espece
         })
         
@@ -100,6 +126,24 @@ export async function getEspeceOfRaceControlleur(req,res) {
         
     } catch (error) {
         console.error("Erreur lors de l'obtention de l'animal de l'annonce:", error);
+        res.status(500).json({ message: "Erreur interne du serveur" });
+    }
+}
+
+export async function getCaracteristiquesOfRaceIdControlleur(req, res) {
+    try {
+        const { id } = req.params;
+        const race = await getRaceById(id);
+        if (!race) {
+            return res.status(404).json({ message: "Race non trouvé" });
+        }
+        const caracteristiques = await getCaracteristiquesByRaceId(id);
+        if (!caracteristiques || caracteristiques.length === 0) {
+            return res.status(404).json({ message: "Aucune caractéristique trouvée pour cette race" });
+        }
+        res.status(200).json(caracteristiques);
+    } catch (error) {
+        console.error("Erreur lors de la récupération des caractéristiques:", error);
         res.status(500).json({ message: "Erreur interne du serveur" });
     }
 }

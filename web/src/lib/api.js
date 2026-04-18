@@ -1,3 +1,4 @@
+import { get } from "http";
 import axiosInstance from "./axios"
 
 /*
@@ -189,6 +190,16 @@ export const animalApi = {
         const { data } = await axiosInstance.get(`/animaux/race/${race}`);
         return data;
     },
+
+    getPhotos: async (photo) => {
+        const { data } = await axiosInstance.get(`/animaux/${photo}/photos`);
+        return data;
+    },
+
+    getCaracteristiques: async (id) => {
+        const { data } = await axiosInstance.get(`/animaux/caracteristiques/${id}`);
+        return data;
+    },
 };
 
 /*
@@ -274,6 +285,12 @@ export const raceApi = {
         );
         return data;
     },
+
+    getCaracteristiques: async (id) => {
+        const { data } = await axiosInstance.get(`/races/caracteristiques/${id}`);
+        return data;
+    },
+
 };
 
 /*
@@ -1344,6 +1361,16 @@ export const produitApi = {
         return data;
     },
 
+    addMateriaux: async (id, materiauxId) => {
+        const { data } = await axiosInstance.post(`/produits/materiaux/ajout/${id}/${materiauxId}`);
+        return data;
+    },
+
+    removeMateriaux: async (id, materiauxId) => {
+        const { data } = await axiosInstance.post(`/produits/materiaux/supprime/${id}/${materiauxId}`);
+        return data;
+    },
+
     // =========================
     // 🔹 Lecture publique
     // =========================
@@ -1366,6 +1393,21 @@ export const produitApi = {
         const { data } = await axiosInstance.get(
             `/produits/refuge/${refuge}`
         );
+        return data;
+    },
+
+    getPhotos: async (photo) => {
+        const { data } = await axiosInstance.get(`/produits/${photo}/photos`);
+        return data;
+    },
+
+    getAllMateriaux: async (id) => {
+        const { data } = await axiosInstance.get(`/produits/materiaux/${id}`);
+        return data;
+    },
+
+    getSpecificMateriaux: async (id) => {
+        const { data } = await axiosInstance.get(`/produits/materiaux/Ids/${id}`);
         return data;
     },
 };
@@ -1948,6 +1990,45 @@ export const wishlistApi = {
         const { data } = await axiosInstance.get(
             `/wishlists/utilisateur/${utilisateur}`
         );
+        return data;
+    },
+};
+
+
+// le reste
+
+export const caracteristiqueApi = {
+
+    // =========================
+    // 🔹 CRUD (ADMIN ONLY)
+    // =========================
+
+    create: async (formData) => {
+        const { data } = await axiosInstance.post("/caracteristiques", formData);
+        return data;
+    },
+
+    update: async ({ id, formData }) => {
+        const { data } = await axiosInstance.put(`/caracteristiques/${id}`, formData);
+        return data;
+    },
+
+    delete: async (id) => {
+        const { data } = await axiosInstance.delete(`/caracteristiques/${id}`);
+        return data;
+    },
+
+    // =========================
+    // 🔹 Lecture publique
+    // =========================
+
+    getSpecific: async (id) => {
+        const { data } = await axiosInstance.get(`/caracteristiques/${id}`);
+        return data;
+    },
+
+    getAll: async () => {
+        const { data } = await axiosInstance.get("/caracteristiques");
         return data;
     },
 };

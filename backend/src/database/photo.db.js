@@ -3,7 +3,7 @@ import { Photo } from "../modeles/photo.model.js";
 
 export const createPhotoUtilisateur = async (photo) => {
     const [result] = await db.query(
-        "INSERT INTO photo (IdUtilisateur,IdRefuge,IdAnimal,Url) values(?, Null, Null, ?)",
+        "INSERT INTO photo (IdUtilisateur,IdProduit,IdRefuge,IdAnimal,Url) values(?, NULL, Null, Null, ?)",
         [
             photo.IdUtilisateur,
             photo.Url
@@ -15,7 +15,7 @@ export const createPhotoUtilisateur = async (photo) => {
 
 export const createPhotoRefuge = async (photo) => {
     const [result] = await db.query(
-        "INSERT INTO photo (IdUtilisateur,IdRefuge,IdAnimal,Url) values(Null, ?, Null, ?)",
+        "INSERT INTO photo (IdUtilisateur,IdProduit,IdRefuge,IdAnimal,Url) values(Null, NULL, ?, Null, ?)",
         [
             photo.IdRefuge,
             photo.Url
@@ -27,9 +27,21 @@ export const createPhotoRefuge = async (photo) => {
 
 export const createPhotoAnimal = async (photo) => {
     const [result] = await db.query(
-        "INSERT INTO photo (IdUtilisateur,IdRefuge,IdAnimal,Url) values(NULL, Null, ?, ?)",
+        "INSERT INTO photo (IdUtilisateur,IdProduit,IdRefuge,IdAnimal,Url) values(NULL, NULL, Null, ?, ?)",
         [
             photo.IdAnimal,
+            photo.Url
+        ]
+    );
+
+    return result.insertId;
+}
+
+export const createPhotoProduit = async (photo) => {
+    const [result] = await db.query(
+        "INSERT INTO photo (IdUtilisateur,IdProduit,IdRefuge,IdAnimal,Url) values(NULL, ?, Null, NULL, ?)",
+        [
+            photo.IdProduit,
             photo.Url
         ]
     );
@@ -112,6 +124,17 @@ export const getAnimalPhotosById = async (id) => {
     const [rows] = await db.query(`
         SELECT * FROM photo 
         WHERE IdAnimal = ?`,
+    [
+        id
+    ]);
+
+    return rows.map(row => new Photo(row));
+}
+
+export const getProduitPhotosById = async (id) => {
+    const [rows] = await db.query(`
+        SELECT * FROM photo 
+        WHERE IdProduit = ?`,
     [
         id
     ]);

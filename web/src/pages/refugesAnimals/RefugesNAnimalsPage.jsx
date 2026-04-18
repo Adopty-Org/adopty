@@ -1,8 +1,10 @@
 import { PageTransition, FadeIn } from '../../components/Animations'
+import { useQuery } from '@tanstack/react-query'
+import { animalApi, refugeApi } from '../../lib/api'
 import AnimalCard from '../../components/ui/AnimalCard'
-//import { useFilters } from '../../hooks/useFilters'
+import { useFilters } from '../../hooks/useFilters'
 
-const ESPECES = ['Tous', 'Chien', 'Chat', 'Lapin']
+/*const*/ let  ESPECES = ['Tous']//, 'Chien', 'Chat', 'Lapin']
 const TAILLES = ['Petit', 'Moyen', 'Grand']
 const CARACTERES = ['Joueur', 'Calme', 'Sociable', 'Sportif', 'Affectueux']
 const TRAITS = [
@@ -13,7 +15,19 @@ const TRAITS = [
 ]
 
 const RefugesNAnimals = () => {
+
+  const {data:AnimauxData, isLoading:AnimauxLoading} = useQuery({
+    queryKey: ["animaux"],
+    queryFn: animalApi.getAll,
+  })
+
+  const {data:RefugesData, isLoading:RefugesLoading} = useQuery({
+    queryKey: ["refuges"],
+    queryFn: refugeApi.getAll,
+  })
+
   const { 
+    especes,
     espece, setEspece, 
     race, setRace, 
     availableRaces,
@@ -22,7 +36,12 @@ const RefugesNAnimals = () => {
     selectedTraits, toggleTrait,
     search, setSearch, 
     reset, filteredAnimaux 
-  } = true//useFilters()
+  } = useFilters()
+
+  ESPECES = [
+  'Tous',
+  ...new Set((especes ?? []).map(e => e.Nom))
+]
 
   return (
     <PageTransition>
@@ -33,7 +52,7 @@ const RefugesNAnimals = () => {
         </FadeIn>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-          {/* Sidebar Filters *}
+          {/* Sidebar Filters */}
           <aside className="lg:col-span-3 space-y-6 lg:sticky lg:top-28">
             <FadeIn className="bg-white p-6 border-4 border-black rounded-2xl shadow-[8px_8px_0px_0px_rgba(21,66,18,1)]">
               <div className="flex items-center justify-between mb-6">
@@ -43,7 +62,7 @@ const RefugesNAnimals = () => {
                 <button onClick={reset} className="text-xs font-bold text-secondary hover:underline uppercase tracking-wider">Reset</button>
               </div>
 
-              {/* Search *}
+              {/* Search */}
               <div className="mb-6">
                 <label className="block font-bold text-xs uppercase tracking-widest mb-3 text-on-surface-variant">Rechercher</label>
                 <div className="relative">
@@ -57,7 +76,7 @@ const RefugesNAnimals = () => {
                 </div>
               </div>
 
-              {/* Espèce *}
+              {/* Espèce */}
               <div className="mb-6">
                 <label className="block font-bold text-xs uppercase tracking-widest mb-3 text-on-surface-variant">Espèce</label>
                 <div className="flex flex-wrap gap-2">
@@ -71,7 +90,7 @@ const RefugesNAnimals = () => {
                 </div>
               </div>
 
-              {/* Race (Dynamic) *}
+              {/* Race (Dynamic) */}
               <div className="mb-6">
                 <label className="block font-bold text-xs uppercase tracking-widest mb-3 text-on-surface-variant">Race</label>
                 <select 
@@ -104,9 +123,9 @@ const RefugesNAnimals = () => {
                     </button>
                   ))}
                 </div>
-              </div>
+              </div>*/}
 
-              {/* Taille *}
+              {/* Taille */}
               <div className="mb-6">
                 <label className="block font-bold text-xs uppercase tracking-widest mb-3 text-on-surface-variant">Gabarit</label>
                 <div className="grid grid-cols-1 gap-2">
@@ -125,7 +144,7 @@ const RefugesNAnimals = () => {
             </FadeIn>
           </aside>
 
-          {/* Grid Content *}
+          {/* Grid Content */}
           <div className="lg:col-span-9">
             {filteredAnimaux.length === 0 ? (
               <FadeIn className="bg-white border-4 border-black rounded-3xl p-16 text-center shadow-[12px_12px_0px_0px_rgba(0,0,0,0.1)]">
@@ -151,12 +170,12 @@ const RefugesNAnimals = () => {
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10">
                   {filteredAnimaux.map((animal, i) => (
-                    <AnimalCard key={animal.id} animal={animal} delay={i * 0.05} />
+                    <AnimalCard key={animal.Id} animal={animal} delay={i * 0.05} />
                   ))}
                 </div>
               </>
             )}
-          </div>{*/}
+          </div>
         </div>
       </div>
     </PageTransition>

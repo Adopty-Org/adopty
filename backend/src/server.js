@@ -34,6 +34,7 @@ import paiement_commandeRoutes from "./routes/paiement_commande.route.js"
 import paiement_serviceRoutes from "./routes/paiement_service.route.js"
 import panierRoutes from "./routes/panier.route.js"
 import profil_prestataireRoutes from "./routes/profil_prestataire.route.js"
+import produitRoutes from "./routes/produit.route.js"
 
 import reservationRoutes from "./routes/reservation.route.js"
 import sous_commandeRoutes from "./routes/sous_commande.route.js"
@@ -46,6 +47,8 @@ import signalementRoutes from "./routes/signalement.route.js"
 import conversationRoutes from "./routes/conversation.route.js"
 import conversation_participantRoutes from "./routes/conversation_participant.route.js"
 import messageRoutes from "./routes/message.route.js"
+import materiauxRoutes from "./routes/materiaux.route.js"
+import caracteristiqueRoutes from "./routes/caracteristique.route.js"
 
 // Au début, avec les autres imports
 import stripeRoutes from './routes/stripe.route.js';
@@ -113,6 +116,7 @@ app.use("/api/paiement_commandes", paiement_commandeRoutes)
 app.use("/api/paiement_services", paiement_serviceRoutes)
 app.use("/api/paniers", panierRoutes)
 app.use("/api/profil_prestataires", profil_prestataireRoutes)
+app.use("/api/produits", produitRoutes)
 
 app.use("/api/reservations", reservationRoutes)
 app.use("/api/sous_commandes", sous_commandeRoutes)
@@ -125,6 +129,8 @@ app.use("/api/signalements", signalementRoutes)
 app.use("/api/conversations", conversationRoutes)
 app.use("/api/conversation_participants", conversation_participantRoutes)
 app.use("/api/messages", messageRoutes)
+app.use("/api/materiaux", materiauxRoutes)
+app.use("/api/caracteristiques", caracteristiqueRoutes)
 
 app.get("/api/calling", (req,res)=>{
     res.status(200).json({message: "oui ca fonctionne"})
