@@ -1,12 +1,33 @@
 import React, { useState } from 'react'
 import { FadeIn, PageTransition } from '../../components/Animations.jsx'
 import ProductCard from '../../components/ui/ProductCard.jsx'
+import { useQuery } from '@tanstack/react-query'
+import { produitApi } from '../../lib/api.js'
 
 const CATEGORIES = ['Tous', 'Alimentation Bio', 'Jouets Écolo', 'Accessoires', 'Hygiène']
 
 function ShopPage() {
   const [categorie, setCategorie] = useState('Tous')
   const [tri, setTri] = useState('nouveautes')
+
+  const { data:ProduitsData, isLoading:ProduitsLoading} = useQuery({
+    queryKey:['produits'],
+    queryFn: produitApi.getAll
+  })
+
+  console.log("ProduitsData :", ProduitsData)
+
+  const produits = ProduitsData ?? []
+
+  console.log("Les produits :   ", produits)
+
+  const filtered = produits
+    .filter(p => categorie === 'Tous' || p.Categorie === categorie)
+    .sort((a, b) => {
+      if (tri === 'prix-asc') return a.Prix - b.Prix
+      if (tri === 'prix-desc') return b.Prix - a.Prix
+      return 0
+    })
 
   /*const filtered = produits
     .filter(p => categorie === 'Tous' || p.categorie === categorie)
@@ -82,7 +103,7 @@ function ShopPage() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
               <FadeIn>
                 <h1 className="font-['Plus_Jakarta_Sans'] font-extrabold text-3xl text-primary">Boutique Naturelle</h1>
-                {/*<p className="text-on-surface-variant text-sm mt-1">{filtered.length} produit{filtered.length > 1 ? 's' : ''} trouvé{filtered.length > 1 ? 's' : ''}</p>*/}
+                {<p className="text-on-surface-variant text-sm mt-1">{filtered.length} produit{filtered.length > 1 ? 's' : ''} trouvé{filtered.length > 1 ? 's' : ''}</p>}
               </FadeIn>
               <FadeIn>
                 <select value={tri} onChange={e => setTri(e.target.value)}
@@ -94,7 +115,7 @@ function ShopPage() {
               </FadeIn>
             </div>
 
-            {/*filtered.length === 0 ? (
+            {filtered.length === 0 ? (
               <FadeIn className="text-center py-20 text-on-surface-variant">
                 <span className="material-symbols-outlined text-6xl mb-3 block opacity-30">shopping_bag</span>
                 <p className="font-bold text-lg">Aucun produit dans cette catégorie.</p>
@@ -102,10 +123,10 @@ function ShopPage() {
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7">
                 {filtered.map((p, i) => (
-                  <ProductCard key={p.id} produit={p} delay={i * 0.07} />
+                  <ProductCard key={p.Id} produit={p} delay={i * 0.07} />
                 ))}
               </div>
-            )*/}
+            )}
           </section>
         </div>
       </div>

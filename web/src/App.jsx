@@ -47,7 +47,9 @@ function App() {
         <Route path="conserning"element={<ConserningPage/>}/>
         <Route path="signalement"element={<Signalement/>}/>
         <Route path="encyclopedie"element={<Encyclopedie/>}/>
-        <Route path="profil"element={<UserProfile/>}/>
+        <Route path="profil" element={<UserProfile/>}/>
+        <Route path="profil/:id" element={<UserProfile/>}/>
+        <Route path="profil_animal/:id"element={<Profil/>}/>
         
 
       </Route>

@@ -11,6 +11,7 @@ router.delete("/:id", protectRoute, adminOnly, race.deleteRaceControlleur);
 
 // Routes spéciales publiques
 router.get("/espece/:Espece", race.getEspeceOfRaceControlleur);
+router.get("/caracteristiques/:id", race.getCaracteristiquesOfRaceIdControlleur);
 
 // Routes publiques - lecture des races
 router.get("/:id", race.getRaceControlleur);

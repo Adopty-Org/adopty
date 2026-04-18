@@ -3,10 +3,11 @@ import { ConversationParticipant } from "../modeles/conversation_participant.mod
 
 export const createConversationParticipant = async (conversation_participant) => {
     const [result] = await db.query(
-        `INSERT INTO conversation_participant (IdConversation, Statut, Role, JoinedAt) 
-        VALUES (?, ?, ?, NOW())`,
+        `INSERT INTO conversation_participant (IdConversation, IdUtilisateur, Statut, Role, JoinedAt) 
+        VALUES (?, ?, ?, ?, NOW())`,
         [
             conversation_participant.IdConversation,
+            conversation_participant.IdUtilisateur,
             conversation_participant.Statut,
             conversation_participant.Role
         ]
@@ -49,11 +50,13 @@ export const updateConversationParticipant = async (id, conversation_participant
   const [result] = await db.query(
     `UPDATE conversation_participant SET 
       IdConversation = ?, 
+      IdUtilisateur = ?,
       Statut = ?,
       Role = ?
      WHERE Id = ?`,
     [
       conversation_participant.IdConversation,
+      conversation_participant.IdUtilisateur,
       conversation_participant.Statut,
       conversation_participant.Role,
       id

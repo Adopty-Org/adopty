@@ -7,6 +7,8 @@ const router = Router()
 // Routes publiques - recherche par statut et race
 router.get("/statut/:Statut", animal.getStatutOfAnimalControlleur);
 router.get("/race/:Race", animal.getRaceOfAnimalControlleur);
+router.get("/:id/photos", animal.getPhotosOfAnimalControlleur);
+router.get("/caracteristiques/:id", animal.getCaracteristiquesOfAnimalIdControlleur);
 
 // Routes protégées - création, modification, suppression d'animaux (refuge ou admin)
 router.post("/", protectRoute, hasAnyRole(["Refuge", "Admin"]), animal.createAnimalControlleur);

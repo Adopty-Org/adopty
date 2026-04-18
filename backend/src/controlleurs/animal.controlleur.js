@@ -1,9 +1,10 @@
 import cloudinary from "../config/cloudinary.js"
 import { Animal } from "../modeles/animal.model.js";
 import { createAnimal, deleteAnimal, getAllAnimals, getAnimalById, updateAnimal } from "../database/animal.db.js";
-import { createPhotoAnimal } from "../database/photo.db.js";
+import { createPhotoAnimal, getAnimalPhotosById } from "../database/photo.db.js";
 import { getStatutById } from "../database/statut.db.js";
 import { getRaceById } from "../database/race.db.js";
+import { getCaracteristiquesByAnimalId } from "../database/caracteristique.db.js";
 
 export async function createAnimalControlleur(req,res) {
     try {
@@ -198,6 +199,46 @@ export async function getRaceOfAnimalControlleur(req,res) {
         
     } catch (error) {
         console.error("Erreur lors de l'obtention du race de l'animal:", error);
+        res.status(500).json({ message: "Erreur interne du serveur" });
+    }
+}
+
+export async function getPhotosOfAnimalControlleur(req, res) {
+    try {
+        const { id } = req.params;
+
+        console.log("ID reçu:", id); // 👈 AJOUTE ÇA
+
+        const photos = await getAnimalPhotosById(id);
+
+        console.log("Photos trouvées:", photos); // 👈 ET ÇA
+
+        /*if (!photos || photos.length === 0) {
+            return res.status(404).json({ message: "Aucune photo trouvée pour cet animal" });
+        }*/
+
+        res.status(200).json(photos ?? []);
+
+    } catch (error) {
+        console.error("Erreur lors de la récupération des photos:", error);
+        res.status(500).json({ message: "Erreur interne du serveur" });
+    }
+}
+
+export async function getCaracteristiquesOfAnimalIdControlleur(req, res) {
+    try {
+        const { id } = req.params;
+        const animal = await getAnimalById(id);
+        if (!animal) {
+            return res.status(404).json({ message: "Animal non trouvé" });
+        }
+        const caracteristiques = await getCaracteristiquesByAnimalId(id);
+        /*if (!caracteristiques || caracteristiques.length === 0) {
+            return res.status(404).json({ message: "Aucune caractéristique trouvée pour cet animal" });
+        }*/
+        res.status(200).json(caracteristiques ?? []);
+    } catch (error) {
+        console.error("Erreur lors de la récupération des caractéristiques:", error);
         res.status(500).json({ message: "Erreur interne du serveur" });
     }
 }
