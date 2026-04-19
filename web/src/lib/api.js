@@ -1070,17 +1070,17 @@ export const messageReadApi = {
     // =========================
 
     create: async (formData) => {
-        const { data } = await axiosInstance.post("/message-reads", formData);
+        const { data } = await axiosInstance.post("/message_reads", formData);
         return data;
     },
 
     update: async ({ id, formData }) => {
-        const { data } = await axiosInstance.put(`/message-reads/${id}`, formData);
+        const { data } = await axiosInstance.put(`/message_reads/${id}`, formData);
         return data;
     },
 
     delete: async (id) => {
-        const { data } = await axiosInstance.delete(`/message-reads/${id}`);
+        const { data } = await axiosInstance.delete(`/message_reads/${id}`);
         return data;
     },
 
@@ -1089,12 +1089,12 @@ export const messageReadApi = {
     // =========================
 
     getSpecific: async (id) => {
-        const { data } = await axiosInstance.get(`/message-reads/${id}`);
+        const { data } = await axiosInstance.get(`/message_reads/${id}`);
         return data;
     },
 
     getAll: async () => {
-        const { data } = await axiosInstance.get("/message-reads");
+        const { data } = await axiosInstance.get("/message_reads");
         return data;
     },
 
@@ -1104,14 +1104,14 @@ export const messageReadApi = {
 
     getByMessage: async (messageId) => {
         const { data } = await axiosInstance.get(
-            `/message-reads/message/${messageId}`
+            `/message_reads/message/${messageId}`
         );
         return data;
     },
 
     getByUtilisateur: async (utilisateurId) => {
         const { data } = await axiosInstance.get(
-            `/message-reads/utilisateur/${utilisateurId}`
+            `/message_reads/utilisateur/${utilisateurId}`
         );
         return data;
     },

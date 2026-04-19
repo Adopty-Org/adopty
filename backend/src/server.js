@@ -47,6 +47,7 @@ import signalementRoutes from "./routes/signalement.route.js"
 import conversationRoutes from "./routes/conversation.route.js"
 import conversation_participantRoutes from "./routes/conversation_participant.route.js"
 import messageRoutes from "./routes/message.route.js"
+import message_readRoutes from "./routes/message_read.route.js"
 import materiauxRoutes from "./routes/materiaux.route.js"
 import caracteristiqueRoutes from "./routes/caracteristique.route.js"
 
@@ -129,6 +130,7 @@ app.use("/api/signalements", signalementRoutes)
 app.use("/api/conversations", conversationRoutes)
 app.use("/api/conversation_participants", conversation_participantRoutes)
 app.use("/api/messages", messageRoutes)
+app.use("/api/message_reads", message_readRoutes)
 app.use("/api/materiaux", materiauxRoutes)
 app.use("/api/caracteristiques", caracteristiqueRoutes)
 

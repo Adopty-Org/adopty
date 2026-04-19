@@ -164,8 +164,9 @@ export default function TestChat() {
 import { useEffect, useState, useRef, useCallback } from "react";
 import { io } from "socket.io-client";
 import { useAuth, useUser } from "@clerk/clerk-react";
+import { messageReadApi } from "../../lib/api";
 
-export default function TestChat({ conversationId: propConversationId }) {
+export default function TestChat({ conversationId: propConversationId , conversationmeta}) {
   const [conversationId, setConversationId] = useState(propConversationId || "1");
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
@@ -173,10 +174,33 @@ export default function TestChat({ conversationId: propConversationId }) {
   const [users, setUsers] = useState([]);
   const [error, setError] = useState(null);
   const user = useUser().user;
-  console.log("user :   ", user)
+  //console.log("user :   ", user)
+
+  const [readMap, setReadMap] = useState({});
 
   const { getToken } = useAuth();
   const socketRef = useRef(null);
+
+  useEffect(() => {
+  const fetchReads = async () => {
+    const map = {};
+
+    for (const msg of messages) {
+      try {
+        const res = await messageReadApi.getByMessage(msg.Id);
+        console.log("res  :   ", res)
+
+        map[msg.Id] = Array.isArray(res) && res.length > 0;
+      } catch (e) {
+        map[msg.Id] = false;
+      }
+    }
+
+    setReadMap(map);
+  };
+
+  if (messages.length > 0) fetchReads();
+}, [messages]);
 
   // Ajoutez un useEffect pour mettre à jour conversationId quand la prop change
   useEffect(() => {
@@ -184,6 +208,32 @@ export default function TestChat({ conversationId: propConversationId }) {
       setConversationId(propConversationId);
     }
   }, [propConversationId]);
+
+  
+
+  // Obtenir les autres participants de la conversation
+  const getOtherParticipants = (conversation) => {
+    if (!user || !conversation.participants) return [];
+    return conversation.participants.filter(p => p.clerkId !== user.id);
+  };
+
+  // Obtenir le nom d'affichage de la conversation
+  const getConversationName = (conversation) => {
+    if (conversation.name) return conversation.name;
+    //console.log("Getting name for conversation:", conversation);
+    
+    const otherParticipants = getOtherParticipants(conversation);
+    if (otherParticipants.length === 1) {
+      return otherParticipants[0].firstName || otherParticipants[0].email || "Unknown User";
+    } else if (otherParticipants.length > 1) {
+      const names = otherParticipants.slice(0, 3).map(p => p.firstName || p.email?.split('@')[0]);
+      if (otherParticipants.length > 3) {
+        return `${names.join(", ")} +${otherParticipants.length - 3}`;
+      }
+      return names.join(", ");
+    }
+    return "Conversation";
+  };
 
   // Initialisation de la socket
   useEffect(() => {
@@ -401,14 +451,14 @@ export default function TestChat({ conversationId: propConversationId }) {
 
       {/* Conversation Selector */}
       <div style={{ marginBottom: 20 }}>
-        <label style={{ marginRight: 10 }}>Conversation avec {}</label>
-        <input
+        <label style={{ marginRight: 10 }}>Conversation en {conversationmeta?.Type } avec {getConversationName(conversationmeta)}</label>
+        {/*<input
           value={conversationId}
           onChange={(e) => setConversationId(e.target.value)}
           placeholder="Enter conversation ID"
           style={{ padding: 8, width: 200 }}
           disabled={!isConnected}
-        />
+        />*/}
       </div>
 
       {/* Messages */}
@@ -440,7 +490,7 @@ export default function TestChat({ conversationId: propConversationId }) {
               <div style={{ fontWeight: "bold", marginBottom: 5 }}>
                 {msg.senderFirstName}
                 <span style={{ fontSize: 11, color: "#999", marginLeft: 10 }}>
-                  {new Date(msg.timestamp).toLocaleTimeString()}
+                  {new Date(msg.timestamp).toLocaleTimeString()   }{console.log( "readMap",readMap) }{readMap[msg.Id] ? " ✓✓" : " ✓"}{/*IsMessageRead(msg) ? " ✓✓" : " ✓"*/}
                 </span>
               </div>
               <div>{msg.message}</div>

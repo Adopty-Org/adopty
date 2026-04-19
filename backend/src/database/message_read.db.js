@@ -55,6 +55,14 @@ export const deleteMessageRead = async (id) => {
   return result.affectedRows;
 };
 
+export const getMessageReadsByMessageId = async (messageId) => {
+    const [rows] = await db.query(
+        "SELECT * FROM message_read WHERE IdMessage = ?",
+        [messageId]
+    );
+    return rows;
+};
+
 
 // 🆕 Nouvelle fonction pour sauvegarder un message avec l'ID auto-incrémenté
 export const saveMessageFromSocket = async (messageData) => {
@@ -121,8 +129,12 @@ export const getMessagesByConversation = async (conversationId, limit = 50, offs
 };
 
 // 🆕 Marquer un message comme lu
-export const markMessageAsRead = async (messageId, userId) => {
+export const markMessageAsRead = async (messageId, userId, senderId = null) => {
     try {
+        // 🚨 protection critique
+        if (senderId && userId === senderId) {
+            return { success: true, skipped: true };
+        }
         // Vérifier si l'entrée existe déjà
         const [existing] = await db.query(
             "SELECT Id FROM message_read WHERE IdMessage = ? AND IdUtilisateur = ?",
@@ -157,7 +169,7 @@ export const markConversationMessagesAsRead = async (conversationId, userId) => 
         
         // Marquer chaque message comme lu
         for (const message of messages) {
-            await markMessageAsRead(message.Id, userId);
+            await markMessageAsRead(message.Id, userId, message.SenderId);
         }
         
         console.log(`✅ ${messages.length} messages marqués comme lus dans conv ${conversationId}`);

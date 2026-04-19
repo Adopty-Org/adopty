@@ -1,5 +1,5 @@
 import { getMessageById } from "../database/message.db.js";
-import { createMessageRead, deleteMessageRead, getAllMessageReads, getMessageReadById, updateMessageRead } from "../database/message_read.db.js";
+import { createMessageRead, deleteMessageRead, getAllMessageReads, getMessageReadById, getMessageReadsByMessageId, updateMessageRead } from "../database/message_read.db.js";
 import { getUtilisateurById } from "../database/utilisateur.db.js";
 
 export async function createMessageReadControlleur(req,res) {// pas utilisable je crois
@@ -91,7 +91,7 @@ export async function getAllMessageReadsControlleur(req,res) {
 export async function getMessageOfMessageReadControlleur(req,res) {
     try {
         const { Message } = req.params;
-        const message = await getMessageById(Message);
+        const message = await getMessageReadsByMessageId(Message);
         if (!message) {
             return res.status(404).json({ message: "MessageRead a un message inexistant !(non trouvé)" });
         }
