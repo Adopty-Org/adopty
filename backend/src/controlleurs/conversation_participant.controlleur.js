@@ -1,4 +1,4 @@
-import { createConversationParticipant, deleteConversationParticipant, getAllConversationParticipants, getConversationParticipantById, updateConversationParticipant } from "../database/conversation_participant.db.js";
+import { createConversationParticipant, deleteConversationParticipant, getAllConversationParticipants, getConversationParticipantById, getParticipantsByConversationId, updateConversationParticipant } from "../database/conversation_participant.db.js";
 import { getConversationById } from "../database/conversation.db.js";
 import { getStatutById } from "../database/statut.db.js";
 
@@ -155,6 +155,8 @@ export async function getConversationOfConversationParticipantControlleur(req,re
     }
 }
 
+
+
 export async function getStatutOfConversationParticipantControlleur(req,res) {
     try {
         const { Statut } = req.params;
@@ -166,6 +168,17 @@ export async function getStatutOfConversationParticipantControlleur(req,res) {
         
     } catch (error) {
         console.error("Erreur lors de l'obtention de l'animal de l'annonce:", error);
+        res.status(500).json({ message: "Erreur interne du serveur" });
+    }
+}
+
+export async function getParticipantsOfConversationControlleur(req,res) {
+    try {
+        const { conversationId } = req.params;
+        const participants = await getParticipantsByConversationId(conversationId);
+        res.status(200).json(participants);
+    } catch (error) {
+        console.error("Erreur lors de l'obtention des participants de la conversation:", error);
         res.status(500).json({ message: "Erreur interne du serveur" });
     }
 }

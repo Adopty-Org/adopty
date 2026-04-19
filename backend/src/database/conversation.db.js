@@ -58,3 +58,12 @@ export const deleteConversation = async (id) => {
   return result.affectedRows;
 };
 
+export const getConversationsByUtilisateurId = async (utilisateurId) => {
+    const [rows] = await db.query(
+        `SELECT c.*
+          FROM conversation c
+          where c.CreatedBy = ?`,
+        [utilisateurId]
+    );
+    return rows.map(row => new Conversation(row));
+}

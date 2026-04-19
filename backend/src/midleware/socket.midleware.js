@@ -488,6 +488,7 @@ export const initSocket = (server, { origin }) => {
           message: savedMessage.Contenu,
           sender: socket.user.Nom || socket.user.Prenom || `user_${socket.user.Id}`,
           senderId: socket.user.Id,
+          senderClerkId: socket.user.ClerkId,
           conversationId,
           timestamp: savedMessage.CreatedAt || new Date().toISOString(),
         };

@@ -5,6 +5,7 @@ import { protectRoute, isOwnerOrAdmin } from "../midleware/auth.midleware.js";
 const router = Router()
 
 // Routes spéciales de lecture protégées
+router.get("/conversation/participants/:conversationId", protectRoute, conversation_participant.getParticipantsOfConversationControlleur);
 router.get("/conversation/:Conversation", protectRoute, conversation_participant.getConversationOfConversationParticipantControlleur);
 router.get("/statut/:Statut", protectRoute, conversation_participant.getStatutOfConversationParticipantControlleur);
 

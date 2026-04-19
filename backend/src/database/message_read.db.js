@@ -98,6 +98,7 @@ export const getMessagesByConversation = async (conversationId, limit = 50, offs
                 m.Contenu as message,
                 m.CreatedAt as timestamp,
                 mr.ReadAt as readAt,
+                u.clerkId as senderClerkId,
                 CONCAT(COALESCE(u.Prenom, ''), ' ', COALESCE(u.Nom, '')) as sender,
                 u.Prenom as senderFirstName,
                 u.Nom as senderLastName

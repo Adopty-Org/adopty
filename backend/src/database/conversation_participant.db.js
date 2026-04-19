@@ -1,5 +1,6 @@
 import { db } from "../config/db.js";
 import { ConversationParticipant } from "../modeles/conversation_participant.model.js";
+import { Utilisateur } from "../modeles/utilisateur.model.js";
 
 export const createConversationParticipant = async (conversation_participant) => {
     const [result] = await db.query(
@@ -75,3 +76,13 @@ export const deleteConversationParticipant = async (id) => {
   return result.affectedRows;
 };
 
+export const getParticipantsByConversationId = async (conversationId) => {
+    const [rows] = await db.query(
+        `SELECT  u.*
+         FROM conversation_participant cp
+         JOIN utilisateur u ON cp.IdUtilisateur = u.Id
+         WHERE cp.IdConversation = ?`,
+        [conversationId]
+    );
+    return rows.map(row => new Utilisateur(row));
+};

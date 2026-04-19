@@ -1,4 +1,4 @@
-//import { get } from "http";
+
 import axiosInstance from "./axios"
 
 /*
@@ -661,17 +661,17 @@ export const conversationParticipantApi = {
     // =========================
 
     create: async (formData) => {
-        const { data } = await axiosInstance.post("/conversation-participants", formData);
+        const { data } = await axiosInstance.post("/conversation_participants", formData);
         return data;
     },
 
     update: async ({ id, formData }) => {
-        const { data } = await axiosInstance.put(`/conversation-participants/${id}`, formData);
+        const { data } = await axiosInstance.put(`/conversation_participants/${id}`, formData);
         return data;
     },
 
     delete: async (id) => {
-        const { data } = await axiosInstance.delete(`/conversation-participants/${id}`);
+        const { data } = await axiosInstance.delete(`/conversation_participants/${id}`);
         return data;
     },
 
@@ -680,12 +680,12 @@ export const conversationParticipantApi = {
     // =========================
 
     getSpecific: async (id) => {
-        const { data } = await axiosInstance.get(`/conversation-participants/${id}`);
+        const { data } = await axiosInstance.get(`/conversation_participants/${id}`);
         return data;
     },
 
     getAll: async () => {
-        const { data } = await axiosInstance.get("/conversation-participants");
+        const { data } = await axiosInstance.get("/conversation_participants");
         return data;
     },
 
@@ -695,16 +695,20 @@ export const conversationParticipantApi = {
 
     getByConversation: async (conversation) => {
         const { data } = await axiosInstance.get(
-            `/conversation-participants/conversation/${conversation}`
+            `/conversation_participants/conversation/${conversation}`
         );
         return data;
     },
 
     getByStatut: async (statut) => {
         const { data } = await axiosInstance.get(
-            `/conversation-participants/statut/${statut}`
+            `/conversation_participants/statut/${statut}`
         );
         return data;
+    },
+
+    getParticipantsOfConversation(conversationId) {
+        return axiosInstance.get(`/conversation_participants/conversation/participants/${conversationId}`);
     },
 };
 
@@ -755,6 +759,13 @@ export const conversationApi = {
     getByUtilisateur: async (utilisateur) => {
         const { data } = await axiosInstance.get(
             `/conversations/utilisateur/${utilisateur}`
+        );
+        return data;
+    },
+
+    getConversationsByUtilisateurId: async (utilisateurId) => {
+        const { data } = await axiosInstance.get(
+            `/conversations/by_utilisateur/${utilisateurId}`
         );
         return data;
     },

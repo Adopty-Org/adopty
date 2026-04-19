@@ -1,4 +1,5 @@
-import { createConversation, deleteConversation, getAllConversations, getConversationById, updateConversation } from "../database/conversation.db.js";
+import { createConversation, deleteConversation, getAllConversations, getConversationById, getConversationsByUtilisateurId, updateConversation } from "../database/conversation.db.js";
+import { getUtilisateurById } from "../database/utilisateur.db.js";
 
 export async function createConversationControlleur(req,res) {
     try {
@@ -124,6 +125,17 @@ export async function getUtilisateurOfConversationControlleur(req,res) {
         
     } catch (error) {
         console.error("Erreur lors de l'obtention de l'animal de l'annonce:", error);
+        res.status(500).json({ message: "Erreur interne du serveur" });
+    }
+}
+
+export async function getConversationsByUtilisateurIdControlleur(req,res) {
+    try {
+        const { utilisateurId } = req.params;
+        const conversations = await getConversationsByUtilisateurId(utilisateurId);
+        res.status(200).json(conversations);
+    } catch (error) {
+        console.error("Erreur lors de l'obtention des conversations de l'utilisateur:", error);
         res.status(500).json({ message: "Erreur interne du serveur" });
     }
 }

@@ -163,18 +163,27 @@ export default function TestChat() {
 
 import { useEffect, useState, useRef, useCallback } from "react";
 import { io } from "socket.io-client";
-import { useAuth } from "@clerk/clerk-react";
+import { useAuth, useUser } from "@clerk/clerk-react";
 
-export default function TestChat() {
-  const [conversationId, setConversationId] = useState("1");
+export default function TestChat({ conversationId: propConversationId }) {
+  const [conversationId, setConversationId] = useState(propConversationId || "1");
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [isConnected, setIsConnected] = useState(false);
   const [users, setUsers] = useState([]);
   const [error, setError] = useState(null);
+  const user = useUser().user;
+  console.log("user :   ", user)
 
   const { getToken } = useAuth();
   const socketRef = useRef(null);
+
+  // Ajoutez un useEffect pour mettre à jour conversationId quand la prop change
+  useEffect(() => {
+    if (propConversationId) {
+      setConversationId(propConversationId);
+    }
+  }, [propConversationId]);
 
   // Initialisation de la socket
   useEffect(() => {
@@ -239,6 +248,7 @@ export default function TestChat() {
         });
 
         socket.on("message_history", (history) => {
+            console.log("histoire :  ", history);
         console.log("📜 Historique reçu:", history.length, "messages");
             setMessages(history);
         });
@@ -339,6 +349,8 @@ export default function TestChat() {
       }
     });
 
+    console.log("socketRef :   ", socketRef)
+
     setMessage("");
   }, [message, conversationId]);
 
@@ -370,7 +382,8 @@ export default function TestChat() {
         <span>
           Users online: {users.length}
         </span>
-      </div>
+      </div>{console.log("socketRef :   ", socketRef)}
+      {console.log("socketRef.current.user :   ", socketRef.current?.user)}
 
       {/* Error Message */}
       {error && (
@@ -388,7 +401,7 @@ export default function TestChat() {
 
       {/* Conversation Selector */}
       <div style={{ marginBottom: 20 }}>
-        <label style={{ marginRight: 10 }}>Conversation ID:</label>
+        <label style={{ marginRight: 10 }}>Conversation avec {}</label>
         <input
           value={conversationId}
           onChange={(e) => setConversationId(e.target.value)}
@@ -421,11 +434,11 @@ export default function TestChat() {
                 padding: 8,
                 backgroundColor: "white",
                 borderRadius: 5,
-                borderLeft: `3px solid ${msg.senderId === socketRef.current?.user?.id ? "#4caf50" : "#2196f3"}`,
+                borderLeft: `3px solid ${msg.senderClerkId === user?.id ? "#4caf50" : "#2196f3"}`,
               }}
             >
               <div style={{ fontWeight: "bold", marginBottom: 5 }}>
-                {msg.senderName}
+                {msg.senderFirstName}
                 <span style={{ fontSize: 11, color: "#999", marginLeft: 10 }}>
                   {new Date(msg.timestamp).toLocaleTimeString()}
                 </span>

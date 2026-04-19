@@ -18,6 +18,7 @@ import UserProfile from './pages/profil/userProfile'
 
 import { useEffect } from "react";
 import { setAuthTokenGetter } from "./lib/axios.js";
+import ConversationsList from './pages/messagerie/conversations.jsx'
 
 
 
@@ -37,6 +38,7 @@ function App() {
       {/* on l'a fait sortir car le navbar et le sidebar se metais a travers de notre chemin */}
       {/*<Route path="/sign-up" element={<SignUpPage/>}/>*/}
       <Route path="/testChat" element={<TestChat/>}/>
+      <Route path="/testConversation" element={<ConversationsList/>}/>
       {/* pas de isSignedIn car debile */}
       <Route path="/" element={<LobbyLayout/>}>
         <Route index element={<Navigate to={"lobby"}/>}/>
