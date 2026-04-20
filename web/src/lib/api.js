@@ -1115,6 +1115,13 @@ export const messageReadApi = {
         );
         return data;
     },
+
+    getByConversation: async (conversationId) => {
+        const { data } = await axiosInstance.get(
+            `/message_reads/messages/${conversationId}`
+        );
+        return data;
+    }
 };
 
 /*
@@ -1164,6 +1171,13 @@ export const messageApi = {
     getByConversation: async (conversationId) => {
         const { data } = await axiosInstance.get(
             `/messages/conversation/${conversationId}`
+        );
+        return data;
+    },
+
+    getMessagesByConversation: async (conversationId) => {
+        const { data } = await axiosInstance.get(
+            `/messages/conversation/messages/${conversationId}`
         );
         return data;
     },

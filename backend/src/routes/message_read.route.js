@@ -6,6 +6,7 @@ const router = Router()
 // routes speciales
 
 router.get("/message/:Message", message_read.getMessageOfMessageReadControlleur);
+router.get("/messages/:Conversation", message_read.getMessagesByConversationControlleur);
 router.get("/utilisateur/:Utilisateur", message_read.getUtilisateurOfMessageReadControlleur);
 
 router.post("/", message_read.createMessageReadControlleur);

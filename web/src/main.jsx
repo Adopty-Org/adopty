@@ -13,6 +13,7 @@ import {
   QueryClientProvider,
 } from '@tanstack/react-query'
 import { CartProvider } from './context/CartContext.jsx'
+import { SocketProvider } from './context/SocketContext.jsx'
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
 console.log("PUBLISHABLE_KEY", PUBLISHABLE_KEY)
@@ -30,7 +31,9 @@ createRoot(document.getElementById('root')).render(
       <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
         <QueryClientProvider client={queryClient}>
           <CartProvider>
-            <App />
+            <SocketProvider>
+              <App />
+            </SocketProvider>
           </CartProvider>
         </QueryClientProvider>
       </ClerkProvider>

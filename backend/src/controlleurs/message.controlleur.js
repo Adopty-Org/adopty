@@ -1,4 +1,4 @@
-import { createMessage, deleteMessage, getAllMessages, getMessageById, updateMessage } from "../database/message.db.js";
+import { createMessage, deleteMessage, getAllMessages, getMessageById, getMessagesByConversationId, updateMessage } from "../database/message.db.js";
 import { getConversationById } from "../database/conversation.db.js";
 import { isUserInConversation } from "../database/conversation_participant.db.js";
 
@@ -150,6 +150,17 @@ export async function getConversationOfMessageControlleur(req,res) {
         
     } catch (error) {
         console.error("Erreur lors de l'obtention de l'animal de l'annonce:", error);
+        res.status(500).json({ message: "Erreur interne du serveur" });
+    }
+}
+
+export const getMessagesByConversationIdControlleur = async (req, res) => {
+    try {
+        const { ConversationId } = req.params;
+        const messages = await getMessagesByConversationId(ConversationId);
+        res.status(200).json(messages);
+    } catch (error) {
+        console.error("Erreur lors de l'obtention des messages de la conversation:", error);
         res.status(500).json({ message: "Erreur interne du serveur" });
     }
 }

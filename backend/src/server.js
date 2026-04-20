@@ -9,7 +9,7 @@ import { serve } from "inngest/express"
 import cors from "cors"
 
 import { functions, ingest} from "./config/inngest.js";
-import { initSocket } from "./midleware/socket.midleware.js";  // Import de la fonction d'initialisation de Socket.io dans le middleware dédié
+import { initSocket } from "./midleware/socket.dingleware.js";  // Import de la fonction d'initialisation de Socket.io dans le middleware dédié
 
 import webRoutes from "./routes/web.route.js"
 import animalRoutes from "./routes/animal.route.js"

@@ -1,5 +1,5 @@
 import { getMessageById } from "../database/message.db.js";
-import { createMessageRead, deleteMessageRead, getAllMessageReads, getMessageReadById, getMessageReadsByMessageId, updateMessageRead } from "../database/message_read.db.js";
+import { createMessageRead, deleteMessageRead, getAllMessageReads, getMessageReadById, getMessageReadsByMessageId, getMessagesByConversation, updateMessageRead } from "../database/message_read.db.js";
 import { getUtilisateurById } from "../database/utilisateur.db.js";
 
 export async function createMessageReadControlleur(req,res) {// pas utilisable je crois
@@ -112,6 +112,20 @@ export async function getUtilisateurOfMessageReadControlleur(req,res) {
         }
         res.status(200).json(senderId);
         
+    } catch (error) {
+        console.error("Erreur lors de l'obtention de l'animal de l'annonce:", error);
+        res.status(500).json({ message: "Erreur interne du serveur" });
+    }
+}
+
+export async function getMessagesByConversationControlleur(req,res) {
+    try {
+        const { Conversation } = req.params;
+        const message = await getMessagesByConversation(Conversation);
+        if (!message) {
+            return res.status(404).json({ message: "MessageRead a un conversation inexistant !(non trouvé)" });
+        }
+        res.status(200).json(message);
     } catch (error) {
         console.error("Erreur lors de l'obtention de l'animal de l'annonce:", error);
         res.status(500).json({ message: "Erreur interne du serveur" });

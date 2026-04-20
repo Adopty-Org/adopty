@@ -6,6 +6,7 @@ const router = Router()
 
 // Routes spéciales de lecture protégées
 router.get("/conversation/:Conversation", protectRoute, message.getConversationOfMessageControlleur);
+router.get("/conversation/messages/:ConversationId", protectRoute, message.getMessagesByConversationIdControlleur);
 router.get("/sender_id/:SenderId", protectRoute, message.getSenderIdOfMessageControlleur);
 
 // Routes protégées - création, modification, suppression (utilisateurs authentifiés)

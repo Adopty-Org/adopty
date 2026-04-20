@@ -196,3 +196,39 @@ export const isOwnerOrAdmin = (req, res, next) => {
         message: "Vous ne pouvez modifier que vos propres données"
     });
 };
+
+
+import { verifyToken } from "@clerk/backend";
+//import { getUtilisateurByClerkId } from "../database/utilisateur.db.js";
+
+export const socketAuth = async (socket, next) => {
+    try {
+        const token = socket.handshake.auth.token;
+        
+        if (!token) {
+            return next(new Error("No token provided"));
+        }
+
+        const payload = await verifyToken(token, {
+            secretKey: process.env.CLERK_SECRET_KEY,
+        });
+
+        if (!payload?.sub) {
+            return next(new Error("Invalid token"));
+        }
+
+        const user = await getUtilisateurByClerkId(payload.sub);
+        
+        if (!user) {
+            return next(new Error("User not found"));
+        }
+
+        // Attacher l'utilisateur à la socket
+        socket.user = user;
+        next();
+        
+    } catch (err) {
+        console.error("Socket auth error:", err);
+        next(new Error("Authentication failed"));
+    }
+};

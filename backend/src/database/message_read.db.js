@@ -1,4 +1,5 @@
 import { db } from "../config/db.js";
+import { toMessageDTOArray } from "../dto/message.dto.js";
 import { MessageRead } from "../modeles/message_read.model.js";
 
 export const createMessageRead = async (message_read) => {
@@ -95,33 +96,66 @@ export const saveMessageFromSocket = async (messageData) => {
     }
 };
 
-// 🆕 Récupérer l'historique des messages d'une conversation
+// backend/database/message_read.db.js
+
 export const getMessagesByConversation = async (conversationId, limit = 50, offset = 0) => {
     try {
-        const [rows] = await db.query(
+        // 1️⃣ Récupérer les messages avec infos expéditeur
+        const [messages] = await db.query(
             `SELECT 
                 m.Id,
-                m.IdConversation as conversationId,
-                m.SenderId as senderId,
-                m.Contenu as message,
-                m.CreatedAt as timestamp,
-                mr.ReadAt as readAt,
-                u.clerkId as senderClerkId,
-                CONCAT(COALESCE(u.Prenom, ''), ' ', COALESCE(u.Nom, '')) as sender,
-                u.Prenom as senderFirstName,
-                u.Nom as senderLastName
+                m.IdConversation,
+                m.SenderId,
+                m.Contenu,
+                m.CreatedAt,
+                u.Prenom as senderPrenom,
+                u.Nom as senderNom,
+                u.Photo as senderAvatar,
+                u.clerkId as senderClerkId
             FROM message m
             JOIN utilisateur u ON m.SenderId = u.Id
-            LEFT JOIN message_read mr ON m.Id = mr.IdMessage AND mr.IdUtilisateur = u.Id
             WHERE m.IdConversation = ?
-            ORDER BY m.CreatedAt DESC
+            ORDER BY m.CreatedAt ASC
             LIMIT ? OFFSET ?`,
             [conversationId, limit, offset]
         );
-        
-        // Retourner dans l'ordre chronologique
-        return rows.reverse();
-        
+
+        if (messages.length === 0) return [];
+
+        // 2️⃣ Récupérer les lectures pour TOUS ces messages (une seule requête)
+        const messageIds = messages.map(m => m.Id);
+        const [reads] = await db.query(
+            `SELECT IdMessage, IdUtilisateur
+             FROM message_read
+             WHERE IdMessage IN (?)`,
+            [messageIds]
+        );
+
+        // 3️⃣ Construire un map: messageId → [userId, userId, ...]
+        const readByMap = {};
+        reads.forEach(read => {
+            if (!readByMap[read.IdMessage]) {
+                readByMap[read.IdMessage] = [];
+            }
+            readByMap[read.IdMessage].push(read.IdUtilisateur);
+        });
+
+        // 4️⃣ Assembler les messages finaux
+        const assembledMessages = messages.map(msg => ({
+            Id: msg.Id,
+            IdConversation: msg.IdConversation,
+            SenderId: msg.SenderId,
+            Contenu: msg.Contenu,
+            CreatedAt: msg.CreatedAt,
+            senderName: `${msg.senderPrenom || ''} ${msg.senderNom || ''}`.trim(),
+            senderAvatar: msg.senderAvatar,
+            senderClerkId: msg.senderClerkId,
+            readBy: readByMap[msg.Id] || []
+        }));
+
+        //console.log(`📬 Récupérés ${assembledMessages.length} messages pour conversation ${conversationId}:     `, assembledMessages);
+        return assembledMessages;
+
     } catch (error) {
         console.error("Error getting messages:", error);
         throw error;

@@ -58,3 +58,15 @@ export const deleteMessage = async (id) => {
   return result.affectedRows;
 };
 
+export const getMessagesByConversationId = async (conversationId) => {
+    try {
+        const [rows] = await db.query(
+            "SELECT m.* FROM message m JOIN utilisateur u ON m.SenderId = u.Id WHERE m.IdConversation = ? ORDER BY m.CreatedAt ASC",
+            [conversationId]
+        );
+        return rows.map(row => new Message(row));
+    } catch (error) {
+        console.error("Erreur lors de la récupération des messages:", error);
+        throw error;
+    }
+};

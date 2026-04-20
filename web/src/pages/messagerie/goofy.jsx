@@ -1,165 +1,3 @@
-/*import { useEffect, useState, useRef } from "react";
-import { io } from "socket.io-client";
-import { useAuth } from "@clerk/clerk-react";
-
-export default function TestChat() {
-    const [conversation, setRoom] = useState("conversation1");
-    const [message, setMessage] = useState("");
-    const [messages, setMessages] = useState([]);
-
-    const { getToken } = useAuth();
-    const socketRef = useRef(null); // 🔥 IMPORTANT
-
-    /*useEffect(() => {
-        const init = async () => {
-            const token = await getToken({template: "default"});
-
-            // 🔥 créer socket UNE fois
-            /*socketRef.current = io("http://localhost:3000", {
-                extraHeaders: {
-                    Authorization: `Bearer ${token}`
-                }
-            });* /
-            socketRef.current = io("http://localhost:3000", {
-                auth: {
-                    token
-                }
-            });
-
-            const socket = socketRef.current;
-
-            setMessages([]);
-            socket.emit("join_conversation", conversation);
-
-            const handler = (data) => {
-                console.log("📩 FRONT RECOIT:", data);
-
-                setMessages((prev) => {
-                    const exists = prev.some((m) => {
-                        if (m.conversationId !== data.conversationId) return false;
-
-                        if (data.id != null || m.id != null) {
-                            return m.id === data.id;
-                        }
-
-                        if (data.timestamp != null || m.timestamp != null) {
-                            return m.timestamp === data.timestamp;
-                        }
-
-                        return m.message === data.message && m.sender === data.sender;
-                    });
-
-                    if (exists) return prev;
-                    return [...prev, data];
-                });
-            };
-
-            socket.on("new_message", handler);
-
-            return () => {
-                socket.off("new_message", handler);
-                socket.disconnect();
-            };
-        };
-
-        init();
-    }, [conversation]);* /
-
-    useEffect(() => {
-        let socket;
-        let cancelled = false;
-        const handler = (data) => {
-            console.log("📩 FRONT RECOIT:", data);
-            setMessages((prev) => {
-                const exists = prev.some((m) => {
-                    if (m.conversationId !== data.conversationId) return false;
-                    if (data.id != null || m.id != null) {
-                        return m.id === data.id;
-                    }
-                    if (data.timestamp != null || m.timestamp != null) {
-                        return m.timestamp === data.timestamp;
-                    }
-                    return m.message === data.message && m.sender === data.sender;
-                });
-                if (exists) return prev;
-                return [...prev, data];
-            });
-        };
-        const init = async () => {
-            const token = await getToken();
-            if (cancelled) return;
-            socket = io(import.meta.env.VITE_SOCKET_URL || "http://localhost:3000", {
-                auth: {
-                    token
-                }
-            });
-            socketRef.current = socket;
-            setMessages([]);
-            socket.emit("join_conversation", conversation);
-            socket.on("new_message", handler);
-        };
-        init();
-        return () => {
-            cancelled = true;
-            socket?.off("new_message", handler);
-            socket?.disconnect();
-            if (socketRef.current === socket) {
-                socketRef.current = null;
-            }
-        };
-    }, [conversation, getToken]);
-
-    const sendMessage = () => {
-        if (!message || !socketRef.current) return;
-
-        if (!socketRef.current.connected) {
-            console.log("❌ Socket not connected");
-            return;
-        }
-
-        socketRef.current.emit("send_message", {
-            conversationId: conversation,
-            message
-        }, (response) => {
-            console.log("📡 Server ACK:", response);
-        });
-
-        console.log("📤 sending message");
-
-        setMessage("");
-
-        console.log("SOCKET STATE:", socketRef.current?.connected);
-    };
-
-    return (
-        <div style={{ padding: 20 }}>
-            <h2>💬 Chat test</h2>
-
-            <input
-                value={conversation}
-                onChange={(e) => {
-                    setRoom(e.target.value);
-                    setMessages([]);
-                }}
-            />
-            <br /><br />
-
-            <input
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-            />
-            <button onClick={sendMessage}>Send</button>
-
-            <ul>
-                {messages.map((msg, i) => (
-                    <li key={i}>
-                        {msg.sender}: {msg.message}
-                    </li>
-                ))}
-            </ul>
-        </div>
-    );
-}*/
 
 import { useEffect, useState, useRef, useCallback } from "react";
 import { io } from "socket.io-client";
@@ -180,6 +18,19 @@ export default function TestChat({ conversationId: propConversationId , conversa
 
   const { getToken } = useAuth();
   const socketRef = useRef(null);
+
+  useEffect(() => {
+    if (!socketRef.current || !messages.length) return;
+
+    const lastMsg = messages[messages.length - 1];
+    if (!lastMsg) return;
+
+    socketRef.current.emit("mark_seen", {
+        conversationId,
+        lastMessageId: lastMsg.id
+    });
+
+    }, [messages]);
 
   useEffect(() => {
   const fetchReads = async () => {
@@ -328,6 +179,20 @@ export default function TestChat({ conversationId: propConversationId , conversa
             return [...prev, data];
           });
         });
+
+        socketRef.current.on("messages_seen", ({ userId, lastMessageId }) => {
+            setReadMap(prev => {
+                const newMap = { ...prev };
+
+                messages.forEach(msg => {
+                if (msg.id <= lastMessageId) {
+                    newMap[msg.id] = true;
+                }
+                });
+
+                return newMap;
+            });
+            });
 
         socket.on("user_left", (data) => {
           console.log("👋 User left:", data);

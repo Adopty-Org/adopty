@@ -421,6 +421,7 @@ export const initSocket = (server, { origin }) => {
         // 🆕 Envoyer l'historique des messages
         try {
           const historique = await getMessagesByConversation(conversationId, 50);
+          //console.log("historique :   ", historique);
           console.log(`📜 Envoi de ${historique.length} messages à l'utilisateur`);
           socket.emit("message_history", historique);
         } catch (err) {
@@ -439,6 +440,21 @@ export const initSocket = (server, { origin }) => {
         socket.emit("error", { message: "Failed to join conversation" });
       }
     });
+
+    socket.on("mark_seen", async ({ conversationId, lastMessageId }) => {
+    try {
+      await markConversationMessagesAsRead(conversationId, socket.user.Id);
+
+      // notifier les autres
+      socket.to(`conv_${conversationId}`).emit("messages_seen", {
+        userId: socket.user.Id,
+        lastMessageId
+      });
+
+    } catch (err) {
+      console.error("mark_seen error:", err);
+    }
+  });
 
     // 💬 SEND MESSAGE avec sauvegarde BDD
     socket.on("send_message", async (data) => {
