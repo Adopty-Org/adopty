@@ -5,6 +5,7 @@ import Modal from '../../components/ui/Modal'
 import AdoptionForm from '../../components/forms/AdoptionForm'
 import { animalApi, especeApi, raceApi } from '../../lib/api'
 import { useQuery } from '@tanstack/react-query'
+import { useAnimals,useAnimal } from '../../hooks/useAnimal'
 //import { animaux } from '../data/mockData'
 
 const Profil = () => {
@@ -13,7 +14,9 @@ const Profil = () => {
   const [adoptionOpen, setAdoptionOpen] = useState(false)
   const [favoris, setFavoris] = useState(false)
 
-  const {data:AnimalData, isLoading:AnimalLoading} = useQuery({
+  const {animal, isLoading: AnimalLoading, isError, error}= useAnimal(id)
+
+  /*const {data:AnimalData, isLoading:AnimalLoading} = useQuery({
     queryKey: ["animaux"],
     queryFn: () => animalApi.getSpecific(id),
     enabled: !!id
@@ -66,7 +69,7 @@ const Profil = () => {
             : null
         }
       })()
-    : null
+    : null*/
 
   
   const { data: photos = [] } = useQuery({
@@ -75,7 +78,7 @@ const Profil = () => {
     enabled: !!id // évite bug au début
   })
 
-  //console.log("L'animal :   ", animal)
+  console.log("L'animal :   ", animal)
   if (AnimalLoading || !animal) {
     return <PageTransition><div className="p-12 text-center">Chargement…</div></PageTransition>
   }

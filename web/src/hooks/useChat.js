@@ -12,9 +12,10 @@ export const useChat = (conversationId) => {
     const [typingUsers, setTypingUsers] = useState({});
 
     const { socket, isConnected } = useSocket();
-    const { user: clerkUser } = useUser(); // ← Récupérer l'utilisateur Clerk
+    const { user: clerkUser } = useUser();
     const typingTimeoutRef = useRef(null);
-    const [dbUser, setDbUser] = useState(null); // ← Utilisateur BDD
+    const [dbUser, setDbUser] = useState(null);
+    const markAsReadRef = useRef(null); // ← Ref pour markAsRead
 
     // ========================================
     // 1. Charger l'utilisateur BDD
@@ -71,7 +72,39 @@ export const useChat = (conversationId) => {
     }, [loadHistory]);
 
     // ========================================
-    // 3. Socket : rejoindre et écouter
+    // 3. Définir markAsRead AVANT de l'utiliser
+    // ========================================
+    const markAsRead = useCallback((messageId) => {
+        if (!socket || !isConnected) return;
+        console.log(`👁️ Marking message ${messageId} as read`);
+        socket.emit("mark_read", { conversationId, messageId });
+    }, [socket, isConnected, conversationId]);
+
+    // Stocker markAsRead dans une ref pour l'utiliser dans les effets
+    useEffect(() => {
+        markAsReadRef.current = markAsRead;
+    }, [markAsRead]);
+
+    // ========================================
+    // 4. Effet pour marquer automatiquement comme lu (CORRIGÉ)
+    // ========================================
+    useEffect(() => {
+        // Marquer comme lu quand on reçoit de nouveaux messages
+        if (messages.length > 0 && dbUser && markAsReadRef.current) {
+            // Trouver le dernier message non-lu qui n'est pas de l'utilisateur courant
+            const lastUnreadMessage = [...messages]
+                .reverse()
+                .find(msg => msg.senderId !== dbUser.Id && !msg.readBy?.includes(dbUser.Id));
+            
+            if (lastUnreadMessage) {
+                console.log(`📖 Auto-marking message ${lastUnreadMessage.id} as read`);
+                markAsReadRef.current(lastUnreadMessage.id);
+            }
+        }
+    }, [messages, dbUser]); // Se déclenche quand messages change
+
+    // ========================================
+    // 5. Socket : rejoindre et écouter
     // ========================================
     useEffect(() => {
         if (!socket || !isConnected || !conversationId) return;
@@ -144,7 +177,7 @@ export const useChat = (conversationId) => {
     }, [socket, isConnected, conversationId]);
 
     // ========================================
-    // 4. Envoyer un message
+    // 6. Envoyer un message
     // ========================================
     const sendMessage = useCallback((content) => {
         if (!socket || !isConnected || !content.trim()) return false;
@@ -162,15 +195,7 @@ export const useChat = (conversationId) => {
     }, [socket, isConnected, conversationId]);
 
     // ========================================
-    // 5. Marquer comme lu
-    // ========================================
-    const markAsRead = useCallback((messageId) => {
-        if (!socket || !isConnected) return;
-        socket.emit("mark_read", { conversationId, messageId });
-    }, [socket, isConnected, conversationId]);
-
-    // ========================================
-    // 6. Indicateur de frappe
+    // 7. Indicateur de frappe
     // ========================================
     const sendTyping = useCallback((isTyping) => {
         if (!socket || !isConnected) return;

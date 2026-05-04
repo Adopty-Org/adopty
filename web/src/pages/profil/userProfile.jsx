@@ -18,7 +18,7 @@ const UserProfile = () => {
         <div className="min-h-[60vh] flex flex-col items-center justify-center gap-6">
           <span className="material-symbols-outlined text-7xl text-on-surface-variant/30">account_circle</span>
           <h2 className="font-['Chewy'] text-4xl text-primary">Vous n'êtes pas connecté</h2>
-          <Link to="/auth" className="px-8 py-4 bg-primary text-white font-bold border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all">
+          <Link to="/auth" className="px-8 py-4 bg-primary text-white font-bold border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-2px hover:translate-y-2px hover:shadow-none transition-all">
             Se connecter / S'inscrire
           </Link>
         </div>
@@ -28,7 +28,7 @@ const UserProfile = () => {
         <div className="max-w-4xl mx-auto px-6 py-12 space-y-10">
           {/* Header profil */}
           <FadeIn className="bg-primary border-4 border-black shadow-[8px_8px_0px_0px_rgba(148,73,37,1)] rounded-xl p-8 flex flex-col md:flex-row items-center gap-8">
-            <div className="relative flex-shrink-0">
+            <div className="relative shrink-0">
               {user?.imageUrl ? (
                 <img src={user.imageUrl} alt={user.fullName} className="w-24 h-24 rounded-full border-4 border-white object-cover shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]" />
               ) : (

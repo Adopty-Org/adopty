@@ -115,9 +115,9 @@ export const getMessagesByConversation = async (conversationId, limit = 50, offs
             FROM message m
             JOIN utilisateur u ON m.SenderId = u.Id
             WHERE m.IdConversation = ?
-            ORDER BY m.CreatedAt ASC
+            ORDER BY m.CreatedAt DESC
             LIMIT ? OFFSET ?`,
-            [conversationId, limit, offset]
+            [conversationId, limit, offset] // DESC <=> ASC
         );
 
         if (messages.length === 0) return [];
@@ -141,7 +141,7 @@ export const getMessagesByConversation = async (conversationId, limit = 50, offs
         });
 
         // 4️⃣ Assembler les messages finaux
-        const assembledMessages = messages.map(msg => ({
+        let assembledMessages = messages.map(msg => ({
             Id: msg.Id,
             IdConversation: msg.IdConversation,
             SenderId: msg.SenderId,
@@ -152,6 +152,9 @@ export const getMessagesByConversation = async (conversationId, limit = 50, offs
             senderClerkId: msg.senderClerkId,
             readBy: readByMap[msg.Id] || []
         }));
+
+        // Inverser l'ordre pour avoir les messages du plus ancien au plus récent
+        assembledMessages = assembledMessages.reverse();
 
         //console.log(`📬 Récupérés ${assembledMessages.length} messages pour conversation ${conversationId}:     `, assembledMessages);
         return assembledMessages;

@@ -3,12 +3,28 @@ import { FadeIn, PageTransition } from '../../components/Animations'
 import ServiceCard from '../../components/ui/ServiceCard'
 import Modal from '../../components/ui/Modal'
 import ReservationForm from '../../components/forms/ReservationForm'
+import { usePrestataires } from '../../hooks/usePrestataire'
+import { useTypeServices } from '../../hooks/useType_service'
 
 function ServicesPage() {
-  const [activeTab, setActiveTab] = useState('Baby-sitting')
+  const [activeTab, setActiveTab] = useState('all')
   const [selectedPrestataire, setSelectedPrestataire] = useState(null)
 
- // const filtered = prestataires.filter(p => p.service === activeTab)
+  const { prestataires } = usePrestataires()
+  const { typeServicesWithAll, typesLoading } = useTypeServices();
+
+  // Mapping des icônes par service
+  const getIconForTab = (tabNom) => {
+    const iconMap = {
+      'Baby-sitting': 'home',
+      'Promenade': 'directions_walk',
+      'Tous': 'apps'
+    }
+    return iconMap[tabNom] || 'star'
+  }
+
+  console.log("Prestataires : ", prestataires);
+  const filtered = prestataires.filter(p => p?.typeService?.Id === activeTab || activeTab === 'all')
 
 
 
@@ -56,25 +72,34 @@ function ServicesPage() {
 
       <div className="max-w-7xl mx-auto px-6 py-12">
         {/* Tabs */}
-        <FadeIn className="flex gap-3 mb-10">
-          {['Baby-sitting', 'Promenade'].map(tab => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`flex items-center gap-2 px-7 py-3 font-['Plus_Jakarta_Sans'] font-extrabold text-lg border-4 border-black transition-all
-                ${activeTab === tab
-                  ? 'bg-primary text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]'
-                  : 'bg-surface-container-lowest text-primary hover:bg-surface-container hover:translate-x-2px hover:translate-y-2px shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none'
-                }`}
-            >
-              <span className="material-symbols-outlined">{tab === 'Baby-sitting' ? 'home' : 'directions_walk'}</span>
-              {tab}
-            </button>
-          ))}
+        <FadeIn className="flex gap-3 mb-10 flex-wrap">
+          {typesLoading ? (
+            // Skeleton loading
+            [1, 2, 3].map(i => (
+              <div key={i} className="h-14 w-32 bg-gray-200 animate-pulse rounded-lg"></div>
+            ))
+          ) : (
+            typeServicesWithAll?.map(tab => (
+              <button
+                key={tab?.Id}
+                onClick={() => setActiveTab(tab?.Id)}
+                className={`flex items-center gap-2 px-7 py-3 font-['Plus_Jakarta_Sans'] font-extrabold text-lg border-4 border-black transition-all whitespace-nowrap
+                  ${activeTab === tab?.Id
+                    ? 'bg-primary text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]'
+                    : 'bg-surface-container-lowest text-primary hover:bg-surface-container hover:translate-x-2px hover:translate-y-2px shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none'
+                  }`}
+              >
+                <span className="material-symbols-outlined">
+                  {getIconForTab(tab?.Type)}
+                </span>
+                {tab?.Type}
+              </button>
+            ))
+          )}
         </FadeIn>
 
         {/* Grid prestataires */}
-        {/*filtered.length === 0 ? (
+        {filtered.length === 0 ? (
           <FadeIn className="text-center py-24 text-on-surface-variant">
             <span className="material-symbols-outlined text-6xl mb-4 block opacity-30">search_off</span>
             <p className="font-bold text-xl">Aucun prestataire disponible pour ce service.</p>
@@ -82,10 +107,10 @@ function ServicesPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filtered.map((p, i) => (
-              <ServiceCard key={p.id} prestataire={p} delay={i * 0.1} onReserver={setSelectedPrestataire} />
+              <ServiceCard key={p.Id} prestataire={p} delay={i * 0.1} onReserver={setSelectedPrestataire} />
             ))}
           </div>
-        )*/}
+        )}
 
         {/* Devenir prestataire */}
         <FadeIn delay={0.3} className="mt-20 bg-[#ffdbcd] border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-10 rounded-xl">

@@ -1,9 +1,12 @@
-import { SignedIn, SignedOut, UserButton, useUser } from '@clerk/clerk-react'
+import { SignedIn, SignedOut, useAuth, UserButton, useUser } from '@clerk/clerk-react'
 import { HomeIcon, InfoIcon, MapPinHouseIcon, PanelLeftIcon, PawPrintIcon, ShoppingBagIcon } from 'lucide-react'
 import React, { Children, useState } from 'react'
 import { Link, useLocation } from 'react-router'
 import { useCart } from '../context/CartContext'
 import { AnimatePresence, motion } from 'framer-motion'
+import { useProduitPhotos } from '../hooks/useProduit'
+import { useNotifications } from '../context/NotificationContext'
+import { useEffect } from 'react'
 
 export const NAVIGATION = [
   {name: "Lobby", path: "/lobby", icon: <HomeIcon className="size-5"/> },
@@ -23,6 +26,53 @@ function Navbar() {
   const [cartOpen, setCartOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { user } = useUser()
+
+  const { isSignedIn, isLoaded, signOut } = useAuth();
+  const isAuthPage = location.pathname === '/auth'
+  const { notifications, unreadCount, markAsRead, markAllAsRead, removeNotification } = useNotifications()
+  const [notificationsOpen, setNotificationsOpen] = useState(false)
+
+  useEffect(() => {
+    if (cartOpen || notificationsOpen || mobileMenuOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => { document.body.style.overflow = '' }
+  }, [cartOpen, notificationsOpen, mobileMenuOpen])
+
+  const getNotificationIcon = (type) => {
+    switch (type) {
+      case 'success': return <span className="material-symbols-outlined text-secondary">check_circle</span>
+      case 'warning': return <span className="material-symbols-outlined text-warning">warning</span>
+      case 'info':
+      default: return <span className="material-symbols-outlined text-primary">info</span>
+    }
+  }
+
+  const formatNotificationTime = (dateString) => {
+    const date = new Date(dateString)
+    const now = new Date()
+    const diff = Math.floor((now - date) / 1000)
+    
+    if (diff < 60) return 'À l\'instant'
+    if (diff < 3600) return `Il y a ${Math.floor(diff / 60)} min`
+    if (diff < 86400) return `Il y a ${Math.floor(diff / 3600)} h`
+    return `Il y a ${Math.floor(diff / 86400)} j`
+  }
+
+  /*useEffect(() => {
+    // Si Clerk est chargé et que c'est l'ouverture d'un nouvel onglet,
+    // on force la déconnexion pour que la session ne soit pas sauvegardée entre deux onglets/navigateurs
+    if (isLoaded) {
+      if (!sessionStorage.getItem('app_initialized')) {
+        sessionStorage.setItem('app_initialized', 'true')
+        if (isSignedIn) {
+          signOut()
+        }
+      }
+    }
+  }, [isLoaded, isSignedIn, signOut])*/
 
   const isActive = (to) => {
     if (to === '/') return location.pathname === '/'
@@ -71,6 +121,24 @@ function Navbar() {
                 </div>
                 
                 <div className='flex justify-between space-x-3'>
+                    
+                    {/* Notifications */}
+                    {/*isSignedIn && !isAuthPage && */(
+                      <button
+                        onClick={() => setNotificationsOpen(true)}
+                        className="relative p-2 rounded-lg hover:bg-surface-container transition-colors border-2 border-transparent hover:border-black"
+                        title="Notifications"
+                      >
+                        <span className="material-symbols-outlined text-primary text-2xl">notifications</span>
+                        {unreadCount > 0 && (
+                          <span className="absolute -top-1 -right-1 w-5 h-5 bg-error text-white text-xs font-extrabold rounded-full border-2 border-black flex items-center justify-center">
+                            {unreadCount > 9 ? '9+' : unreadCount}
+                          </span>
+                        )}
+                      </button>
+                    )}
+
+
                     {/* Panier */}
                     <button
                     onClick={() => setCartOpen(true)}
@@ -84,6 +152,89 @@ function Navbar() {
                         </span>
                     )}
                     </button>
+
+                    {/* NOTIFICATIONS DRAWER */}
+                    <AnimatePresence>
+                      {notificationsOpen && (
+                        <motion.div
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          className="fixed inset-0 z-[200]"
+                          onClick={() => setNotificationsOpen(false)}
+                        >
+                          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
+                          <motion.aside
+                            initial={{ x: '100%' }}
+                            animate={{ x: 0 }}
+                            exit={{ x: '100%' }}
+                            transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+                            className="absolute right-0 top-0 bottom-0 w-full max-w-md bg-[#fbfbe2] border-l-4 border-black flex flex-col shadow-[-8px_0_0_0_rgba(0,0,0,0.3)]"
+                            onClick={e => e.stopPropagation()}
+                          >
+                            <div className="flex items-center justify-between p-5 border-b-4 border-black bg-surface-container">
+                              <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-xl text-primary flex items-center gap-2">
+                                <span className="material-symbols-outlined">notifications</span>
+                                Notifications {unreadCount > 0 && <span className="bg-error text-white text-sm px-2 py-0.5 rounded-full border border-black">{unreadCount}</span>}
+                              </h2>
+                              <div className="flex items-center gap-2">
+                                {unreadCount > 0 && (
+                                  <button onClick={markAllAsRead} className="text-xs font-bold text-primary underline mr-2">
+                                    Tout marquer lu
+                                  </button>
+                                )}
+                                <button onClick={() => setNotificationsOpen(false)} className="p-2 border-2 border-black hover:bg-error hover:text-white transition-colors rounded-lg flex items-center justify-center">
+                                  <span className="material-symbols-outlined">close</span>
+                                </button>
+                              </div>
+                            </div>
+
+                            <div className="flex-1 overflow-y-auto p-5 space-y-4">
+                              {notifications.length === 0 ? (
+                                <div className="text-center py-16 text-on-surface-variant">
+                                  <span className="material-symbols-outlined text-6xl mb-4 block opacity-30">notifications_active</span>
+                                  <p className="font-bold text-lg">Aucune notification</p>
+                                  <p className="text-sm mt-2 opacity-80">Vous êtes à jour !</p>
+                                </div>
+                              ) : (
+                                notifications.map(notification => (
+                                  <div 
+                                    key={notification.id} 
+                                    className={`relative p-4 border-2 border-black rounded-xl transition-colors cursor-pointer
+                                      ${notification.read ? 'bg-surface-container-lowest opacity-70' : 'bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none'}`}
+                                    onClick={() => !notification.read && markAsRead(notification.id)}
+                                  >
+                                    {!notification.read && (
+                                      <span className="absolute top-4 right-4 w-2.5 h-2.5 bg-error rounded-full border border-black"></span>
+                                    )}
+                                    <div className="flex items-start gap-3">
+                                      <div className="mt-0.5">
+                                        {getNotificationIcon(notification.type)}
+                                      </div>
+                                      <div className="flex-1 min-w-0 pr-4">
+                                        <p className="font-['Plus_Jakarta_Sans'] font-bold text-sm text-primary">{notification.title}</p>
+                                        <p className="text-xs text-on-surface-variant mt-1 leading-relaxed">{notification.message}</p>
+                                        <p className="text-[10px] font-bold text-primary/50 mt-2 uppercase tracking-wider">{formatNotificationTime(notification.date)}</p>
+                                      </div>
+                                    </div>
+                                    <button 
+                                      onClick={(e) => {
+                                        e.stopPropagation()
+                                        removeNotification(notification.id)
+                                      }} 
+                                      className="absolute bottom-3 right-3 p-1.5 border border-black/20 hover:bg-error-container hover:border-error text-error rounded transition-colors flex-shrink-0 opacity-0 group-hover:opacity-100 sm:opacity-100"
+                                      title="Supprimer"
+                                    >
+                                      <span className="material-symbols-outlined text-[14px]">delete</span>
+                                    </button>
+                                  </div>
+                                ))
+                              )}
+                            </div>
+                          </motion.aside>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
 
                     {/* CART DRAWER */}
                     <AnimatePresence>
@@ -124,20 +275,25 @@ function Navbar() {
                                     </Link>
                                 </div>
                                 ) : (
-                                cartItems.map(item => (
-                                    <div key={item.id} className="flex items-start gap-4 p-4 bg-surface-container-lowest border-2 border-black rounded-xl">
-                                    <img src={item.photo} alt={item.nom} className="w-16 h-16 object-cover border-2 border-black rounded-lg shrink-0" />
+                                cartItems.map(item => {
+                                  
+                                  // Utiliser la première photo ou une image par défaut
+                                  const photoUrl = item?.photos?.[0]?.Url || '/placeholder-image.jpg'
+                                  console.log("Cart Item:", item)
+                                  return (
+                                    <div key={item?.Id} className="flex items-start gap-4 p-4 bg-surface-container-lowest border-2 border-black rounded-xl">
+                                    <img src={photoUrl} alt={item?.Nom} className="w-16 h-16 object-cover border-2 border-black rounded-lg shrink-0" />
                                     <div className="flex-1 min-w-0">
-                                        <p className="font-'Plus_Jakarta_Sans' font-bold text-sm truncate">{item.nom}</p>
-                                        <p className="text-xs text-on-surface-variant">{item.categorie}</p>
-                                        <p className="font-extrabold text-primary mt-1">{item.prix.toFixed(2)}€ × {item.qty}</p>
+                                        <p className="font-'Plus_Jakarta_Sans' font-bold text-sm truncate">{item?.Nom}</p>
+                                        <p className="text-xs text-on-surface-variant">{item?.Categorie}</p>
+                                        <p className="font-extrabold text-primary mt-1">{item?.Prix.toFixed(2)}€ × {item?.Quantite}</p>
                                     </div>
-                                    <button onClick={() => removeFromCart(item.id)} className="p-1.5 border border-black hover:bg-error-container text-error rounded transition-colors shrink-0">
+                                    <button onClick={() => removeFromCart(item?.Id)} className="p-1.5 border border-black hover:bg-error-container text-error rounded transition-colors shrink-0">
                                         <span className="material-symbols-outlined text-base">delete</span>
                                     </button>
                                     </div>
-                                ))
                                 )}
+                                ))}
                             </div>
 
                             {cartItems.length > 0 && (

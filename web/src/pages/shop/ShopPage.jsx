@@ -3,23 +3,40 @@ import { FadeIn, PageTransition } from '../../components/Animations.jsx'
 import ProductCard from '../../components/ui/ProductCard.jsx'
 import { useQuery } from '@tanstack/react-query'
 import { produitApi } from '../../lib/api.js'
+import { useProduits } from '../../hooks/useProduit.js'
 
 const CATEGORIES = ['Tous', 'Alimentation Bio', 'Jouets Écolo', 'Accessoires', 'Hygiène']
 
 function ShopPage() {
   const [categorie, setCategorie] = useState('Tous')
   const [tri, setTri] = useState('nouveautes')
+  const { produits, isLoading: ProduitsLoading } = useProduits()
 
-  const { data:ProduitsData, isLoading:ProduitsLoading} = useQuery({
+  /*const { data:ProduitsData, isLoading:ProduitsLoading} = useQuery({
     queryKey:['produits'],
     queryFn: produitApi.getAll
   })
 
   console.log("ProduitsData :", ProduitsData)
 
-  const produits = ProduitsData ?? []
+  const produits = ProduitsData ?? []*/
 
-  console.log("Les produits :   ", produits)
+  // 🛡️ GARDE-FOU N°1 : Valeur par défaut
+  const produitsArray = produits ?? []  // 👈 Si undefined/null, devient []
+
+  console.log("Les produits :   ", produitsArray)
+
+  // 🛡️ GARDE-FOU N°2 : Affichage conditionnel
+  if (ProduitsLoading) {
+    return <div className="flex justify-center p-12">
+      <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent"></div>
+    </div>
+  }
+
+  // 🛡️ GARDE-FOU N°3 : Sécurité absolue
+  if (!produitsArray.length) {
+    return <div className="text-center p-12 text-gray-500">Aucun produit disponible</div>
+  }
 
   const filtered = produits
     .filter(p => categorie === 'Tous' || p.Categorie === categorie)

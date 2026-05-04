@@ -16,7 +16,7 @@ const TRAITS = [
 
 const RefugesNAnimals = () => {
 
-  const {data:AnimauxData, isLoading:AnimauxLoading} = useQuery({
+  /*const {data:AnimauxData, isLoading:AnimauxLoading} = useQuery({
     queryKey: ["animaux"],
     queryFn: animalApi.getAll,
   })
@@ -24,7 +24,7 @@ const RefugesNAnimals = () => {
   const {data:RefugesData, isLoading:RefugesLoading} = useQuery({
     queryKey: ["refuges"],
     queryFn: refugeApi.getAll,
-  })
+  })*/
 
   const { 
     especes,
@@ -35,13 +35,26 @@ const RefugesNAnimals = () => {
     caractere, toggleCaractere, 
     selectedTraits, toggleTrait,
     search, setSearch, 
-    reset, filteredAnimaux 
+    reset, filteredAnimaux, 
+    isLoading
   } = useFilters()
 
   ESPECES = [
-  'Tous',
-  ...new Set((especes ?? []).map(e => e.Nom))
-]
+    'Tous',
+    ...new Set((especes ?? []).map(e => e.Nom))
+  ]
+
+  // 🛡️ GARDE-FOU N°2 : Affichage conditionnel
+  if (isLoading) {
+    return <div className="flex justify-center p-12">
+      <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent"></div>
+    </div>
+  }
+
+  // 🛡️ GARDE-FOU N°3 : Sécurité absolue
+  if (!filteredAnimaux.length) {
+    return <div className="text-center p-12 text-gray-500">Aucun animal disponible</div>
+  }
 
   return (
     <PageTransition>
@@ -83,7 +96,7 @@ const RefugesNAnimals = () => {
                   {ESPECES.map(e => (
                     <button key={e} onClick={() => setEspece(e)}
                       className={`px-4 py-2 rounded-xl text-xs font-black border-2 border-black transition-all uppercase
-                        ${espece === e ? 'bg-primary text-white shadow-none translate-x-[2px] translate-y-[2px]' : 'bg-white hover:bg-secondary-container shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]'}`}>
+                        ${espece === e ? 'bg-primary text-white shadow-none translate-x-2px translate-y-2px' : 'bg-white hover:bg-secondary-container shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]'}`}>
                       {e}
                     </button>
                   ))}
@@ -114,7 +127,7 @@ const RefugesNAnimals = () => {
                       onClick={() => toggleTrait(t.id)}
                       className={`w-full flex items-center gap-3 p-3 border-2 border-black transition-all rounded-xl
                         ${selectedTraits.includes(t.id) 
-                          ? 'bg-secondary text-white shadow-none translate-x-[1px] translate-y-[1px]' 
+                          ? 'bg-secondary text-white shadow-none translate-x-1px translate-y-1px' 
                           : 'bg-white hover:bg-surface-container shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]'}`}
                     >
                       <span className="material-symbols-outlined text-lg">{t.icon}</span>

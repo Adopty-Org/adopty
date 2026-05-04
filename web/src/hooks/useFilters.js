@@ -1,13 +1,19 @@
 import { useState } from 'react'
 import { animalApi, especeApi, raceApi } from '../lib/api'
 import { useQuery } from '@tanstack/react-query'
+import { useEspeces } from './useEspece'
+import { useRaces } from './useRace'
+import { useAnimals } from './useAnimal'
 //import { animaux } from '../data/mockData'
 
 
 
 export const useFilters = () => {
 
-  const {data:AnimauxData, isLoading:AnimauxLoading} = useQuery({
+  const {animals, isLoading:AnimalsLoading} = useAnimals();
+  const {especes, isLoading:EspecesLoading} = useEspeces();
+
+  /*const {data:AnimauxData, isLoading:AnimauxLoading} = useQuery({
     queryKey: ["animaux"],
     queryFn: animalApi.getAll,
   })
@@ -72,7 +78,7 @@ export const useFilters = () => {
           }
         : null
     }
-  })
+  })*/
 
   console.log("L'animal :   ", animals)
 
@@ -134,6 +140,7 @@ export const useFilters = () => {
     caractere, toggleCaractere, 
     selectedTraits, toggleTrait,
     search, setSearch, 
-    reset, filteredAnimaux 
+    reset, filteredAnimaux, 
+    isLoading: AnimalsLoading || EspecesLoading
   }
 }

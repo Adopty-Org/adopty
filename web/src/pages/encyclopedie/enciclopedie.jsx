@@ -4,14 +4,18 @@ import { PageTransition, FadeIn } from '../../components/Animations'
 import BreedDetailModal from '../../components/ui/BreedDetailModal'
 import { especeApi, raceApi } from '../../lib/api'
 import { useQuery } from '@tanstack/react-query'
+import { useRaces } from '../../hooks/useRace'
+import { useEspeces } from '../../hooks/useEspece'
 
 const Encyclopedie = () => {
   const [search, setSearch] = useState('')
   const [selectedSpecies, setSelectedSpecies] = useState('Tous')
   const [selectedBreed, setSelectedBreed] = useState(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const {especes, especeMap, EspecesLoading} = useEspeces()
+  const {racesWithEspece, races, raceMap, RacesLoading} = useRaces(especeMap)
 
-  const {data:RacesData, isLoading:RacesLoading} = useQuery({
+  /*const {data:RacesData, isLoading:RacesLoading} = useQuery({
     queryKey: ["races"],
     queryFn: raceApi.getAll,
   })
@@ -30,7 +34,9 @@ const Encyclopedie = () => {
   const racesWithEspece = races.map(r => ({
     ...r,
     EspeceObj: especeMap.get(r.Espece)
-  }))
+  }))*/
+
+    console.log("racesraw:", races)
 
   console.log(racesWithEspece)
 
@@ -47,7 +53,7 @@ const Encyclopedie = () => {
 
   const SPECIES = ['Tous', 'Chien', 'Chat', 'Lapin']
 
-  console.log(races)
+  console.log("Races:", racesWithEspece)
 
   return (
     <PageTransition>

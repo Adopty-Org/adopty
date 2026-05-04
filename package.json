@@ -20,5 +20,8 @@
   "bugs": {
     "url": "https://github.com/Adopty-Org/adopty/issues"
   },
-  "homepage": "https://github.com/Adopty-Org/adopty#readme"
+  "homepage": "https://github.com/Adopty-Org/adopty#readme",
+  "dependencies": {
+    "tailwind-merge": "^3.5.0"
+  }
 }

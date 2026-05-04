@@ -50,6 +50,8 @@ import messageRoutes from "./routes/message.route.js"
 import message_readRoutes from "./routes/message_read.route.js"
 import materiauxRoutes from "./routes/materiaux.route.js"
 import caracteristiqueRoutes from "./routes/caracteristique.route.js"
+import demande_transfertRoutes from "./routes/demande_transfert.route.js"
+import demande_adoptionRoutes from "./routes/demande_adoption.route.js"
 
 // Au début, avec les autres imports
 import stripeRoutes from './routes/stripe.route.js';
@@ -133,6 +135,8 @@ app.use("/api/messages", messageRoutes)
 app.use("/api/message_reads", message_readRoutes)
 app.use("/api/materiaux", materiauxRoutes)
 app.use("/api/caracteristiques", caracteristiqueRoutes)
+app.use("/api/demande_transferts", demande_transfertRoutes)
+app.use("/api/demande_adoptions", demande_adoptionRoutes)
 
 app.get("/api/calling", (req,res)=>{
     res.status(200).json({message: "oui ca fonctionne"})

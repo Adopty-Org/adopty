@@ -486,17 +486,17 @@ export const avisServiceApi = {
     // =========================
 
     create: async (formData) => {
-        const { data } = await axiosInstance.post("/avis-services", formData);
+        const { data } = await axiosInstance.post("/avis_services", formData);
         return data;
     },
 
     update: async ({ id, formData }) => {
-        const { data } = await axiosInstance.put(`/avis-services/${id}`, formData);
+        const { data } = await axiosInstance.put(`/avis_services/${id}`, formData);
         return data;
     },
 
     delete: async (id) => {
-        const { data } = await axiosInstance.delete(`/avis-services/${id}`);
+        const { data } = await axiosInstance.delete(`/avis_services/${id}`);
         return data;
     },
 
@@ -505,12 +505,12 @@ export const avisServiceApi = {
     // =========================
 
     getSpecific: async (id) => {
-        const { data } = await axiosInstance.get(`/avis-services/${id}`);
+        const { data } = await axiosInstance.get(`/avis_services/${id}`);
         return data;
     },
 
     getAll: async () => {
-        const { data } = await axiosInstance.get("/avis-services");
+        const { data } = await axiosInstance.get("/avis_services");
         return data;
     },
 
@@ -519,17 +519,17 @@ export const avisServiceApi = {
     // =========================
 
     getByTypeAvis: async (typeService) => {
-        const { data } = await axiosInstance.get(`/avis-services/type_avis/${typeService}`);
+        const { data } = await axiosInstance.get(`/avis_services/type_avis/${typeService}`);
         return data;
     },
 
     getByUtilisateur: async (utilisateur) => {
-        const { data } = await axiosInstance.get(`/avis-services/utilisateur/${utilisateur}`);
+        const { data } = await axiosInstance.get(`/avis_services/utilisateur/${utilisateur}`);
         return data;
     },
 
     getByReservation: async (reservation) => {
-        const { data } = await axiosInstance.get(`/avis-services/reservation/${reservation}`);
+        const { data } = await axiosInstance.get(`/avis_services/reservation/${reservation}`);
         return data;
     },
 };
@@ -836,17 +836,17 @@ export const ligneCommandeApi = {
     // =========================
 
     create: async (formData) => {
-        const { data } = await axiosInstance.post("/ligne-commandes", formData);
+        const { data } = await axiosInstance.post("/ligne_commandes", formData);
         return data;
     },
 
     update: async ({ id, formData }) => {
-        const { data } = await axiosInstance.put(`/ligne-commandes/${id}`, formData);
+        const { data } = await axiosInstance.put(`/ligne_commandes/${id}`, formData);
         return data;
     },
 
     delete: async (id) => {
-        const { data } = await axiosInstance.delete(`/ligne-commandes/${id}`);
+        const { data } = await axiosInstance.delete(`/ligne_commandes/${id}`);
         return data;
     },
 
@@ -855,12 +855,12 @@ export const ligneCommandeApi = {
     // =========================
 
     getSpecific: async (id) => {
-        const { data } = await axiosInstance.get(`/ligne-commandes/${id}`);
+        const { data } = await axiosInstance.get(`/ligne_commandes/${id}`);
         return data;
     },
 
     getAll: async () => {
-        const { data } = await axiosInstance.get("/ligne-commandes");
+        const { data } = await axiosInstance.get("/ligne_commandes");
         return data;
     },
 
@@ -870,14 +870,14 @@ export const ligneCommandeApi = {
 
     getByProduit: async (produit) => {
         const { data } = await axiosInstance.get(
-            `/ligne-commandes/produit/${produit}`
+            `/ligne_commandes/produit/${produit}`
         );
         return data;
     },
 
     getBySousCommande: async (sousCommande) => {
         const { data } = await axiosInstance.get(
-            `/ligne-commandes/sous_commande/${sousCommande}`
+            `/ligne_commandes/sous_commande/${sousCommande}`
         );
         return data;
     },
@@ -895,17 +895,17 @@ export const lignePanierApi = {
     // =========================
 
     create: async (formData) => {
-        const { data } = await axiosInstance.post("/ligne-paniers", formData);
+        const { data } = await axiosInstance.post("/ligne_paniers", formData);
         return data;
     },
 
     update: async ({ id, formData }) => {
-        const { data } = await axiosInstance.put(`/ligne-paniers/${id}`, formData);
+        const { data } = await axiosInstance.put(`/ligne_paniers/${id}`, formData);
         return data;
     },
 
     delete: async (id) => {
-        const { data } = await axiosInstance.delete(`/ligne-paniers/${id}`);
+        const { data } = await axiosInstance.delete(`/ligne_paniers/${id}`);
         return data;
     },
 
@@ -914,12 +914,12 @@ export const lignePanierApi = {
     // =========================
 
     getSpecific: async (id) => {
-        const { data } = await axiosInstance.get(`/ligne-paniers/${id}`);
+        const { data } = await axiosInstance.get(`/ligne_paniers/${id}`);
         return data;
     },
 
     getAll: async () => {
-        const { data } = await axiosInstance.get("/ligne-paniers");
+        const { data } = await axiosInstance.get("/ligne_paniers");
         return data;
     },
 
@@ -929,14 +929,14 @@ export const lignePanierApi = {
 
     getByProduit: async (produit) => {
         const { data } = await axiosInstance.get(
-            `/ligne-paniers/produit/${produit}`
+            `/ligne_paniers/produit/${produit}`
         );
         return data;
     },
 
     getByPanier: async (panier) => {
         const { data } = await axiosInstance.get(
-            `/ligne-paniers/panier/${panier}`
+            `/ligne_paniers/panier/${panier}`
         );
         return data;
     },
@@ -954,17 +954,17 @@ export const ligneWishlistApi = {
     // =========================
 
     create: async (formData) => {
-        const { data } = await axiosInstance.post("/ligne-wishlists", formData);
+        const { data } = await axiosInstance.post("/ligne_wishlists", formData);
         return data;
     },
 
     update: async ({ id, formData }) => {
-        const { data } = await axiosInstance.put(`/ligne-wishlists/${id}`, formData);
+        const { data } = await axiosInstance.put(`/ligne_wishlists/${id}`, formData);
         return data;
     },
 
     delete: async (id) => {
-        const { data } = await axiosInstance.delete(`/ligne-wishlists/${id}`);
+        const { data } = await axiosInstance.delete(`/ligne_wishlists/${id}`);
         return data;
     },
 
@@ -973,12 +973,12 @@ export const ligneWishlistApi = {
     // =========================
 
     getSpecific: async (id) => {
-        const { data } = await axiosInstance.get(`/ligne-wishlists/${id}`);
+        const { data } = await axiosInstance.get(`/ligne_wishlists/${id}`);
         return data;
     },
 
     getAll: async () => {
-        const { data } = await axiosInstance.get("/ligne-wishlists");
+        const { data } = await axiosInstance.get("/ligne_wishlists");
         return data;
     },
 
@@ -988,14 +988,14 @@ export const ligneWishlistApi = {
 
     getByProduit: async (produit) => {
         const { data } = await axiosInstance.get(
-            `/ligne-wishlists/produit/${produit}`
+            `/ligne_wishlists/produit/${produit}`
         );
         return data;
     },
 
     getByWishlist: async (wishlist) => {
         const { data } = await axiosInstance.get(
-            `/ligne-wishlists/wishlist/${wishlist}`
+            `/ligne_wishlists/wishlist/${wishlist}`
         );
         return data;
     },
@@ -1202,17 +1202,17 @@ export const paiementCommandeApi = {
     // =========================
 
     create: async (formData) => {
-        const { data } = await axiosInstance.post("/paiement-commandes", formData);
+        const { data } = await axiosInstance.post("/paiement_commandes", formData);
         return data;
     },
 
     update: async ({ id, formData }) => {
-        const { data } = await axiosInstance.put(`/paiement-commandes/${id}`, formData);
+        const { data } = await axiosInstance.put(`/paiement_commandes/${id}`, formData);
         return data;
     },
 
     delete: async (id) => {
-        const { data } = await axiosInstance.delete(`/paiement-commandes/${id}`);
+        const { data } = await axiosInstance.delete(`/paiement_commandes/${id}`);
         return data;
     },
 
@@ -1221,12 +1221,12 @@ export const paiementCommandeApi = {
     // =========================
 
     getSpecific: async (id) => {
-        const { data } = await axiosInstance.get(`/paiement-commandes/${id}`);
+        const { data } = await axiosInstance.get(`/paiement_commandes/${id}`);
         return data;
     },
 
     getAll: async () => {
-        const { data } = await axiosInstance.get("/paiement-commandes");
+        const { data } = await axiosInstance.get("/paiement_commandes");
         return data;
     },
 
@@ -1236,14 +1236,14 @@ export const paiementCommandeApi = {
 
     getByStatut: async (statut) => {
         const { data } = await axiosInstance.get(
-            `/paiement-commandes/statut/${statut}`
+            `/paiement_commandes/statut/${statut}`
         );
         return data;
     },
 
     getByCommande: async (commande) => {
         const { data } = await axiosInstance.get(
-            `/paiement-commandes/commande/${commande}`
+            `/paiement_commandes/commande/${commande}`
         );
         return data;
     },
@@ -1261,17 +1261,17 @@ export const paiementServiceApi = {
     // =========================
 
     create: async (formData) => {
-        const { data } = await axiosInstance.post("/paiement-services", formData);
+        const { data } = await axiosInstance.post("/paiement_services", formData);
         return data;
     },
 
     update: async ({ id, formData }) => {
-        const { data } = await axiosInstance.put(`/paiement-services/${id}`, formData);
+        const { data } = await axiosInstance.put(`/paiement_services/${id}`, formData);
         return data;
     },
 
     delete: async (id) => {
-        const { data } = await axiosInstance.delete(`/paiement-services/${id}`);
+        const { data } = await axiosInstance.delete(`/paiement_services/${id}`);
         return data;
     },
 
@@ -1280,12 +1280,12 @@ export const paiementServiceApi = {
     // =========================
 
     getSpecific: async (id) => {
-        const { data } = await axiosInstance.get(`/paiement-services/${id}`);
+        const { data } = await axiosInstance.get(`/paiement_services/${id}`);
         return data;
     },
 
     getAll: async () => {
-        const { data } = await axiosInstance.get("/paiement-services");
+        const { data } = await axiosInstance.get("/paiement_services");
         return data;
     },
 
@@ -1295,14 +1295,14 @@ export const paiementServiceApi = {
 
     getByReservation: async (reservation) => {
         const { data } = await axiosInstance.get(
-            `/paiement-services/reservation/${reservation}`
+            `/paiement_services/reservation/${reservation}`
         );
         return data;
     },
 
     getByStatut: async (statut) => {
         const { data } = await axiosInstance.get(
-            `/paiement-services/statut/${statut}`
+            `/paiement_services/statut/${statut}`
         );
         return data;
     },
@@ -1449,17 +1449,17 @@ export const profilPrestataireApi = {
     // =========================
 
     create: async (formData) => {
-        const { data } = await axiosInstance.post("/profil-prestataires", formData);
+        const { data } = await axiosInstance.post("/profil_prestataires", formData);
         return data;
     },
 
     update: async ({ id, formData }) => {
-        const { data } = await axiosInstance.put(`/profil-prestataires/${id}`, formData);
+        const { data } = await axiosInstance.put(`/profil_prestataires/${id}`, formData);
         return data;
     },
 
     delete: async (id) => {
-        const { data } = await axiosInstance.delete(`/profil-prestataires/${id}`);
+        const { data } = await axiosInstance.delete(`/profil_prestataires/${id}`);
         return data;
     },
 
@@ -1468,12 +1468,12 @@ export const profilPrestataireApi = {
     // =========================
 
     getSpecific: async (id) => {
-        const { data } = await axiosInstance.get(`/profil-prestataires/${id}`);
+        const { data } = await axiosInstance.get(`/profil_prestataires/${id}`);
         return data;
     },
 
     getAll: async () => {
-        const { data } = await axiosInstance.get("/profil-prestataires");
+        const { data } = await axiosInstance.get("/profil_prestataires");
         return data;
     },
 
@@ -1483,21 +1483,21 @@ export const profilPrestataireApi = {
 
     getByStatut: async (statut) => {
         const { data } = await axiosInstance.get(
-            `/profil-prestataires/statut/${statut}`
+            `/profil_prestataires/statut/${statut}`
         );
         return data;
     },
 
     getByTypeService: async (typeService) => {
         const { data } = await axiosInstance.get(
-            `/profil-prestataires/type_service/${typeService}`
+            `/profil_prestataires/type_service/${typeService}`
         );
         return data;
     },
 
     getByUtilisateur: async (utilisateur) => {
         const { data } = await axiosInstance.get(
-            `/profil-prestataires/utilisateur/${utilisateur}`
+            `/profil_prestataires/utilisateur/${utilisateur}`
         );
         return data;
     },
@@ -1661,17 +1661,17 @@ export const sousCommandeApi = {
     // =========================
 
     create: async (formData) => {
-        const { data } = await axiosInstance.post("/sous-commandes", formData);
+        const { data } = await axiosInstance.post("/sous_commandes", formData);
         return data;
     },
 
     update: async ({ id, formData }) => {
-        const { data } = await axiosInstance.put(`/sous-commandes/${id}`, formData);
+        const { data } = await axiosInstance.put(`/sous_commandes/${id}`, formData);
         return data;
     },
 
     delete: async (id) => {
-        const { data } = await axiosInstance.delete(`/sous-commandes/${id}`);
+        const { data } = await axiosInstance.delete(`/sous_commandes/${id}`);
         return data;
     },
 
@@ -1680,12 +1680,12 @@ export const sousCommandeApi = {
     // =========================
 
     getSpecific: async (id) => {
-        const { data } = await axiosInstance.get(`/sous-commandes/${id}`);
+        const { data } = await axiosInstance.get(`/sous_commandes/${id}`);
         return data;
     },
 
     getAll: async () => {
-        const { data } = await axiosInstance.get("/sous-commandes");
+        const { data } = await axiosInstance.get("/sous_commandes");
         return data;
     },
 
@@ -1695,21 +1695,21 @@ export const sousCommandeApi = {
 
     getByStatut: async (statut) => {
         const { data } = await axiosInstance.get(
-            `/sous-commandes/statut/${statut}`
+            `/sous_commandes/statut/${statut}`
         );
         return data;
     },
 
     getByRefuge: async (refuge) => {
         const { data } = await axiosInstance.get(
-            `/sous-commandes/refuge/${refuge}`
+            `/sous_commandes/refuge/${refuge}`
         );
         return data;
     },
 
     getByCommande: async (commande) => {
         const { data } = await axiosInstance.get(
-            `/sous-commandes/commande/${commande}`
+            `/sous_commandes/commande/${commande}`
         );
         return data;
     },
@@ -1897,17 +1897,17 @@ export const typeServiceApi = {
     // =========================
 
     create: async (formData) => {
-        const { data } = await axiosInstance.post("/type-services", formData);
+        const { data } = await axiosInstance.post("/type_services", formData);
         return data;
     },
 
     update: async ({ id, formData }) => {
-        const { data } = await axiosInstance.put(`/type-services/${id}`, formData);
+        const { data } = await axiosInstance.put(`/type_services/${id}`, formData);
         return data;
     },
 
     delete: async (id) => {
-        const { data } = await axiosInstance.delete(`/type-services/${id}`);
+        const { data } = await axiosInstance.delete(`/type_services/${id}`);
         return data;
     },
 
@@ -1916,12 +1916,12 @@ export const typeServiceApi = {
     // =========================
 
     getSpecific: async (id) => {
-        const { data } = await axiosInstance.get(`/type-services/${id}`);
+        const { data } = await axiosInstance.get(`/type_services/${id}`);
         return data;
     },
 
     getAll: async () => {
-        const { data } = await axiosInstance.get("/type-services");
+        const { data } = await axiosInstance.get("/type_services");
         return data;
     },
 };
@@ -2054,6 +2054,62 @@ export const caracteristiqueApi = {
 
     getAll: async () => {
         const { data } = await axiosInstance.get("/caracteristiques");
+        return data;
+    },
+};
+
+
+export const demande_transfertApi = {
+
+    // =========================
+    // 🔹 CRUD demande_transfert (protégé)
+    // =========================
+
+    create: async (formData) => {
+        const { data } = await axiosInstance.post("/demande_transferts", formData);
+        return data;
+    },
+
+    update: async ({ id, formData }) => {
+        const { data } = await axiosInstance.put(`/demande_transferts/${id}`, formData);
+        return data;
+    },
+
+    delete: async (id) => {
+        const { data } = await axiosInstance.delete(`/demande_transferts/${id}`);
+        return data;
+    },
+
+    // =========================
+    // 🔹 Lecture publique
+    // =========================
+
+    getSpecific: async (id) => {
+        const { data } = await axiosInstance.get(`/demande_transferts/${id}`);
+        return data;
+    },
+
+    getAll: async () => {
+        const { data } = await axiosInstance.get("/demande_transferts");
+        return data;
+    },
+
+    // =========================
+    // 🔹 Filtres / recherches
+    // =========================
+
+    getByAnimal: async (animal) => {
+        const { data } = await axiosInstance.get(`/demande_transferts/animal/${animal}`);
+        return data;
+    },
+
+    getByRefuge: async (refuge) => {
+        const { data } = await axiosInstance.get(`/demande_transferts/refuge/${refuge}`);
+        return data;
+    },
+
+    getByStatut: async (statut) => {
+        const { data } = await axiosInstance.get(`/demande_transferts/statut/${statut}`);
         return data;
     },
 };
