@@ -14,6 +14,7 @@ export async function createCommandeControlleur(req,res) {// pas utilisable je c
             IdUtilisateur, 
             Statut
         })
+        console.log("la requete", requete)
 
         res.status(201).json({ message: "Commande crée avec succès", id: requete });
         

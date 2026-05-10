@@ -21,6 +21,7 @@ import { setAuthTokenGetter } from "./lib/axios.js";
 import ConversationsList from './pages/messagerie/conversations.jsx'
 import { ChatRoom } from './components/chat/ChatRoom.jsx'
 import { ChatPage } from './pages/messagerie/ChatPage.jsx'
+import Refuges from './pages/refuge/Refuge.jsx'
 
 
 
@@ -43,6 +44,7 @@ function App() {
       <Route path="/testConversation" element={<ConversationsList/>}/>
       <Route path="/testConversation2" element={<ChatRoom conversationId="1" currentUserId="1" />}/>
       <Route path="/testConversation3" element={<ChatPage />}/>
+      <Route path="/realrefuge" element={<Refuges />}/>
       {/* pas de isSignedIn car debile */}
       <Route path="/" element={<LobbyLayout/>}>
         <Route index element={<Navigate to={"lobby"}/>}/>

@@ -1,4 +1,5 @@
 import { db } from "../config/db.js";
+import { Materiaux } from "../modeles/materiaux.model.js";
 import { Produit } from "../modeles/produit.model.js";
 
 export const createProduit = async (produit) => {

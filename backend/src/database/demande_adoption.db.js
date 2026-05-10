@@ -86,3 +86,12 @@ export const deleteDemandeAdoption = async (id) => {
   return result.affectedRows;
 };
 
+export const getDemandeAdoptionByRefugeId = async (id) => {
+  const [rows] = await db.query(
+    "SELECT * FROM demande_adoption WHERE IdRefuge = ?",
+    [
+      id
+    ]
+  )
+  return rows.map(row => new DemandeAdoption(row));
+}

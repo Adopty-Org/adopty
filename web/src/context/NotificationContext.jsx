@@ -69,6 +69,38 @@ export const NotificationProvider = ({ children }) => {
     setNotifications(prev => [newNotif, ...prev])
   }
 
+  // NOUVELLES FONCTIONS POUR LES MESSAGES
+  const addMessageNotification = (conversationId, messageContent, displayName, unreadCount) => {
+    const newNotif = {
+      id: `msg_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+      title: `📨 Nouveau message dans ${displayName}`,
+      message: messageContent?.slice(0, 100) || "Vous avez reçu un nouveau message",
+      type: 'message',
+      read: false,
+      conversationId: conversationId,
+      unreadCount: unreadCount,
+      date: new Date().toISOString()
+    }
+    
+    setNotifications(prev => {
+      // Éviter les doublons pour la même conversation récente
+      const existingNotif = prev.find(n => n.conversationId === conversationId && n.type === 'message' && !n.read);
+      if (existingNotif) {
+        // Mettre à jour la notification existante
+        return prev.map(n => 
+          n.conversationId === conversationId && n.type === 'message' && !n.read
+            ? { ...n, message: `${unreadCount} message(s) non lu(s) dans ${displayName}`, unreadCount, date: new Date().toISOString() }
+            : n
+        );
+      }
+      return [newNotif, ...prev];
+    });
+  }
+
+  const clearMessageNotifications = (conversationId) => {
+    setNotifications(prev => prev.filter(n => !(n.conversationId === conversationId && n.type === 'message')));
+  }
+
   return (
     <NotificationContext.Provider value={{
       notifications,
@@ -76,7 +108,9 @@ export const NotificationProvider = ({ children }) => {
       markAsRead,
       markAllAsRead,
       removeNotification,
-      addNotification
+      addNotification,
+      addMessageNotification,      // Nouvelle fonction
+      clearMessageNotifications 
     }}>
       {children}
     </NotificationContext.Provider>

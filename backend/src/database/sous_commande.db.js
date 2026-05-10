@@ -67,3 +67,13 @@ export const deleteSousCommande = async (id) => {
   return result.affectedRows;
 };
 
+export const getSousCommandesOfCommande = async (id) => {
+  const [rows] = await db.query(
+    "SELECT * FROM sous_commande WHERE IdCommande = ?",
+    [id]
+  );
+
+  if (!rows[0]) return null;
+
+  return new SousCommande(rows[0]);
+};

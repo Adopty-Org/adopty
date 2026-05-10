@@ -93,7 +93,7 @@ app.use(cors({origin : ENV.CLIENT_URL, credentials : true}))// cors() est un mid
 
 
 // Puis les routes
-app.use('/api/stripe', stripeRoutes);
+app.use("/api/stripe", stripeRoutes);
 
 app.use("/api/inngest", serve({ client: ingest, functions }));
 

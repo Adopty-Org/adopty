@@ -7,15 +7,15 @@ const router = Router()
 // Routes protégées - réservées aux refuges (création)
 router.post("/", protectRoute, refugeOnly, refuge.createRefugeControlleur);
 
-// Routes protégées - modification/suppression (propriétaire ou admin)
-router.put("/:id", protectRoute, refugeOnly, isOwnerOrAdmin, refuge.updateRefugeControlleur);
-router.delete("/:id", protectRoute, refugeOnly, isOwnerOrAdmin, refuge.deleteRefugeControlleur);
-
 // Routes protégées - gestion des animaux (refuge only)
 router.put("/unset_animal/:id", protectRoute, refugeOnly, refuge.unsetAnimalToRefugeByIdsControlleur);
 router.put("/set_animal/:id", protectRoute, refugeOnly, refuge.setAnimalToRefugeByIdsControlleur);
 router.delete("/supprime_animal/:id", protectRoute, refugeOnly, refuge.removeAnimalFromRefugeByIdsControlleur);
 router.post("/ajout_animal/:id", protectRoute, refugeOnly, refuge.addAnimalToRefugeByIdsControlleur);
+
+// Routes protégées - modification/suppression (propriétaire ou admin)
+router.put("/:id", protectRoute, refugeOnly, isOwnerOrAdmin, refuge.updateRefugeControlleur);
+router.delete("/:id", protectRoute, refugeOnly, isOwnerOrAdmin, refuge.deleteRefugeControlleur);
 
 // Routes de lecture publiques
 router.get("/animaaux/:id", refuge.getRefugeAnimalsByIdControlleur);

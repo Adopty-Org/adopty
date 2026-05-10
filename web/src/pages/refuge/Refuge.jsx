@@ -1,28 +1,30 @@
-/*import { useEffect, useRef, useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
-import { PageTransition, FadeIn } from '../components/Animations'
-import Pagination from '../components/ui/Pagination'
+import { useEffect, useRef, useState } from 'react'
+import { Link, useLocation } from 'react-router'
+import { PageTransition, FadeIn } from '../../components/Animations'
+import Pagination from '../../components/ui/Pagination'
 
-import { getAnimaux, getRefuges } from '../services/publicApi'
-import { mapAnimals } from '../mappers/animalMapper'
-import { mapRefuges } from '../mappers/refugeMapper'
+import { useRefuge } from '../../hooks/useRefuge'
+
+//import { getAnimaux, getRefuges } from '../services/publicApi'
+//import { mapAnimals } from '../mappers/animalMapper'
+//import { mapRefuges } from '../mappers/refugeMapper'
 //import { normalizeApiError } from '../lib/http'
 
 // Mini animal card for refuge pages
 const MiniAnimalCard = ({ animal }) => (
   <Link
-    to={`/profil/${animal.id}`}
-    className="flex items-center gap-3 p-3 bg-white border-2 border-black rounded-xl hover:bg-primary-fixed/30 hover:translate-x-[2px] hover:translate-y-[2px] transition-all shadow-[3px_3px_0px_0px_rgba(21,66,18,1)] hover:shadow-none group"
+    to={`/profil/${animal?.id}`}
+    className="flex items-center gap-3 p-3 bg-white border-2 border-black rounded-xl hover:bg-primary-fixed/30 hover:translate-x-0.5 hover:translate-y-0.5 transition-all shadow-[3px_3px_0px_0px_rgba(21,66,18,1)] hover:shadow-none group"
   >
-    <div className="w-12 h-12 rounded-lg bg-surface-container border-2 border-black flex-shrink-0 overflow-hidden">
-      <img src={animal.photo} alt={animal.nom} className="w-full h-full object-cover" />
+    <div className="w-12 h-12 rounded-lg bg-surface-container border-2 border-black shrink-0 overflow-hidden">
+      {/*<img src={animal?.photo} alt={animal?.Nom} className="w-full h-full object-cover" />*/}
     </div>
-    <div className="flex-grow min-w-0">
-      <p className="font-['Plus_Jakarta_Sans'] font-extrabold text-sm text-primary truncate">{animal.nom}</p>
-      <p className="text-xs text-on-surface-variant font-medium">{animal.race} · {animal.ageLabel}</p>
+    <div className="grow min-w-0">
+      <p className="font-['Plus_Jakarta_Sans'] font-extrabold text-sm text-primary truncate">{animal?.Nom}</p>
+      <p className="text-xs text-on-surface-variant font-medium">{animal?.Race?.Nom} · {animal?.age}</p>
     </div>
-    {animal.urgent && (
-      <span className="flex-shrink-0 bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">
+    {animal?.urgent && (
+      <span className="shrink-0 bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">
         Urgent
       </span>
     )}
@@ -44,8 +46,8 @@ const StatChip = ({ icon, label, value }) => (
 // Full refuge card with anchor id
 const RefugeCard = ({ refuge, allAnimals }) => {
   const animauxRefuge = allAnimals.filter(a => {
-    if (a.idRefuge != null && refuge.id) return String(a.idRefuge) === String(refuge.id)
-    return a.lieu === refuge.lieu || a.lieu === refuge.nom
+    if (a?.IdRefuge != null && refuge?.Id) return String(a?.IdRefuge) === String(refuge?.Id)
+    return a?.lieu === refuge?.lieu || a?.lieu === refuge?.Nom
   })
 
   // Optional: paginate mini animal cards inside refuge card if there are too many
@@ -59,19 +61,19 @@ const RefugeCard = ({ refuge, allAnimals }) => {
 
   return (
     <section
-      id={`refuge-${refuge.id}`}
+      id={`refuge-${refuge.Id}`}
       className="scroll-mt-28 bg-surface-container-lowest border-4 border-black rounded-3xl overflow-hidden shadow-[10px_10px_0px_0px_rgba(21,66,18,1)]"
     >
-      {/* Header band * /}
+      {/* Header band */}
       <div className="bg-[#154212] px-8 py-6 flex flex-wrap items-center justify-between gap-4">
         <div>
           <p className="font-['Plus_Jakarta_Sans'] text-secondary-fixed text-xs uppercase tracking-widest font-bold mb-1">
-            {refuge.ville} · {refuge.codePostal}
+            {refuge?.ville} · {refuge?.codePostal}
           </p>
-          <h2 className="font-['Chewy'] text-3xl lg:text-4xl text-white">{refuge.nom}</h2>
+          <h2 className="font-['Chewy'] text-3xl lg:text-4xl text-white">{refuge?.Nom}</h2>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          {refuge.certifications.map(c => (
+          {refuge?.certifications?.map(c => (
             <span
               key={c}
               className="bg-white/10 border border-white/20 text-white text-xs font-bold px-3 py-1.5 rounded-full"
@@ -80,7 +82,7 @@ const RefugeCard = ({ refuge, allAnimals }) => {
             </span>
           ))}
           <Link
-            to={`/refuge/${refuge.id}`}
+            to={`/refuge/${refuge?.Id}`}
             className="flex items-center gap-2 bg-white text-primary border-2 border-white font-bold text-xs px-4 py-2 rounded-full hover:bg-primary-fixed transition-colors"
           >
             <span className="material-symbols-outlined text-sm">open_in_new</span>
@@ -90,30 +92,30 @@ const RefugeCard = ({ refuge, allAnimals }) => {
       </div>
 
       <div className="p-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Left column * /}
+        {/* Left column */}
         <div className="lg:col-span-7 space-y-8">
-          {/* Description * /}
+          {/* Description */}
           <div>
-            <p className="text-on-surface-variant leading-relaxed text-base">{refuge.description}</p>
+            <p className="text-on-surface-variant leading-relaxed text-base">{refuge?.Description}</p>
           </div>
 
 
 
-          {/* Stats * /}
+          {/* Stats */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <StatChip icon="pets" label="Animaux" value={refuge.animauxTotal} />
-            <StatChip icon="people" label="Bénévoles" value={refuge.bénévoles} />
-            <StatChip icon="home" label="Capacité" value={refuge.capacite} />
-            <StatChip icon="straighten" label="Surface" value={refuge.surface} />
+            <StatChip icon="pets" label="Animaux" value={refuge?.animauxTotal} />
+            <StatChip icon="people" label="Bénévoles" value={refuge?.bénévoles} />
+            <StatChip icon="home" label="Capacité" value={refuge?.capacite} />
+            <StatChip icon="straighten" label="Surface" value={refuge?.surface} />
           </div>
 
-          {/* Specialites * /}
+          {/* Specialites */}
           <div>
             <h3 className="font-['Plus_Jakarta_Sans'] font-extrabold text-sm uppercase tracking-widest text-on-surface-variant mb-3">
               Spécialités
             </h3>
             <div className="flex flex-wrap gap-2">
-              {refuge.specialites.map(s => (
+              {refuge?.specialites?.map(s => (
                 <span
                   key={s}
                   className="bg-primary-fixed text-on-primary-fixed-variant border-2 border-black px-4 py-2 rounded-full font-bold text-sm shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
@@ -125,27 +127,27 @@ const RefugeCard = ({ refuge, allAnimals }) => {
           </div>
         </div>
 
-        {/* Right column * /}
+        {/* Right column */}
         <div className="lg:col-span-5 space-y-6">
-          {/* Contact card * /}
+          {/* Contact card */}
           <div className="bg-white border-4 border-black rounded-2xl p-5 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] space-y-3">
             <h3 className="font-['Plus_Jakarta_Sans'] font-extrabold uppercase text-sm tracking-widest text-primary mb-4 flex items-center gap-2">
               <span className="material-symbols-outlined text-lg">contact_phone</span> Contact
             </h3>
             {[
-              { icon: 'location_on', text: refuge.adresse },
-              { icon: 'schedule', text: refuge.horaires },
-              { icon: 'phone', text: refuge.telephone },
-              { icon: 'email', text: refuge.email },
-            ].map(({ icon, text }) => (
+              { icon: 'location_on', text: refuge?.adresse },
+              { icon: 'schedule', text: refuge?.horaires },
+              { icon: 'phone', text: refuge?.Telephone },
+              { icon: 'email', text: refuge?.email },
+            ]?.map(({ icon, text }) => (
               <div key={icon} className="flex items-start gap-3">
-                <span className="material-symbols-outlined text-primary text-lg mt-0.5 flex-shrink-0">{icon}</span>
+                <span className="material-symbols-outlined text-primary text-lg mt-0.5 shrink-0">{icon}</span>
                 <span className="text-sm font-medium text-on-surface-variant break-all">{text}</span>
               </div>
             ))}
           </div>
 
-          {/* Animaux du refuge * /}
+          {/* Animaux du refuge */}
           <div>
             <h3 className="font-['Plus_Jakarta_Sans'] font-extrabold uppercase text-sm tracking-widest text-on-surface-variant mb-3 flex items-center gap-2">
               <span className="material-symbols-outlined text-secondary text-lg">hotel_class</span>
@@ -155,7 +157,7 @@ const RefugeCard = ({ refuge, allAnimals }) => {
               <>
                 <div className="space-y-2">
                   {paginatedAnimaux.map(a => (
-                    <MiniAnimalCard key={a.id} animal={a} />
+                    <MiniAnimalCard key={a?.Id} animal={a} />
                   ))}
                 </div>
                 {totalAnimauxPages > 1 && (
@@ -201,16 +203,24 @@ const Refuges = () => {
   const [refugesData, setRefugesData] = useState([])
   const [animauxData, setAnimauxData] = useState([])
   const [currentPage, setCurrentPage] = useState(1)
+  const { RefugesData, RefugesLoading, isError, error, refugeMap } = useRefuge()
 
   useEffect(() => {
     const loadData = async () => {
+      if(RefugesLoading) return 
       try {
-        const [refugesResponse, animauxResponse] = await Promise.all([getRefuges(), getAnimaux()])
-        const mappedRefuges = Array.isArray(refugesResponse) ? mapRefuges(refugesResponse) : []
-        const mappedAnimaux = Array.isArray(animauxResponse) ? mapAnimals(animauxResponse) : []
-
-        setRefugesData(mappedRefuges)
-        setAnimauxData(mappedAnimaux)
+        //const [refugesResponse, animauxResponse] = await Promise.all([getRefuges(), getAnimaux()])
+        //const mappedRefuges = Array.isArray(refugesResponse) ? mapRefuges(refugesResponse) : []
+        //const mappedAnimaux = Array.isArray(animauxResponse) ? mapAnimals(animauxResponse) : []
+        
+        if(!RefugesLoading) {
+          setRefugesData(RefugesData)//(mappedRefuges)
+          console.log("refugeData", refugesData)
+          }else{
+            return 
+          }
+        
+        //setAnimauxData(mappedAnimaux)
       } catch (error) {
         console.error("Erreur lors du chargement des données:", error)
         setRefugesData([])
@@ -219,7 +229,7 @@ const Refuges = () => {
     }
 
     loadData()
-  }, [])
+  }, [RefugesLoading, RefugesData])
 
   useEffect(() => {
     if (initialScrollDone.current) return
@@ -227,7 +237,7 @@ const Refuges = () => {
     const refugeId = params.get('refuge')
     if (refugeId) {
       // Find page containing refuge
-      const index = refugesData.findIndex(r => String(r.id) === refugeId)
+      const index = refugesData.findIndex(r => String(r?.Id) === refugeId)
       if (index !== -1) {
         const pageNum = Math.floor(index / ITEMS_PER_PAGE) + 1
         setCurrentPage(pageNum)
@@ -257,11 +267,11 @@ const Refuges = () => {
   return (
     <PageTransition>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Header * /}
+        {/* Header */}
         <FadeIn className="mb-12">
 
           <Link
-            to="/animaux"
+            to="/refanimal"
             className="inline-flex items-center gap-2 mb-8 text-primary font-bold group"
           >
             <span className="material-symbols-outlined transition-transform group-hover:-translate-x-1">arrow_back</span>
@@ -274,35 +284,35 @@ const Refuges = () => {
             Découvrez les refuges associés à Adopty, leur équipe et les animaux qui y cherchent une famille.
           </p>
 
-          {/* Refuges quick-nav * /}
+          {/* Refuges quick-nav */}
           <div className="flex flex-wrap gap-3 mt-8">
             {refugesData.map((r, index) => {
               const targetPage = Math.floor(index / ITEMS_PER_PAGE) + 1
               return (
                 <a
-                  key={r.id}
-                  href={`#refuge-${r.id}`}
+                  key={r?.Id}
+                  href={`#refuge-${r?.Id}`}
                   onClick={(e) => {
                     if (currentPage !== targetPage) {
                       e.preventDefault()
                       setCurrentPage(targetPage)
                       setTimeout(() => {
-                        const el = document.getElementById(`refuge-${r.id}`)
+                        const el = document.getElementById(`refuge-${r?.Id}`)
                         if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
                       }, 100)
                     }
                   }}
-                  className="inline-flex items-center gap-2 bg-white border-2 border-black px-5 py-2.5 rounded-full font-['Plus_Jakarta_Sans'] font-bold text-sm hover:bg-primary hover:text-white transition-all shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+                  className="inline-flex items-center gap-2 bg-white border-2 border-black px-5 py-2.5 rounded-full font-['Plus_Jakarta_Sans'] font-bold text-sm hover:bg-primary hover:text-white transition-all shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none"
                 >
                   <span className="material-symbols-outlined text-sm">location_on</span>
-                  {r.nom}
+                  {r?.Nom}
                 </a>
               )
             })}
           </div>
         </FadeIn>
 
-        {/* Global stats banner * /}
+        {/* Global stats banner */}
         <FadeIn delay={0.1}>
           <div className="grid grid-cols-3 gap-4 mb-16 bg-[#154212] rounded-2xl p-6 border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
             <div className="text-center">
@@ -311,7 +321,7 @@ const Refuges = () => {
             </div>
             <div className="text-center border-x-2 border-white/10">
               <p className="font-['Chewy'] text-5xl text-white">
-                {refugesData.reduce((sum, r) => sum + (r.bénévoles || 0), 0)}
+                {refugesData.reduce((sum, r) => sum + (r?.bénévoles || 0), 0)}
               </p>
               <p className="text-secondary-fixed text-xs uppercase tracking-widest font-bold mt-1">Bénévoles actifs</p>
             </div>
@@ -322,10 +332,10 @@ const Refuges = () => {
           </div>
         </FadeIn>
 
-        {/* Refuge cards * /}
+        {/* Refuge cards */}
         <div className="space-y-14">
           {paginatedRefuges.map((refuge, i) => (
-            <FadeIn key={refuge.id} delay={i * 0.1}>
+            <FadeIn key={refuge?.Id} delay={i * 0.1}>
               <RefugeCard refuge={refuge} allAnimals={animauxData} />
             </FadeIn>
           ))}
@@ -344,4 +354,4 @@ const Refuges = () => {
   )
 }
 
-export default Refuges*/
+export default Refuges

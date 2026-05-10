@@ -32,11 +32,11 @@ createRoot(document.getElementById('root')).render(
       <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
         <QueryClientProvider client={queryClient}>
           <CartProvider>
-            <SocketProvider>
+            {/*<SocketProvider>*/}
               <NotificationProvider>
                 <App />
               </NotificationProvider>
-            </SocketProvider>
+            {/*</SocketProvider>*/}
           </CartProvider>
         </QueryClientProvider>
       </ClerkProvider>

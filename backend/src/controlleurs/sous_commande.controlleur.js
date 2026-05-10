@@ -1,13 +1,14 @@
 import { getCommandeById } from "../database/commande.db.js";
 import { getRefugeById } from "../database/refuge.db.js";
-import { createSousCommande, deleteSousCommande, getAllSousCommandes, getSousCommandeById, updateSousCommande } from "../database/sous_commande.db.js";
+import { createSousCommande, deleteSousCommande, getAllSousCommandes, getSousCommandeById, getSousCommandesOfCommande, updateSousCommande } from "../database/sous_commande.db.js";
 import { getStatutById } from "../database/statut.db.js";
 
 export async function createSousCommandeControlleur(req,res) {
     try {
         const { IdCommande,IdRefuge,Statut,Total_prix,stripe_transfer_id,platformFee } = req.body;
+        console.log("les entres : ", IdCommande,IdRefuge,Statut,Total_prix,stripe_transfer_id,platformFee )
 
-        if(!IdCommande || !Statut && !Total_prix || !stripe_transfer_id){
+        if(!IdCommande || !Statut && !Total_prix /*|| /*!stripe_transfer_id*/){
             return res.status(400).json({ message: "Le strict minimun en information est requis! "})
         }
 
@@ -21,12 +22,13 @@ export async function createSousCommandeControlleur(req,res) {
         })
 
         res.status(201).json({ message: "SousCommande crée avec succès", id: requete });
-        
+        console.log({ message: "SousCommande crée avec succès", id: requete })
     } catch (error) {
         console.error("Erreur lors de la création de la sous_commande:", error);
         res.status(500).json({ message: "Erreur interne du serveur" });
     }
 }
+
 export async function updateSousCommandeControlleur(req,res) {
     try {
         const { id } = req.params;
@@ -140,3 +142,19 @@ export async function getStatutOfSousCommandeControlleur(req,res) {
         res.status(500).json({ message: "Erreur interne du serveur" });
     }
 }
+
+/*export async function getSousCommandesOfCommandeControlleur(req,res) {
+    try {
+        const { commandeId } = req.params;
+        const sous_commande = await getSousCommandesOfCommande(commandeId);
+        if (!sous_commande) {
+            return res.status(404).json({ message: "SousCommande a un sous_commande inexistant !(non trouvé)" });
+        }
+        res.status(200).json(sous_commande);
+        
+    } catch (error) {
+        console.error("Erreur lors de l'obtention de l'animal de l'annonce:", error);
+        res.status(500).json({ message: "Erreur interne du serveur" });
+    }
+}
+*/

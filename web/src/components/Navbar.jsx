@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { useProduitPhotos } from '../hooks/useProduit'
 import { useNotifications } from '../context/NotificationContext'
 import { useEffect } from 'react'
+import { useConversationNotifications } from '../hooks/useConversationNotifications'
 
 export const NAVIGATION = [
   {name: "Lobby", path: "/lobby", icon: <HomeIcon className="size-5"/> },
@@ -80,6 +81,8 @@ function Navbar() {
   }
 
   console.log(location);
+
+  useConversationNotifications()
 
   
   return (
@@ -160,7 +163,7 @@ function Navbar() {
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           exit={{ opacity: 0 }}
-                          className="fixed inset-0 z-[200]"
+                          className="fixed inset-0 z-200"
                           onClick={() => setNotificationsOpen(false)}
                         >
                           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
@@ -201,7 +204,7 @@ function Navbar() {
                                   <div 
                                     key={notification.id} 
                                     className={`relative p-4 border-2 border-black rounded-xl transition-colors cursor-pointer
-                                      ${notification.read ? 'bg-surface-container-lowest opacity-70' : 'bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none'}`}
+                                      ${notification.read ? 'bg-surface-container-lowest opacity-70' : 'bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1px hover:translate-y-1px hover:shadow-none'}`}
                                     onClick={() => !notification.read && markAsRead(notification.id)}
                                   >
                                     {!notification.read && (
@@ -222,7 +225,7 @@ function Navbar() {
                                         e.stopPropagation()
                                         removeNotification(notification.id)
                                       }} 
-                                      className="absolute bottom-3 right-3 p-1.5 border border-black/20 hover:bg-error-container hover:border-error text-error rounded transition-colors flex-shrink-0 opacity-0 group-hover:opacity-100 sm:opacity-100"
+                                      className="absolute bottom-3 right-3 p-1.5 border border-black/20 hover:bg-error-container hover:border-error text-error rounded transition-colors shrink-0 opacity-0 group-hover:opacity-100 sm:opacity-100"
                                       title="Supprimer"
                                     >
                                       <span className="material-symbols-outlined text-[14px]">delete</span>

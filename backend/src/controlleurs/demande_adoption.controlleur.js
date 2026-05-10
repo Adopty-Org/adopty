@@ -12,19 +12,23 @@ export async function createDemandeAdoptionControlleur(req,res) {
 
         // verif les infos
         if (IdAnimal == null || IdRefuge == null){
+            console.log("IdAnimal: ", IdAnimal, "IdRefuge: ", IdRefuge);
             return res.status(400).json({ message: "Le strict minimun en information est requis! "});
         }
 
         if(IdRefuge<=0 || !Number.isInteger(IdRefuge)){
+            console.log("IdRefuge: ", IdRefuge);
             return res.status(400).json({ message: "L'age dois etre un entier positif! "});
         }
 
         if(TypeLogement<=0 || TypeLogement>1000000){ // 1.000.000 kg
+            console.log("TypeLogement: ", TypeLogement);
             return res.status(400).json({ message: "Le poids doit etre un positif non demesures ! "});
         }
 
         // verif si pas de photo
-        if(!req.files || req.files.length === 0){
+        /*if(!req.files || req.files.length === 0){
+            console.log("Aucune photo fournie");
             return res.status(400).json({ message: "une photo au minimun est requise" });
         }
 
@@ -33,7 +37,7 @@ export async function createDemandeAdoptionControlleur(req,res) {
         if(req.files.length> 3){
             return res.status(400).json({ message: "Un maximum de 3 photos sont permises"});
         }
-        */
+        * /
 
         // les upload vers cloudinary
         const uploadPromises = req.files.map((file) => {
@@ -48,7 +52,7 @@ export async function createDemandeAdoptionControlleur(req,res) {
             uploadResults = await Promise.all(uploadPromises);
         } catch (error) {
             return res.status(500).json({ message: "Erreur upload images" });
-        }
+        }*/
         
 
         
@@ -203,7 +207,9 @@ export async function getUtilisateurOfDemandeAdoptionControlleur(req,res) {
 export async function getRefugeOfDemandeAdoptionControlleur(req,res) {
     try {
         const { Refuge } = req.params;
+        console.log("le refuge", Refuge)
         const refuge = await getRefugeById(Refuge);
+        console.log("la reponce :  ", refuge)
         if (!refuge) {
             return res.status(404).json({ message: "DemandeAdoption a un refuge inexistante !(non trouvé)" });
         }
