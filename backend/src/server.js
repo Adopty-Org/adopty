@@ -144,6 +144,8 @@ app.get("/api/calling", (req,res)=>{
 
 
 
+
+
 if(ENV.NODE_ENV == "production"){
     app.use(express.static(path.join(__dirname, "../web/dist")))
     app.get("/{*any}", (req,res) => {
@@ -156,6 +158,35 @@ const server = http.createServer(app);
 // init websocket
 //initSocket(server);
 initSocket(server, { origin: ENV.CLIENT_URL });
+
+// Dans votre fichier principal (app.js ou server.js)
+// Ajoutez ceci pour voir toutes les routes enregistrées
+
+// DÉBOGAGE - Afficher toutes les routes (à mettre APRÈS le montage des routes)
+console.log("\n=== LISTE DES ROUTES ENREGISTRÉES ===\n");
+
+const listRoutes = (stack, basePath = '') => {
+    stack.forEach((middleware) => {
+        if (middleware.route) {
+            // Routes directes
+            const methods = Object.keys(middleware.route.methods).join(',').toUpperCase();
+            console.log(`${methods.padEnd(7)} ${basePath}${middleware.route.path}`);
+        } else if (middleware.name === 'router' && middleware.handle.stack) {
+            // Sous-routers
+            const newBasePath = basePath + (middleware.regexp.source.replace('\\/?(?=\\/|$)', ''));
+            listRoutes(middleware.handle.stack, newBasePath);
+        }
+    });
+};
+
+if (app._router && app._router.stack) {
+    listRoutes(app._router.stack);
+} else {
+    console.log("Aucune route trouvée - app._router n'est pas encore prêt");
+}
+
+console.log("\n===================================\n");
+
 
 server.listen(ENV.PORT, () => {
     console.log(ENV.NODE_ENV + ENV.PORT + " Le serveur roule ma boule !");

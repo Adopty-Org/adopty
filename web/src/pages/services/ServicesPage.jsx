@@ -5,6 +5,9 @@ import Modal from '../../components/ui/Modal'
 import ReservationForm from '../../components/forms/ReservationForm'
 import { usePrestataires } from '../../hooks/usePrestataire'
 import { useTypeServices } from '../../hooks/useType_service'
+import Pagination from '../../components/ui/Pagination'
+
+const ITEMS_PER_PAGE = 6
 
 function ServicesPage() {
   const [activeTab, setActiveTab] = useState('all')
@@ -12,6 +15,7 @@ function ServicesPage() {
 
   const { prestataires } = usePrestataires()
   const { typeServicesWithAll, typesLoading } = useTypeServices();
+  const [currentPage, setCurrentPage] = useState(1)
 
   // Mapping des icônes par service
   const getIconForTab = (tabNom) => {
@@ -26,7 +30,11 @@ function ServicesPage() {
   console.log("Prestataires : ", prestataires);
   const filtered = prestataires.filter(p => p?.typeService?.Id === activeTab || activeTab === 'all')
 
-
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE)
+  const paginatedProducts = filtered.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  )
 
   return (
     <PageTransition>
@@ -99,18 +107,27 @@ function ServicesPage() {
         </FadeIn>
 
         {/* Grid prestataires */}
-        {filtered.length === 0 ? (
+        {paginatedProducts.length === 0 ? (
           <FadeIn className="text-center py-24 text-on-surface-variant">
             <span className="material-symbols-outlined text-6xl mb-4 block opacity-30">search_off</span>
             <p className="font-bold text-xl">Aucun prestataire disponible pour ce service.</p>
           </FadeIn>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filtered.map((p, i) => (
+            {paginatedProducts.map((p, i) => (
               <ServiceCard key={p.Id} prestataire={p} delay={i * 0.1} onReserver={setSelectedPrestataire} />
             ))}
           </div>
         )}
+
+        <Pagination 
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={(page) => {
+                    setCurrentPage(page)
+                    window.scrollTo({ top: 0, behavior: 'smooth' })
+                  }}
+                />
 
         {/* Devenir prestataire */}
         <FadeIn delay={0.3} className="mt-20 bg-[#ffdbcd] border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-10 rounded-xl">

@@ -1,8 +1,11 @@
 import React from 'react'
 import { FadeIn, PageTransition } from '../components/Animations'
 import { Link } from 'react-router'
+import { useAnimals } from '../hooks/useAnimal';
 
 function LobbyPage() {
+
+  const {a} = useAnimals
 
   const animauxVedette = null;
 
@@ -51,7 +54,7 @@ function LobbyPage() {
               <img
                 alt="Compagnon Adopty"
                 className="w-full h-[480px] object-cover"
-                src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+ip1sAAAAASUVORK5CYII="
+                src="https://res.cloudinary.com/dosin8azh/image/upload/v1770555071/samples/balloons.jpg"
               />
             </div>
             <div className="absolute -bottom-5 -left-5 bg-white p-4 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] z-20 -rotate-2">
@@ -129,7 +132,7 @@ function LobbyPage() {
                 </p>
               </div>
               <div className="mt-8 rounded-xl overflow-hidden border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] rotate-1 group-hover:rotate-0 transition-transform duration-500">
-                <img className="w-full h-56 object-cover" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+ip1sAAAAASUVORK5CYII=" alt="Chien au refuge" />
+                <img className="w-full h-56 object-cover" src="https://res.cloudinary.com/dosin8azh/image/upload/v1770555068/samples/animals/kitten-playing.gif" alt="Chien au refuge" />
               </div>
             </FadeIn>
 
@@ -171,7 +174,7 @@ function LobbyPage() {
                 </p>
                 <div className="mt-8 flex justify-center">
                   <div className="relative">
-                    <img className="w-48 h-48 rounded-xl border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] object-cover group-hover:scale-105 transition-transform" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+ip1sAAAAASUVORK5CYII=" alt="Chat" />
+                    <img className="w-48 h-48 rounded-xl border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] object-cover group-hover:scale-105 transition-transform" src="https://res.cloudinary.com/dosin8azh/image/upload/v1770555067/samples/imagecon-group.jpg" alt="Chat" />
                     <div className="absolute -bottom-2 -right-2 bg-white p-3 rounded-xl border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
                       <span className="material-symbols-outlined text-tertiary">favorite</span>
                     </div>
@@ -297,7 +300,7 @@ function LobbyPage() {
               <img
                 alt="Famille heureuse avec leur animal adopté"
                 className="w-full h-64 object-cover border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] rounded-xl"
-                src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+ip1sAAAAASUVORK5CYII="
+                src="https://res.cloudinary.com/dosin8azh/image/upload/v1770555065/samples/animals/three-dogs.jpg"
               />
               <div className="absolute -top-4 -left-4 bg-primary text-white p-4 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
                 <p className="font-['Chewy'] text-3xl">2.4k</p>
@@ -307,7 +310,7 @@ function LobbyPage() {
             <img
               alt="Intérieur du refuge"
               className="w-full h-48 object-cover border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] rounded-xl"
-              src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+ip1sAAAAASUVORK5CYII="
+              src="https://res.cloudinary.com/dosin8azh/image/upload/v1770555064/samples/people/boy-snow-hoodie.jpg"
             />
             <div className="bg-[#ffdbcd] border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] rounded-xl p-6 flex flex-col justify-center items-center">
               <p className="font-['Chewy'] text-5xl text-primary">15+</p>

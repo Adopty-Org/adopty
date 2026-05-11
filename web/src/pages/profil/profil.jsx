@@ -6,6 +6,7 @@ import AdoptionForm from '../../components/forms/AdoptionForm'
 import { animalApi, especeApi, raceApi } from '../../lib/api'
 import { useQuery } from '@tanstack/react-query'
 import { useAnimals,useAnimal } from '../../hooks/useAnimal'
+import Carousel from '../../components/ui/Carousel'
 //import { animaux } from '../data/mockData'
 
 const Profil = () => {
@@ -16,61 +17,13 @@ const Profil = () => {
 
   const {animal, isLoading: AnimalLoading, isError, error}= useAnimal(id)
 
-  /*const {data:AnimalData, isLoading:AnimalLoading} = useQuery({
-    queryKey: ["animaux"],
-    queryFn: () => animalApi.getSpecific(id),
-    enabled: !!id
-  })
+  const [showCarousel, setShowCarousel] = useState(false);
+  const [carouselStartIndex, setCarouselStartIndex] = useState(0);
 
-  const {data:RacesData, isLoading:RacesLoading} = useQuery({
-    queryKey: ["races"],
-    queryFn: raceApi.getAll,
-  })
-
-  const {data:EspecesData, isLoading:EspecesLoading} = useQuery({
-    queryKey: ["especes"],
-    queryFn: especeApi.getAll,
-  }) 
-
-  const animalRaw = AnimalData
-  const races = RacesData ?? []
-  const especes = EspecesData ?? []
-
-  const raceMap = new Map(races.map(r => [r.Id, r]))
-  const especeMap = new Map(especes.map(e => [e.Id, e]))
-
-  const getTailleLabel = (cm) => {
-    if (cm <= 30) return 'Petit'
-    if (cm <= 60) return 'Moyen'
-    return 'Grand'
-  }
-
-  
-
-  const animal = animalRaw
-    ? (() => {
-        const race = raceMap.get(animalRaw.Race)
-        const espece = race ? especeMap.get(race.Espece) : undefined
-
-        return {
-          ...animalRaw,
-          TailleLabel: getTailleLabel(animalRaw.Taille),
-          Race: race
-            ? {
-                Id: race.Id,
-                Nom: race.Nom,
-                Espece: espece
-                  ? {
-                      Id: espece.Id,
-                      Nom: espece.Nom
-                    }
-                  : null
-              }
-            : null
-        }
-      })()
-    : null*/
-
+  const openCarousel = (startIndex) => {
+    setCarouselStartIndex(startIndex);
+    setShowCarousel(true);
+  };
   
   const { data: photos = [] } = useQuery({
     queryKey: ["photos", id],
@@ -83,6 +36,8 @@ const Profil = () => {
     return <PageTransition><div className="p-12 text-center">Chargement…</div></PageTransition>
   }
 
+  
+
 
   // Find animal by id or fallback to Barnabé
   //const animal = animaux.find(a => a.id === id) || animaux[0]
@@ -91,7 +46,7 @@ const Profil = () => {
     <PageTransition>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Back Link */}
-        <Link to="/animaux" className="inline-flex items-center gap-2 mb-8 text-primary font-bold group">
+        <Link to="/refanimal" className="inline-flex items-center gap-2 mb-8 text-primary font-bold group">
           <span className="material-symbols-outlined transition-transform group-hover:-translate-x-1">arrow_back</span>
           <span className="font-['Plus_Jakarta_Sans'] uppercase tracking-wider text-sm">Retour à la recherche</span>
         </Link>
@@ -100,7 +55,7 @@ const Profil = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-16 items-start">
           {/* Gallery */}
           <FadeIn className="lg:col-span-7 grid grid-cols-2 gap-4">
-            <div className="col-span-2 relative overflow-hidden rounded-xl border-4 border-black shadow-[8px_8px_0px_0px_rgba(148,73,37,1)] aspect-16/10">
+            {/*<div className="col-span-2 relative overflow-hidden rounded-xl border-4 border-black shadow-[8px_8px_0px_0px_rgba(148,73,37,1)] aspect-16/10">
               {<img alt={animal?.Nom} className="w-full h-full object-cover" src={photos[0]?.Url} />}
               <div className="absolute bottom-4 left-4 bg-primary text-white px-4 py-2 font-['Plus_Jakarta_Sans'] font-bold rounded-lg border-2 border-black">
                 ALBUM DE {animal?.Nom?.toUpperCase()}
@@ -114,8 +69,126 @@ const Profil = () => {
                 <span className="material-symbols-outlined text-4xl mb-1">add_a_photo</span>
                 <span className="font-['Plus_Jakarta_Sans'] font-bold">+12 PHOTOS</span>
               </div>
-              {/*<img alt="More photos" className="w-full h-full object-cover group-hover:scale-105 transition-transform" src={animal.photo} />*/}
-            </div>
+              {/*<img alt="More photos" className="w-full h-full object-cover group-hover:scale-105 transition-transform" src={animal.photo} />* /}
+            </div>*/}
+            <FadeIn className="lg:col-span-7 grid grid-cols-2 gap-4">
+              {/* Première photo (grande, prend 2 colonnes) */}
+              {animal?.photos?.length >= 1 && (
+                <div 
+                  className="col-span-2 relative overflow-hidden rounded-xl border-4 border-black shadow-[8px_8px_0px_0px_rgba(148,73,37,1)] aspect-16/10 group cursor-pointer"
+                  onClick={() => openCarousel(0)}
+                >
+                  <img 
+                    alt={animal?.Nom} 
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" 
+                    src={animal?.photos[0]?.Url} 
+                  />
+                  <div className="absolute bottom-4 left-4 bg-primary text-white px-4 py-2 font-['Plus_Jakarta_Sans'] font-bold rounded-lg border-2 border-black">
+                    ALBUM DE {animal?.Nom?.toUpperCase()}
+                  </div>
+                </div>
+              )}
+
+              {/* Deuxième photo (petite carrée) */}
+              {animal?.photos?.length >= 2 && (
+                <div 
+                  className="relative overflow-hidden rounded-xl border-4 border-black aspect-square bg-primary-fixed flex items-center justify-center group cursor-pointer"
+                  onClick={() => openCarousel(1)}
+                >
+                  <img 
+                    alt={`${animal?.Nom} portrait`} 
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" 
+                    src={animal?.photos[1]?.Url} 
+                    style={{ filter: 'saturate(0.7) contrast(1.1)' }} 
+                  />
+                </div>
+              )}
+
+              {/* Troisième case dynamique */}
+              {animal?.photos?.length === 2 && (
+                // EXACTEMENT 2 photos → bouton "+0 PHOTO"
+                <div 
+                  className="relative overflow-hidden rounded-xl border-4 border-black aspect-square bg-secondary-container flex items-center justify-center group cursor-pointer"
+                  onClick={() => openCarousel(0)}
+                >
+                  <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-white z-10 transition-all group-hover:bg-black/50">
+                    <span className="material-symbols-outlined text-4xl mb-1">add_a_photo</span>
+                    <span className="font-['Plus_Jakarta_Sans'] font-bold">
+                      +{animal?.photos.length - 2} PHOTO
+                    </span>
+                  </div>
+                  <img 
+                    alt="More photos" 
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform" 
+                    src={animal?.photos[1]?.Url} 
+                  />
+                </div>
+              )}
+
+              {animal?.photos?.length >= 3 && (
+                // 3 photos ou plus → afficher la 3ème photo
+                <div 
+                  className="relative overflow-hidden rounded-xl border-4 border-black aspect-square bg-secondary-container flex items-center justify-center group cursor-pointer"
+                  onClick={() => openCarousel(2)}
+                >
+                  <img 
+                    alt={`${animal?.Nom} photo 3`} 
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" 
+                    src={animal?.photos[2]?.Url} 
+                  />
+                </div>
+              )}
+
+              {animal?.photos?.length === 1 && (
+                // EXACTEMENT 1 photo → placeholder
+                <div className="relative overflow-hidden rounded-xl border-4 border-black aspect-square bg-gray-100 flex items-center justify-center">
+                  <span className="text-gray-400 font-['Plus_Jakarta_Sans']">Aucune photo</span>
+                </div>
+              )}
+
+              {/* Bouton supplémentaire pour 4+ photos (4ème case) */}
+              {animal?.photos?.length > 3 && (
+                <div 
+                  className="relative overflow-hidden rounded-xl border-4 border-black aspect-square bg-secondary-container flex items-center justify-center group cursor-pointer"
+                  onClick={() => openCarousel(0)}
+                >
+                  <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-white z-10 transition-all group-hover:bg-black/50">
+                    <span className="material-symbols-outlined text-4xl mb-1">add_a_photo</span>
+                    <span className="font-['Plus_Jakarta_Sans'] font-bold">
+                      +{animal?.photos.length - 3} PHOTO{animal?.photos.length - 3 > 1 ? 'S' : ''}
+                    </span>
+                  </div>
+                  <img 
+                    alt="More photos" 
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform" 
+                    src={animal?.photos[3]?.Url || animal?.photos[0]?.Url} 
+                  />
+                </div>
+              )}
+            </FadeIn>
+
+            {/* Composant Carousel (à implémenter) */}
+            {showCarousel && (
+              <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center">
+                <div className="relative max-w-4xl w-full mx-4">
+                  <button 
+                    onClick={() => setShowCarousel(false)}
+                    className="absolute -top-12 right-0 text-white text-2xl"
+                  >
+                    ✕
+                  </button>
+                  {/* Ton carousel ici */}
+                  {/* Carousel Modal - à placer après tout le contenu */}
+                  {showCarousel && (
+                    <Carousel 
+                      photos={animal.photos}
+                      initialIndex={carouselStartIndex}
+                      onClose={() => setShowCarousel(false)}
+                    />
+                  )}
+                </div>
+              </div>
+            )}
           </FadeIn>
 
           {/* Profile Info Card */}
@@ -161,18 +234,18 @@ const Profil = () => {
                   <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">pets</span>
                 </button>
                 <p className="text-center text-sm text-on-surface-variant italic">
-                  {animal.Nom} attend sa famille depuis <strong>{/*animal.joursRefuge*/} jours</strong>.
+                  {animal?.Nom} attend sa famille depuis <strong>{/*animal.joursRefuge*/} jours</strong>.
                 </p>
               </div>
             </FadeIn>
 
             {/* Traits */}
             <FadeIn delay={0.2} className="flex flex-wrap gap-2">
-              {/*animal.caractere.map(c => (
-                <span key={c} className="bg-secondary-fixed text-on-secondary-container px-4 py-2 rounded-full border-2 border-black flex items-center gap-1.5 font-bold text-sm shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-                  <span className="material-symbols-outlined text-sm">pets</span> {c}
+              {animal?.Caracteres?.map(c => (
+                <span key={c?.Id} className="bg-secondary-fixed text-on-secondary-container px-4 py-2 rounded-full border-2 border-black flex items-center gap-1.5 font-bold text-sm shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                  <span className="material-symbols-outlined text-sm">pets</span> {c?.Nom}
                 </span>
-              ))*/}
+              ))}
             </FadeIn>
           </div>
         </div>
@@ -240,10 +313,10 @@ const Profil = () => {
             </FadeIn>
 
             <FadeIn delay={0.2}>
-              <Link to="/boutique" className="block bg-white p-5 rounded-xl border-4 border-black text-center group hover:bg-secondary-fixed transition-colors shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+              <Link to="/shop" className="block bg-white p-5 rounded-xl border-4 border-black text-center group hover:bg-secondary-fixed transition-colors shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
                 <span className="material-symbols-outlined text-tertiary text-4xl mb-2 block group-hover:scale-110 transition-transform">volunteer_activism</span>
                 <h4 className="font-['Plus_Jakarta_Sans'] font-extrabold uppercase text-sm tracking-tight">Soutenir le refuge</h4>
-                <p className="text-xs text-on-surface-variant mt-1">Achetez en boutique — 10% reversés au refuge</p>
+                <p className="text-xs text-on-surface-variant mt-1">Achetez en boutique — 90% reversés au refuge</p>
               </Link>
             </FadeIn>
           </aside>
@@ -252,7 +325,7 @@ const Profil = () => {
 
       {/* Modal adoption */}                                                      {/**/}
       <Modal isOpen={adoptionOpen} onClose={() => setAdoptionOpen(false)} title={`Adopter ${animal?.Nom}`} size="md">
-        {/*<AdoptionForm animal={animal} onClose={() => setAdoptionOpen(false)} />*/}
+        {<AdoptionForm animal={animal} onClose={() => setAdoptionOpen(false)} />}
       </Modal>
     </PageTransition>
   )

@@ -22,6 +22,16 @@ import ConversationsList from './pages/messagerie/conversations.jsx'
 import { ChatRoom } from './components/chat/ChatRoom.jsx'
 import { ChatPage } from './pages/messagerie/ChatPage.jsx'
 import Refuges from './pages/refuge/Refuge.jsx'
+import Dashboard from './pages/dashboard/Dashboard.jsx'
+import DashboardHub from './pages/dashboard/DashboardHub.jsx'
+import RefugeProfile from './pages/profil/RefugeProfile.jsx'
+import Paiement from './pages/paiements/Paiement.jsx'
+import ProductDetail from './pages/shop/ProductDetail.jsx'
+
+import { Elements } from '@stripe/react-stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
+
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
 
 
@@ -58,7 +68,16 @@ function App() {
         <Route path="profil" element={<UserProfile/>}/>
         <Route path="profil/:id" element={<UserProfile/>}/>
         <Route path="profil_animal/:id"element={<Profil/>}/>
-        
+        <Route path="dashboard"element={<DashboardHub />}/>
+        <Route path="refugeProfile/:id"element={<RefugeProfile/>}/>
+
+        <Route path="paiement"element={
+          <Elements stripe={stripePromise}>
+            <Paiement />
+          </Elements>
+        }/>
+
+        <Route path="shop/:id"element={<ProductDetail/>}/>
 
       </Route>
     </Routes>

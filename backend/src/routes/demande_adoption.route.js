@@ -4,11 +4,19 @@ import { protectRoute, isOwnerOrAdmin, refugeOnly } from "../midleware/auth.midl
 
 const router = Router()
 
+router.use((req, res, next) => {
+  console.log(`🔵 ${req.method} ${req.originalUrl}`);
+  next();
+});router.patch('/demandes/statut/:id'/*, protectRoute, refugeOnly*/, demande_adoption.updateDemandeStatutController);
+
 // Routes spéciales de lecture (publiques)
 router.get("/animal/:Animal", protectRoute, refugeOnly, demande_adoption.getAnimalOfDemandeAdoptionControlleur);
 router.get("/refuge/:Refuge", protectRoute, refugeOnly, demande_adoption.getRefugeOfDemandeAdoptionControlleur);
-router.get("/utilisateur/:Utilisateur", protectRoute, refugeOnly, demande_adoption.getUtilisateurOfDemandeAdoptionControlleur);
+router.get("/demandes_refuge/:Refuge", protectRoute, refugeOnly, demande_adoption.getDemandeAdoptionByRefugeIdControlleur);
+router.get("/demandes_utilisateur/:Utilisateur", protectRoute, demande_adoption.getDemandeAdoptionByUtilisateurIdControlleur);
+router.get("/utilisateur/:Utilisateur", protectRoute, demande_adoption.getUtilisateurOfDemandeAdoptionControlleur);
 router.get("/statut/:Statut",protectRoute, refugeOnly, demande_adoption.getStatutOfDemandeAdoptionControlleur);
+
 
 // Routes protégées - création, modification, suppression (utilisateurs authentifiés)
 router.post("/", protectRoute, /*refugeOnly,*/ demande_adoption.createDemandeAdoptionControlleur);

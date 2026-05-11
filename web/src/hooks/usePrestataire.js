@@ -1,7 +1,7 @@
 // frontend/src/hooks/usePrestataire.js
 
-import { useQuery } from "@tanstack/react-query"
-import { profilPrestataireApi, specificationApi } from "../lib/api"
+import { useMutation, useQueries, useQuery, useQueryClient } from "@tanstack/react-query"
+import { profilPrestataireApi, specificationApi, utilisateurApi } from "../lib/api"
 import { useMemo } from "react"
 import { useTypeServices } from "./useType_service"
 import { useStatut } from "./useStatut"
@@ -12,6 +12,8 @@ export const usePrestataires = () => {
     const { typeServicesMap } = useTypeServices()
     const { statutMap } = useStatut()
     const { especeMap, isLoading: especesLoading } = useEspeces()  // 👈 Pour les noms d'espèces
+    
+    
 
     const { data: PrestatairesData, isLoading: PrestatairesLoading, isError: isPrestataireError, error: prestataireError } = useQuery({
         queryKey: ["prestataires"],
@@ -22,6 +24,27 @@ export const usePrestataires = () => {
         queryKey: ["specifications"],
         queryFn: specificationApi.getAll,
     });
+    
+    // CORRECTION 1 : Récupérer les utilisateurs avec useQueries mais en utilisant une Map
+    const utilisateursQueries = useQueries({
+        queries: (PrestatairesData ?? []).map(prestataire => ({
+            queryKey: ["utilisateur", prestataire?.IdUtilisateur],
+            queryFn: () => utilisateurApi.getSpecific(prestataire?.IdUtilisateur),
+            enabled: !!prestataire?.IdUtilisateur,
+        }))
+    })
+
+    // CORRECTION 2 : Créer une Map utilisateur par ID utilisateur
+    const utilisateurMap = useMemo(() => {
+        const map = new Map()
+        utilisateursQueries.forEach((query, index) => {
+            const prestataire = PrestatairesData?.[index]
+            if (prestataire && query.data) {
+                map.set(prestataire.IdUtilisateur, query.data)
+            }
+        })
+        return map
+    }, [utilisateursQueries, PrestatairesData])
 
     // 1. Map des spécifications par IdProfil (prestataire)
     const specificationsByPrestataire = useMemo(() => {
@@ -50,6 +73,7 @@ export const usePrestataires = () => {
         
         return {
             ...prestataire,
+
             specifications: specs,      // Les specs brutes
             especes: especes,           // Les espèces complètes (avec noms)
             especesIds: specs.map(s => s.IdEspece)  // Juste les IDs si besoin
@@ -57,16 +81,18 @@ export const usePrestataires = () => {
     }
 
     // 3. Prestataires enrichis
+    // CORRECTION 3 : Bien mapper les utilisateurs
     const prestataires = useMemo(() => {
         const prestatairesRaw = PrestatairesData ?? []
 
-        return prestatairesRaw.map(p => {
+        return prestatairesRaw.map((p) => {
             const typeService = typeServicesMap.get(p.TypeService)
-            const statut = statutMap.get(p.Statut)  // 👈 Correction: p.Statut (pas p.statut)
+            const statut = statutMap.get(p.Statut)
             
-            // Enrichit avec les espèces
             const prestataireAvecEspeces = enrichPrestataireWithSpecies(p)
-            console.log("Prestataire enrichi:", prestataireAvecEspeces)  // Debug
+            
+            // Récupérer l'utilisateur correspondant via la Map
+            const utilisateur = utilisateurMap.get(p.IdUtilisateur) ?? null
 
             return {
                 ...prestataireAvecEspeces,
@@ -78,10 +104,11 @@ export const usePrestataires = () => {
                     Id: statut.Id,
                     Nom: statut.Nom,
                     Description: statut.Description
-                } : null
+                } : null,
+                utilisateur: utilisateur  // ✅ Maintenant c'est un objet ou null
             }
         })
-    }, [PrestatairesData, typeServicesMap, statutMap, specificationsByPrestataire, especeMap])
+    }, [PrestatairesData, typeServicesMap, statutMap, specificationsByPrestataire, especeMap, utilisateurMap])
 
     // 4. Map des prestataires par ID (pratique pour accès direct)
     const prestatairesMap = useMemo(
@@ -122,4 +149,60 @@ export const usePrestataire = (id) => {
     }, [prestatairesMap, id])
 
     return { prestataire, isLoading, isError, error }
+}
+
+export const useCreatePrestataire = () => {
+    const queryClient = useQueryClient()
+
+    const mutation = useMutation({
+        mutationFn: (prestataireData) => profilPrestataireApi.create(prestataireData),
+        onSuccess: (data) => {
+            // Invalider et recharger la liste des prestataires
+            queryClient.invalidateQueries({ queryKey: ["prestataires"] })
+            
+            // Optionnel : ajouter le nouveau prestataire au cache directement
+            queryClient.setQueryData(["prestataires"], (oldData) => {
+                if (!oldData) return [data]
+                return [...oldData, data]
+            })
+            
+            console.log("Prestataire créé avec succès:", data)
+        },
+        onError: (error) => {
+            console.error("Erreur lors de la création:", error)
+        }
+    })
+
+    return mutation
+}
+
+export const useUpdatePrestataire = () => {
+    const queryClient = useQueryClient()
+
+    const mutation = useMutation({
+        mutationFn: ({ id, data }) => profilPrestataireApi.update(id, data), // 👈 Prend id et data
+        onSuccess: (data, variables) => {
+            // Invalider la liste pour recharger
+            queryClient.invalidateQueries({ queryKey: ["prestataires"] })
+            
+            // Mettre à jour le cache individuel du prestataire
+            queryClient.setQueryData(["prestataire", variables.id], data)
+            
+            // Mettre à jour le prestataire dans la liste existante
+            queryClient.setQueryData(["prestataires"], (oldData) => {
+                if (!oldData) return [data]
+                // Remplacer l'ancien prestataire par le nouveau
+                return oldData.map(prestataire => 
+                    prestataire.Id === variables.id ? data : prestataire
+                )
+            })
+            
+            console.log("Prestataire mis à jour avec succès:", data)
+        },
+        onError: (error) => {
+            console.error("Erreur lors de la mise à jour:", error)
+        }
+    })
+
+    return mutation
 }

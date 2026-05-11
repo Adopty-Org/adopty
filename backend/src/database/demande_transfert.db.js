@@ -73,3 +73,23 @@ export const deleteDemandeTransfert = async (id) => {
   return result.affectedRows;
 };
 
+
+export const getDemandeTransfertByRefugeDepartId = async (id) => {
+  const [rows] = await db.query(
+    "SELECT * FROM demande_transfert WHERE IdRefugeDepart = ?",
+    [
+      id
+    ]
+  )
+  return rows.map(row => new DemandeTransfert(row));
+}
+
+export const getDemandeTransfertByRefugeCibleId = async (id) => {
+  const [rows] = await db.query(
+    "SELECT * FROM demande_transfert WHERE IdRefugeCible = ?",
+    [
+      id
+    ]
+  )
+  return rows.map(row => new DemandeTransfert(row));
+}

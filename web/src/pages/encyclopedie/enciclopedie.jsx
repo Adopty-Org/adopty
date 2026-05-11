@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import { PageTransition, FadeIn } from '../../components/Animations'
-//import { racesInfo } from '../data/mockData'
 import BreedDetailModal from '../../components/ui/BreedDetailModal'
-import { especeApi, raceApi } from '../../lib/api'
-import { useQuery } from '@tanstack/react-query'
 import { useRaces } from '../../hooks/useRace'
 import { useEspeces } from '../../hooks/useEspece'
+import Pagination from '../../components/ui/Pagination'
+
+const ITEMS_PER_PAGE = 8
 
 const Encyclopedie = () => {
   const [search, setSearch] = useState('')
@@ -14,29 +14,9 @@ const Encyclopedie = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const {especes, especeMap, EspecesLoading} = useEspeces()
   const {racesWithEspece, races, raceMap, RacesLoading} = useRaces(especeMap)
+  const [currentPage, setCurrentPage] = useState(1)
 
-  /*const {data:RacesData, isLoading:RacesLoading} = useQuery({
-    queryKey: ["races"],
-    queryFn: raceApi.getAll,
-  })
-
-  const {data:EspecesData, isLoading:EspecesLoading} = useQuery({
-    queryKey: ["especes"],
-    queryFn: especeApi.getAll,
-  }) 
-
-
-  const races = RacesData ?? []
-  const especes = EspecesData ?? []
-
-  const especeMap = new Map(especes.map(e => [e.Id, e]))
-
-  const racesWithEspece = races.map(r => ({
-    ...r,
-    EspeceObj: especeMap.get(r.Espece)
-  }))*/
-
-    console.log("racesraw:", races)
+  console.log("racesraw:", races)
 
   console.log(racesWithEspece)
 
@@ -55,6 +35,12 @@ const Encyclopedie = () => {
 
   console.log("Races:", racesWithEspece)
 
+  const totalPages = Math.ceil(filterRaces.length / ITEMS_PER_PAGE)
+  const paginatedProducts = filterRaces.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  )
+
   return (
     <PageTransition>
       <div className="max-w-7xl mx-auto px-6 py-12 ">
@@ -63,8 +49,8 @@ const Encyclopedie = () => {
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
             <div className="max-w-2xl">
               <span className="bg-secondary text-white px-4 py-1 rounded-full border-2 border-black font-black text-xs uppercase tracking-widest mb-4 inline-block shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">Encyclopédie Adopty</span>
-              <h1 className="font-'Chewy' text-5xl md:text-8xl text-primary leading-none mb-6">Découvrez les Races</h1>
-              <p className="font-'Plus_Jakarta_Sans' text-xl text-on-surface-variant">Apprenez-en plus sur les besoins, le caractère et l'histoire de chaque espèce pour une adoption réussie.</p>
+              <h1 className="font-['Chewy'] text-5xl md:text-8xl text-primary leading-none mb-6">Découvrez les Races</h1>
+              <p className="font-['Plus_Jakarta_Sans'] text-xl text-on-surface-variant">Apprenez-en plus sur les besoins, le caractère et l'histoire de chaque espèce pour une adoption réussie.</p>
             </div>
             
             {/* Search Bar */}
@@ -101,8 +87,8 @@ const Encyclopedie = () => {
 
         {/* Breed Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-          {filterRaces.length > 0 ? (
-            filterRaces.map((breed, i) => (
+          {paginatedProducts.length > 0 ? (
+            paginatedProducts.map((breed, i) => (
               <FadeIn key={breed.Id} delay={i * 0.05}>
                 <div 
                   onClick={() => openModal(breed)}
@@ -115,14 +101,14 @@ const Encyclopedie = () => {
                     </div>
                   </div>
                   <div className="p-6 flex flex-col flex-1">
-                    <h3 className="font-'Chewy' text-3xl text-primary mb-2 group-hover:text-secondary transition-colors">{breed.Nom}</h3>
+                    <h3 className="font-['Chewy'] text-3xl text-primary mb-2 group-hover:text-secondary transition-colors">{breed.Nom}</h3>
                     <p className="text-sm font-bold text-on-surface-variant line-clamp-2 mb-4 opacity-70 italic">{breed.Description}</p>
                     
-                    {/*<div className="mt-auto pt-4 flex flex-wrap gap-2">
-                       {breed.traits?.slice(0, 2).map(t => (
-                         <span key={t} className="text-[10px] font-black uppercase tracking-widest px-2 py-1 bg-surface-container border border-black/10 rounded-full">{t}</span>
+                    {<div className="mt-auto pt-4 flex flex-wrap gap-2">
+                       {breed?.Caracteres?.slice(0, 2).map(t => (
+                         <span key={t?.Id} className="text-[10px] font-black uppercase tracking-widest px-2 py-1 bg-surface-container border border-black/10 rounded-full">{t?.Nom}</span>
                        ))}
-                    </div>*/}
+                    </div>}
                   </div>
                   <div className="bg-primary text-white p-4 font-black uppercase text-center text-xs tracking-widest group-hover:bg-secondary transition-colors flex items-center justify-center gap-2">
                     En savoir plus <span className="material-symbols-outlined text-sm">open_in_new</span>
@@ -132,10 +118,19 @@ const Encyclopedie = () => {
             ))
           ) : (
             <div className="col-span-full py-20 text-center">
-              <p className="font-'Chewy' text-4xl text-on-surface-variant/30">Aucun résultat trouvé...</p>
+              <p className="font-['Chewy'] text-4xl text-on-surface-variant/30">Aucun résultat trouvé...</p>
             </div>
           )}
         </div>
+
+        <Pagination 
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={(page) => {
+                    setCurrentPage(page)
+                    window.scrollTo({ top: 0, behavior: 'smooth' })
+                  }}
+                />
 
         {/* Breed Modal */}
         <BreedDetailModal 

@@ -131,7 +131,7 @@ export async function getPhotosOfProduitControlleur(req, res) {
 
         const photos = await getProduitPhotosById(id);
 
-        console.log("Photos trouvées:", photos); // 👈 ET ÇA
+        //console.log("Photos trouvées:", photos); // 👈 ET ÇA
 
         if (!photos || photos.length === 0) {
             return res.status(404).json({ message: "Aucune photo trouvée pour ce produit" });
