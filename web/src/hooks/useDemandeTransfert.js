@@ -172,7 +172,7 @@ export const useDemandeTransfertsByAnimal = (id) => {
 
     const {data:DemandeTransfertsData, isLoading:DemandeTransfertsLoading, isError, error } = useQuery({
         queryKey: ["demandeTransfertsAnimal", id],
-        queryFn: demandeTransfertApi.getByAnimal(id),
+        queryFn: () => demandeTransfertApi.getByAnimal(id),
         enabled: !!id,
     }) 
 
@@ -298,7 +298,7 @@ export const useCreateDemandeTransfertWithNotification = () => {
         onSuccess: async (data, variables) => {
             // Invalider les requêtes
             queryClient.invalidateQueries({ queryKey: ["demandeTransferts"] })
-            queryClient.invalidateQueries({ queryKey: ["demandeTransferts", "refuge", data.RefugeId] })
+            queryClient.invalidateQueries({ queryKey: ["demandeTransferts", "refuge", data.IdRefugeDepart] })
             
             // Ajouter la notification pour l'utilisateur
             addNotification({
@@ -334,7 +334,7 @@ export const useCreateDemandeTransfertWithNotification = () => {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    refugeId: demande.RefugeId,
+                    refugeId: demande.IdRefugeDepart,
                     demandeId: demande.Id,
                     message: `${demande.prenom} ${demande.nom} souhaite adopter un animal`
                 })

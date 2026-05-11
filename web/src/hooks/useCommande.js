@@ -31,6 +31,22 @@ export const useCommandes = () => {
         return map
     }, [sousCommandes])
 
+    
+
+    // Fonction utilitaire pour déterminer le statut global
+    const getStatutGlobal = (statutCommande, sousCommandesList) => {
+        if (sousCommandesList.length === 0) return statutCommande
+        
+        const tousLivres = sousCommandesList.every(sc => sc?.statut?.Statut === "livree")
+        const unEncours = sousCommandesList.some(sc => sc?.statut?.Statut === "en_cours")
+        const unAnnule = sousCommandesList.some(sc => sc?.statut?.Statut === "annulee")
+        
+        if (tousLivres) return "completee"
+        if (unAnnule && !unEncours) return "partiellement_annulee"
+        if (unEncours) return "en_cours"
+        return statutCommande
+    }
+
     // Enrichir les commandes avec leurs sous-commandes
     const commandes = useMemo(() => {
         const commandesRaw = CommandesData ?? []
@@ -55,27 +71,13 @@ export const useCommandes = () => {
                 statutGlobal: getStatutGlobal(commande.Statut, sousCommandesList)
             }
         })
-    }, [CommandesData, sousCommandesByCommande])
+    }, [CommandesData, sousCommandesByCommande, statutMap])
 
     // Map des commandes par ID
     const commandeMap = useMemo(
         () => new Map(commandes.map(c => [c.Id, c])),
         [commandes]
     )
-
-    // Fonction utilitaire pour déterminer le statut global
-    const getStatutGlobal = (statutCommande, sousCommandesList) => {
-        if (sousCommandesList.length === 0) return statutCommande
-        
-        const tousLivres = sousCommandesList.every(sc => sc?.statut?.Statut === "livree")
-        const unEncours = sousCommandesList.some(sc => sc?.statut?.Statut === "en_cours")
-        const unAnnule = sousCommandesList.some(sc => sc?.statut?.Statut === "annulee")
-        
-        if (tousLivres) return "completee"
-        if (unAnnule && !unEncours) return "partiellement_annulee"
-        if (unEncours) return "en_cours"
-        return statutCommande
-    }
 
     return ({
         commandes,

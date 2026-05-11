@@ -8,18 +8,19 @@ import { NewLoadingLayout } from "../../components/Loadingpage"
 
 const DashboardHub = () => {
     const {user, isLoaded, isSignedIn, } = useUser()
+    const {utilisateur, isLoading} = useUtilisateur(user.id)
     
     if (!isLoaded) {
         return <NewLoadingLayout/>
     }
-    const {utilisateur, isLoading} = useUtilisateur(user.id)
+    
 
     if (isLoading) {
         return <NewLoadingLayout/>
     }
 
     //console.log("l\'utilisateur : ", utilisateur)
-  const  role  = utilisateur?.Roles[0]?.Nom
+  const  role  = utilisateur?.Roles?.[0]?.Nom
 
   /*if (role === ROLE_KEYS.ADMIN) {
     return <Dashboard />

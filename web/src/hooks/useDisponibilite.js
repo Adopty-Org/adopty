@@ -8,7 +8,7 @@ export const useDisponibilites = (id) => {
 
     const {data:DisponibilitesData, isLoading:DisponibilitesLoading, isError, error } = useQuery({
         queryKey: ["disponibilites", id],
-        queryFn: disponibiliteApi.getByProfilPrestataire(id),
+        queryFn: () => disponibiliteApi.getByProfilPrestataire(id),
         enabled: !!id,
     }) 
 

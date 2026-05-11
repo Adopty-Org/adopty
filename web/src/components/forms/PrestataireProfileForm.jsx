@@ -34,15 +34,14 @@ const PrestataireProfileForm = ({ initialData = null, onClose, onSuccess }) => {
     setError(null)
 
     try {
+      
       if (profileId) {
-        // Édition
-        updatePrestataire.mutate(profileId, formData)
+        await updatePrestataire.mutateAsync({ id: profileId, data:formData })
       } else {
-        // Création
-        createPrestataire.mutate(formData)
+        await createPrestataire.mutateAsync(formData)
       }
-      onSuccess()
-      onClose()
+      onSuccess?.()
+      onClose?.()
     } catch (err) {
       const msg = err?.response?.data?.message || err?.message || "Une erreur est survenue lors de l'enregistrement."
       setError(msg)

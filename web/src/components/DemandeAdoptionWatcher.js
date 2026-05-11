@@ -79,7 +79,7 @@ import { useEffect, useRef } from 'react'
 import { useDemandeAdoptionsByRefuge, useDemandeAdoptionsByUser } from '../hooks/useDemandeAdoption'
 import { useNotifications } from '../context/NotificationContext'
 import { useAuth } from '@clerk/clerk-react'
-import { setDragLock } from 'framer-motion'
+//import { setDragLock } from 'framer-motion'
 import { useDemandeTransfertsByRefugeCible, useDemandeTransfertsByRefugeDepart } from '../hooks/useDemandeTransfert'
 
 export const DemandeAdoptionWatcher = ({ refugeId, utilisateur }) => {

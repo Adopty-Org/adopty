@@ -32,10 +32,12 @@ const AvailabilityForm = ({ initialData = null, profilId, onClose, onSuccess }) 
     setError(null)
 
     try {
-      if (initialData?.id) {
-        updateDisponibilite.mutate(initialData.id, formData)
+      const disponibiliteId = initialData?.id ?? initialData?.Id
+
+      if (disponibiliteId) {
+        await updateDisponibilite.mutateAsync({ id: disponibiliteId, data: formData })
       } else {
-        createDisponibilite.mutate(formData)
+        await createDisponibilite.mutateAsync(formData)
       }
       onSuccess()
       onClose()

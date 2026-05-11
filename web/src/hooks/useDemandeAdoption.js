@@ -5,6 +5,7 @@ import { demandeAdoptionApi } from "../lib/api"
 import { useMemo } from "react"
 import { useUtilisateur, useUtilisateurs } from "./useUtilisateur"
 import { useAnimals } from "./useAnimal"
+import { useNotifications } from "../context/NotificationContext"
 
 export const useDemandeAdoptionsByRefuge = (id) => {
     const { data: DemandeAdoptionsData, isLoading: DemandeAdoptionsLoading, isError, error } = useQuery({
@@ -91,7 +92,7 @@ export const useDemandeAdoptionsByAnimal = (id) => {
 
     const {data:DemandeAdoptionsData, isLoading:DemandeAdoptionsLoading, isError, error } = useQuery({
         queryKey: ["demandeAdoptionsAnimal", id],
-        queryFn: demandeAdoptionApi.getByAnimal(id),
+        queryFn: () => demandeAdoptionApi.getByAnimal(id),
         enabled: !!id,
     }) 
 
@@ -161,7 +162,7 @@ export const useDemandeAdoptionsByUtilisateur = (id) => {
 
     const {data:DemandeAdoptionsData, isLoading:DemandeAdoptionsLoading, isError, error } = useQuery({
         queryKey: ["demandeAdoptionsUtilisateur", id],
-        queryFn: demandeAdoptionApi.getByUtilisateur(id),
+        queryFn: () => demandeAdoptionApi.getByUtilisateur(id),
         enabled: !!id,
     }) 
 

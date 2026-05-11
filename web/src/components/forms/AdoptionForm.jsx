@@ -17,7 +17,7 @@ const AdoptionForm = ({ animal, onClose }) => {
   const { user } = useUser()
 
   const createDemandeAdoption = useCreateDemandeAdoption()
-  const {utilisateur, isLoading} = useUtilisateur(user.id)
+  const {utilisateur, isLoading} = useUtilisateur(user?.id)
   const {refuge,RefugesLoading} =useRefugeByAnimal(animal?.Id)
 
   console.log("refuge", refuge?.Id)
@@ -28,8 +28,10 @@ const AdoptionForm = ({ animal, onClose }) => {
     e.preventDefault()
     console.log("animal dans le handle : ", animal)
     if(isLoading || RefugesLoading) return <NewLoadingLayout/>
-    console.log(" le refuge", refuge?.Id)
-    return;
+    if (!utilisateur?.Id || !refuge?.Id) {
+      alert("Données utilisateur ou refuge non disponibles. Réessayez dans un instant.")
+      return
+    }
     // Vérifier que toutes les conditions sont remplies
     if (!form.acceptConditions) {
       alert("Vous devez accepter les conditions d'adoption")

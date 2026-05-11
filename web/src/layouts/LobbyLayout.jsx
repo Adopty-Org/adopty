@@ -12,8 +12,8 @@ function LobbyLayout() {
   const { utilisateur, isLoading } = useUtilisateur(user?.id)
   
   // Vérifier si l'utilisateur est un refuge et a un refuge associé
-  const isRefuge = utilisateur?.role === 'Refuge' || utilisateur?.Refuge !== null
-  const refugeId = utilisateur?.Refuge[0]?.Id
+  const refugeId = utilisateur?.Refuge?.[0]?.Id
+  const isRefuge = utilisateur?.role === 'Refuge' || !!refugeId
 
   console.log("dans le layout :" , utilisateur)
 

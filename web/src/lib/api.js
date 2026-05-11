@@ -904,22 +904,10 @@ export const demandeAdoptionApi = {
 
     // Mettre à jour le statut d'une demande
     updateStatut: async (demandeId, statut) => {
-        console.log(`Appel API: Mise à jour demande ${demandeId} -> statut ${statut}`);
-        
-        const token = localStorage.getItem('token');
-
-        const response = await axiosInstance.patch(`/demande_adoptions/demandes/statut/${demandeId}`, {statut});
-        
-        /*console.log(`Réponse reçue - Status: ${response.status}`);
-        
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.message || `Erreur HTTP ${response.status}`);
-        }*/
-        
-        const data = await response.json();
-        //console.log("Succès:", data);*/
-        
+        const { data } = await axiosInstance.patch(
+            `/demande_adoptions/demandes/statut/${demandeId}`,
+            { statut }
+        );
         return data;
     }
 };
