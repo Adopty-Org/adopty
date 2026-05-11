@@ -17,9 +17,9 @@ function Sidebar() {
   return (
     
         <div className="drawer-side is-drawer-close:overflow-visible transition-all duration-300">
-            <label htmlFor="my-drawer-2" aria-label="close sidebar" className="drawer-overlay"></label>
+            <label htmlFor="my-drawer-2" aria-label="close sidebar" className="drawer-overlay "></label>
             
-            <div className='flex min-h-full flex-col items-start bg-base-200 transform transition-transform duration-300 is-drawer-open:translate-x-0 is-drawer-close:-translate-x-full  justify-between'>
+            <div className='flex min-h-full flex-col items-start bg-[#fbfbe2]  transform transition-transform duration-300 is-drawer-open:translate-x-0 is-drawer-close:-translate-x-full  justify-between'>
 
                 <div>
                     {/* l'icon */}
@@ -36,7 +36,7 @@ function Sidebar() {
                     </div>
                     
                     {/* le tiroir */}
-                    <ul className="menu bg-base-200 min-h-full w-64 p-4 is-drawer-close:hidden transition-all duration-300">
+                    <ul className="menu min-h-full w-64 p-4 is-drawer-close:hidden transition-all duration-300 bg-[#fbfbe2]">
                     {/* Sidebar content here */}
                     {NAVIGATION.map(item => {
                         const isActive = location.pathname === item.path;
@@ -44,7 +44,7 @@ function Sidebar() {
                         return (
                             <li key={item.path}>
                                 <Link to={item.path} className={`is-drawer-close:tooltip is-drawer-close:tooltip-right ${isActive ? "bg-primary text-primary-content " : ""} ${item.path === '/signalement'
-                        ? 'text-white bg-[#ba1a1a] border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1px hover:translate-y-1px hover:shadow-none ml-2'
+                        ? 'text-white bg-[#ba1a1a] border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none ml-2'
                         : isActive
                         ? 'text-primary bg-surface-container border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
                         : 'text-primary/70 hover:text-primary hover:bg-surface-container'

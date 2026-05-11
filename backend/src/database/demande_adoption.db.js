@@ -95,3 +95,54 @@ export const getDemandeAdoptionByRefugeId = async (id) => {
   )
   return rows.map(row => new DemandeAdoption(row));
 }
+
+export const getDemandeAdoptionByUtilisateurId = async (id) => {
+  const [rows] = await db.query(
+    "SELECT * FROM demande_adoption WHERE IdUtilisateur = ?",
+    [
+      id
+    ]
+  )
+  return rows.map(row => new DemandeAdoption(row));
+}
+
+// backend/services/demandeAdoptionService.js
+
+// Mettre à jour le statut d'une demande
+export const updateDemandeStatut = async (demandeId, nouveauStatut) => {
+    try {
+        console.log(`Mise à jour de la demande ${demandeId} vers le statut ${nouveauStatut}`);
+        
+        // Vérifier si la demande existe
+        const [demandeExistante] = await db.execute(
+            'SELECT Id, Statut FROM demande_adoption WHERE Id = ?',
+            [demandeId]
+        );
+        
+        if (demandeExistante.length === 0) {
+            throw new Error(`Demande ${demandeId} non trouvée`);
+        }
+        
+        console.log(`Demande trouvée, statut actuel: ${demandeExistante[0].Statut}`);
+        
+        // Mettre à jour le statut
+        const [result] = await db.execute(
+            'UPDATE demande_adoption SET Statut = ? WHERE Id = ?',
+            [nouveauStatut, demandeId]
+        );
+        
+        console.log(`Mise à jour effectuée, lignes affectées: ${result.affectedRows}`);
+        
+        // Récupérer la demande mise à jour
+        const [demandeMaj] = await db.execute(
+            'SELECT * FROM demande_adoption WHERE Id = ?',
+            [demandeId]
+        );
+        
+        return demandeMaj[0];
+        
+    } catch (error) {
+        console.error("Erreur dans updateDemandeStatut:", error);
+        throw error;
+    }
+};

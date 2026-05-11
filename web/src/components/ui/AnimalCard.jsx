@@ -35,11 +35,11 @@ const AnimalCard = ({ animal, delay = 0 }) => {
           <span className="text-secondary font-bold">{animal?.Age}</span>
         </div>
         <p className="text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-2">{animal.Race?.Nom ?? "Inconnu"}</p>
-        <p className="text-on-surface-variant text-sm line-clamp-2 mb-4 font-body grow">{/*animal.description */animal.Couleur}</p>
+        <p className="text-on-surface-variant text-sm line-clamp-2 mb-4 font-body grow">{/*animal.description */animal?.Couleur}</p>
         <div className="flex flex-wrap gap-1.5 mb-4">
-          {/*animal.caractere.slice(0, 3).map(c => (
-            <span key={c} className="text-xs font-bold uppercase tracking-tight bg-surface-variant px-2 py-0.5 border border-black/20 rounded-sm">{c}</span>
-          ))*/}
+          {animal?.Caracteres?.slice(0, 3).map(c => (
+            <span key={c?.Id} className="text-xs font-bold uppercase tracking-tight bg-surface-variant px-2 py-0.5 border border-black/20 rounded-sm">{c?.Nom}</span>
+          ))}
           <span className="text-xs font-bold uppercase tracking-tight bg-surface-variant px-2 py-0.5 border border-black/20 rounded-sm">{animal?.Taille}</span>
         </div>
         <Link

@@ -3,6 +3,7 @@ import { useCart } from '../../context/CartContext'
 import Badge from './Badge'
 import { useQuery } from '@tanstack/react-query'
 import { produitApi } from '../../lib/api'
+import { Link } from 'react-router-dom'
 
 const ProductCard = ({ produit, delay = 0 }) => {
   const { addToCart } = useCart()
@@ -15,6 +16,7 @@ const ProductCard = ({ produit, delay = 0 }) => {
 
   return (
     <FadeIn delay={delay} className="group bg-surface-container-lowest border-[3px] border-black rounded-xl overflow-hidden shadow-[8px_8px_0px_0px_rgba(21,66,18,1)] hover:-translate-x-1 hover:-translate-y-1 hover:shadow-[12px_12px_0px_0px_rgba(21,66,18,1)] transition-all duration-200 flex flex-col">
+      <Link to={`/shop/${produit?.Id}`} className="flex flex-col h-full">
       <div className="relative h-56 overflow-hidden border-b-[3px] border-black">
         <img
           alt={produit?.Nom}
@@ -28,6 +30,7 @@ const ProductCard = ({ produit, delay = 0 }) => {
           <Badge variant="eco" className="absolute top-3 left-3">{produit.badge}</Badge>
         )*/}
       </div>
+      </Link>
       <div className="p-5 flex flex-col grow">
         <span className="text-xs font-bold text-secondary uppercase tracking-widest mb-1">{produit?.categorie}</span>
         <h3 className="font-['Plus_Jakarta_Sans'] font-extrabold text-xl mb-2 text-primary">{produit?.Nom}</h3>

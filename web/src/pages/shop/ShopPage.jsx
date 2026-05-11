@@ -2,29 +2,29 @@ import React, { useState } from 'react'
 import { FadeIn, PageTransition } from '../../components/Animations.jsx'
 import ProductCard from '../../components/ui/ProductCard.jsx'
 import { useQuery } from '@tanstack/react-query'
-import { produitApi } from '../../lib/api.js'
+import { produitApi, utilisateurApi } from '../../lib/api.js'
 import { useProduits } from '../../hooks/useProduit.js'
+import Pagination from '../../components/ui/Pagination'
+import { useUtilisateur } from '../../hooks/useUtilisateur.js'
 
 const CATEGORIES = ['Tous', 'Alimentation Bio', 'Jouets Écolo', 'Accessoires', 'Hygiène']
+const ITEMS_PER_PAGE = 6
 
 function ShopPage() {
   const [categorie, setCategorie] = useState('Tous')
   const [tri, setTri] = useState('nouveautes')
   const { produits, isLoading: ProduitsLoading } = useProduits()
+  const [currentPage, setCurrentPage] = useState(1)
 
-  /*const { data:ProduitsData, isLoading:ProduitsLoading} = useQuery({
-    queryKey:['produits'],
-    queryFn: produitApi.getAll
-  })
+  //const {utilisateur} = useUtilisateur("user_3Cl8Cijc2dCXvaEPWX4ZGa7s8f0")
 
-  console.log("ProduitsData :", ProduitsData)
+  //console.log("l'utilisateur", utilisateur)
 
-  const produits = ProduitsData ?? []*/
 
   // 🛡️ GARDE-FOU N°1 : Valeur par défaut
   const produitsArray = produits ?? []  // 👈 Si undefined/null, devient []
 
-  console.log("Les produits :   ", produitsArray)
+  //console.log("Les produits :   ", produitsArray)
 
   // 🛡️ GARDE-FOU N°2 : Affichage conditionnel
   if (ProduitsLoading) {
@@ -46,13 +46,11 @@ function ShopPage() {
       return 0
     })
 
-  /*const filtered = produits
-    .filter(p => categorie === 'Tous' || p.categorie === categorie)
-    .sort((a, b) => {
-      if (tri === 'prix-asc') return a.prix - b.prix
-      if (tri === 'prix-desc') return b.prix - a.prix
-      return 0
-    })*/
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE)
+  const paginatedProducts = filtered.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  )
 
 
   return (
@@ -138,11 +136,22 @@ function ShopPage() {
                 <p className="font-bold text-lg">Aucun produit dans cette catégorie.</p>
               </FadeIn>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7">
-                {filtered.map((p, i) => (
-                  <ProductCard key={p.Id} produit={p} delay={i * 0.07} />
-                ))}
-              </div>
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7">
+                  {paginatedProducts.map((p, i) => (
+                      <ProductCard key={p?.Id} produit={p} delay={i * 0.07} />
+                    ))}
+                </div>
+
+                <Pagination 
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={(page) => {
+                      setCurrentPage(page)
+                      window.scrollTo({ top: 0, behavior: 'smooth' })
+                    }}
+                  />
+                </>
             )}
           </section>
         </div>

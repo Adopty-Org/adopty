@@ -20,7 +20,7 @@ export const SocketProvider = ({ children }) => {
     const socketRef = useRef(null);
     const reconnectAttemptsRef = useRef(0);
     const refreshIntervalRef = useRef(null);
-    const { getToken } = useAuth();
+    const { getToken, isSignedIn, userId } = useAuth(); // Ajouter isSignedIn
 
     // ========================================
     // 1. DÉCONNEXION PROPRE
@@ -168,12 +168,18 @@ export const SocketProvider = ({ children }) => {
     // 4. INITIALISATION AU MONTAGE
     // ========================================
     useEffect(() => {
-        connect();
+        if (isSignedIn) {
+            console.log("👤 Utilisateur connecté, initialisation du socket...");
+            connect();
+        } else {
+            console.log("🚪 Utilisateur déconnecté, nettoyage du socket...");
+            disconnect();
+        }
 
         return () => {
             disconnect();
         };
-    }, [connect, disconnect]);
+    }, [isSignedIn, connect, disconnect]);
 
     return (
         <SocketContext.Provider value={{ 

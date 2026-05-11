@@ -1,5 +1,5 @@
 import { getAnimalById } from "../database/animal.db.js";
-import { createDemandeTransfert, deleteDemandeTransfert, getAllDemandeTransferts, getDemandeTransfertById, updateDemandeTransfert } from "../database/demande_transfert.db.js";
+import { createDemandeTransfert, deleteDemandeTransfert, getAllDemandeTransferts, getDemandeTransfertById, getDemandeTransfertByRefugeCibleId, getDemandeTransfertByRefugeDepartId, updateDemandeTransfert } from "../database/demande_transfert.db.js";
 import { getStatutById } from "../database/statut.db.js";
 
 export async function createDemandeTransfertControlleur(req,res) {
@@ -140,6 +140,41 @@ export async function getAnimalOfDemandeTransfertControlleur(req,res) {
         
     } catch (error) {
         console.error("Erreur lors de l'obtention de l'aniaml de l'demande_transfert:", error);
+        res.status(500).json({ message: "Erreur interne du serveur" });
+    }
+}
+
+
+export async function getDemandeTransfertByRefugeCibleIdControlleur(req,res) {
+    try {
+        const { Refuge } = req.params;
+        console.log("le refuge", Refuge)
+        const refuge = await getDemandeTransfertByRefugeCibleId(Refuge);
+        console.log("la reponce :  ", refuge)
+        if (!refuge) {
+            return res.status(404).json({ message: "DemandeTransfert a un refuge inexistante !(non trouvé)" });
+        }
+        res.status(200).json(refuge);
+        
+    } catch (error) {
+        console.error("Erreur lors de l'obtention du refuge de l'demande_adoption:", error);
+        res.status(500).json({ message: "Erreur interne du serveur" });
+    }
+}
+
+export async function getDemandeTransfertByRefugeDepartIdControlleur(req,res) {
+    try {
+        const { Refuge } = req.params;
+        console.log("le refuge", Refuge)
+        const refuge = await getDemandeTransfertByRefugeDepartId(Refuge);
+        console.log("la reponce :  ", refuge)
+        if (!refuge) {
+            return res.status(404).json({ message: "DemandeTransfert a un refuge inexistante !(non trouvé)" });
+        }
+        res.status(200).json(refuge);
+        
+    } catch (error) {
+        console.error("Erreur lors de l'obtention du refuge de l'demande_adoption:", error);
         res.status(500).json({ message: "Erreur interne du serveur" });
     }
 }

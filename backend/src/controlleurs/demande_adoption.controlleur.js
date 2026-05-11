@@ -1,5 +1,5 @@
 import cloudinary from "../config/cloudinary.js"
-import { createDemandeAdoption, deleteDemandeAdoption, getAllDemandeAdoptions, getDemandeAdoptionById, updateDemandeAdoption } from "../database/demande_adoption.db.js";
+import { createDemandeAdoption, deleteDemandeAdoption, getAllDemandeAdoptions, getDemandeAdoptionById, getDemandeAdoptionByRefugeId, getDemandeAdoptionByUtilisateurId, updateDemandeAdoption, updateDemandeStatut } from "../database/demande_adoption.db.js";
 import { getStatutById } from "../database/statut.db.js";
 import { getAnimalById } from "../database/animal.db.js";
 import { getUtilisateurById } from "../database/utilisateur.db.js";
@@ -220,3 +220,91 @@ export async function getRefugeOfDemandeAdoptionControlleur(req,res) {
         res.status(500).json({ message: "Erreur interne du serveur" });
     }
 }
+
+export async function getDemandeAdoptionByRefugeIdControlleur(req,res) {
+    try {
+        const { Refuge } = req.params;
+        console.log("le refuge", Refuge)
+        const refuge = await getDemandeAdoptionByRefugeId(Refuge);
+        console.log("la reponce :  ", refuge)
+        if (!refuge) {
+            return res.status(404).json({ message: "DemandeAdoption a un refuge inexistante !(non trouvé)" });
+        }
+        res.status(200).json(refuge);
+        
+    } catch (error) {
+        console.error("Erreur lors de l'obtention du refuge de l'demande_adoption:", error);
+        res.status(500).json({ message: "Erreur interne du serveur" });
+    }
+}
+
+export async function getDemandeAdoptionByUtilisateurIdControlleur(req,res) {
+    try {
+        const { Utilisateur } = req.params;
+        console.log("le utilisateur", Utilisateur)
+        const utilisateur = await getDemandeAdoptionByUtilisateurId(Utilisateur);
+        console.log("la reponce :  ", utilisateur)
+        if (!utilisateur) {
+            return res.status(404).json({ message: "DemandeAdoption a un utilisateur inexistante !(non trouvé)" });
+        }
+        res.status(200).json(utilisateur);
+        
+    } catch (error) {
+        console.error("Erreur lors de l'obtention du utilisateur de l'demande_adoption:", error);
+        res.status(500).json({ message: "Erreur interne du serveur" });
+    }
+}
+
+
+// PATCH /api/demandes/:id/statut
+export const updateDemandeStatutController = async (req, res) => {
+    try {
+        const { id } = req.params;      // Récupère l'ID de la demande
+        const { statut } = req.body;    // Récupère le nouveau statut
+        
+        console.log(`Requête PATCH reçue - Demande ID: ${id}, Nouveau statut: ${statut}`);
+        
+        // Validation: vérifier que l'ID est valide
+        if (!id || isNaN(parseInt(id))) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "ID de demande invalide" 
+            });
+        }
+        
+        // Validation: vérifier que le statut est valide (1-6)
+        const statutsValides = [1, 2, 3, 4, 5, 6];
+        if (!statut || !statutsValides.includes(statut)) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "Statut invalide. Utilisez 1,2,3,4,5 ou 6" 
+            });
+        }
+        
+        // Appeler le service
+        const demandeMaj = await updateDemandeStatut(id, statut);
+        
+        // Retourner la réponse
+        res.status(200).json({
+            success: true,
+            message: `Statut de la demande ${id} mis à jour avec succès`,
+            demande: demandeMaj,
+            nouveauStatut: statut
+        });
+        
+    } catch (error) {
+        console.error("Erreur dans updateDemandeStatutController:", error);
+        
+        if (error.message.includes('non trouvée')) {
+            return res.status(404).json({ 
+                success: false, 
+                message: error.message 
+            });
+        }
+        
+        res.status(500).json({ 
+            success: false, 
+            message: "Erreur interne du serveur" 
+        });
+    }
+};

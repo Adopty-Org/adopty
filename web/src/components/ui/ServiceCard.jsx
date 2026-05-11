@@ -9,7 +9,7 @@ const ServiceCard = ({ prestataire, delay = 0, onReserver }) => {
         <div className="flex items-start gap-4 mb-4">
           <div className="relative shrink-0">
             <img
-              alt={prestataire?.Nom}
+              alt={prestataire?.utilisateur?.Nom}
               src={prestataire?.photo}
               className="w-16 h-16 rounded-full border-4 border-black object-cover"
             />
@@ -21,7 +21,7 @@ const ServiceCard = ({ prestataire, delay = 0, onReserver }) => {
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between gap-2">
-              <h3 className="font-['Plus_Jakarta_Sans'] font-extrabold text-lg text-primary truncate">{prestataire?.Nom}</h3>
+              <h3 className="font-['Plus_Jakarta_Sans'] font-extrabold text-lg text-primary truncate">{prestataire?.utilisateur?.Nom}</h3>
               <span className={`text-xs font-bold px-2 py-0.5 rounded-full border-2 border-black shrink-0 ${prestataire?.disponible ? 'bg-primary-fixed text-on-primary-fixed-variant' : 'bg-error-container text-on-error-container'}`}>
                 {prestataire?.disponible ? 'Disponible' : 'Occupé'}
               </span>
@@ -33,7 +33,7 @@ const ServiceCard = ({ prestataire, delay = 0, onReserver }) => {
                   <span key={i} className={`text-sm ${filled ? 'text-secondary' : 'text-outline-variant'}`}>★</span>
                 ))}
               </div>
-              <span className="text-sm font-bold text-on-surface">{prestataire?.note}</span>
+              <span className="text-sm font-bold text-on-surface">{prestataire?.NoteMoyenne}</span>
               <span className="text-xs text-on-surface-variant">({prestataire?.avis} avis)</span>
             </div>
           </div>

@@ -135,6 +135,11 @@ export const utilisateurApi = {
         const { data } = await axiosInstance.delete(`/utilisateurs/role/${id}`);
         return data;
     },
+
+    getRoles: async (id) => {
+        const { data } = await axiosInstance.get(`/utilisateurs/roles/${id}`);
+        return data;
+    },
 };
 
 /*
@@ -191,8 +196,8 @@ export const animalApi = {
         return data;
     },
 
-    getPhotos: async (photo) => {
-        const { data } = await axiosInstance.get(`/animaux/${photo}/photos`);
+    getPhotos: async (id) => {
+        const { data } = await axiosInstance.get(`/animaux/${id}/photos`);
         return data;
     },
 
@@ -823,6 +828,160 @@ export const disponibiliteApi = {
     },
 };
 
+/*
+========================================================
+🛡️ DEMANDEADOPTION
+========================================================
+*/
+export const demandeAdoptionApi = {
+
+    // =========================
+    // 🔹 CRUD (protégé - refuge seulement)
+    // =========================
+
+    create: async (formData) => {
+        const { data } = await axiosInstance.post("/demande_adoptions", formData);
+        return data;
+    },
+
+    update: async ({ id, formData }) => {
+        const { data } = await axiosInstance.put(`/demande_adoptions/${id}`, formData);
+        return data;
+    },
+
+    delete: async (id) => {
+        const { data } = await axiosInstance.delete(`/demande_adoptions/${id}`);
+        return data;
+    },
+
+    // =========================
+    // 🔹 Lecture publique
+    // =========================
+
+    getSpecific: async (id) => {
+        const { data } = await axiosInstance.get(`/demande_adoptions/${id}`);
+        return data;
+    },
+
+    getAll: async () => {
+        const { data } = await axiosInstance.get("/demande_adoptions");
+        return data;
+    },
+
+    // =========================
+    // 🔹 Filtres (réservés aux refuges)
+    // =========================
+
+    getByAnimal: async (animalId) => {
+        const { data } = await axiosInstance.get(`/demande_adoptions/animal/${animalId}`);
+        return data;
+    },
+
+    getByRefuge: async (refugeId) => {
+        const { data } = await axiosInstance.get(`/demande_adoptions/refuge/${refugeId}`);
+        return data;
+    },
+
+    getEmByRefuge: async (refugeId) => {
+        const { data } = await axiosInstance.get(`/demande_adoptions/demandes_refuge/${refugeId}`);
+        return data;
+    },
+
+    getByUtilisateur: async (utilisateurId) => {
+        const { data } = await axiosInstance.get(`/demande_adoptions/utilisateur/${utilisateurId}`);
+        return data;
+    },
+
+    getEmByUtilisateur: async (utilisateurId) => {
+        const { data } = await axiosInstance.get(`/demande_adoptions/demandes_utilisateur/${utilisateurId}`);
+        return data;
+    },
+
+    getByStatut: async (statut) => {
+        const { data } = await axiosInstance.get(`/demande_adoptions/statut/${statut}`);
+        return data;
+    },
+
+    // Mettre à jour le statut d'une demande
+    updateStatut: async (demandeId, statut) => {
+        const { data } = await axiosInstance.patch(
+            `/demande_adoptions/demandes/statut/${demandeId}`,
+            { statut }
+        );
+        return data;
+    }
+};
+
+/*
+========================================================
+🛡️ DEMANDETRANSFERT
+========================================================
+*/
+export const demandeTransfertApi = {
+
+    // =========================
+    // 🔹 CRUD (protégé - refuge seulement)
+    // =========================
+
+    create: async (formData) => {
+        const { data } = await axiosInstance.post("/demande_transferts", formData);
+        return data;
+    },
+
+    update: async ({ id, formData }) => {
+        const { data } = await axiosInstance.put(`/demande_transferts/${id}`, formData);
+        return data;
+    },
+
+    delete: async (id) => {
+        const { data } = await axiosInstance.delete(`/demande_transferts/${id}`);
+        return data;
+    },
+
+    // =========================
+    // 🔹 Lecture publique
+    // =========================
+
+    getSpecific: async (id) => {
+        const { data } = await axiosInstance.get(`/demande_transferts/${id}`);
+        return data;
+    },
+
+    getAll: async () => {
+        const { data } = await axiosInstance.get("/demande_transferts");
+        return data;
+    },
+
+    // =========================
+    // 🔹 Filtres (réservés aux refuges)
+    // =========================
+
+    getByAnimal: async (animalId) => {
+        const { data } = await axiosInstance.get(`/demande_transferts/animal/${animalId}`);
+        return data;
+    },
+
+    getByRefuge: async (refugeId) => {
+        const { data } = await axiosInstance.get(`/demande_transferts/refuge/${refugeId}`);
+        return data;
+    },
+
+    getByStatut: async (statut) => {
+        const { data } = await axiosInstance.get(`/demande_transferts/statut/${statut}`);
+        return data;
+    },
+
+    getEmByRefugeDepart: async (refugeId) => {
+        const { data } = await axiosInstance.get(`/demande_transferts/demandes_refuge_depart/${refugeId}`);
+        return data;
+    },
+
+    getEmByRefugeCible: async (refugeId) => {
+        const { data } = await axiosInstance.get(`/demande_transferts/demandes_refuge_cible/${refugeId}`);
+        return data;
+    },
+};
+
 
 /*
 ========================================================
@@ -1186,6 +1345,47 @@ export const messageApi = {
         const { data } = await axiosInstance.get(
             `/messages/sender_id/${senderId}`
         );
+        return data;
+    },
+};
+
+/*
+========================================================
+🛡️ MATERIAUX
+========================================================
+*/
+export const materiauxApi = {
+
+    // =========================
+    // 🔹 CRUD (admin seulement)
+    // =========================
+
+    create: async (formData) => {
+        const { data } = await axiosInstance.post("/materiaux", formData);
+        return data;
+    },
+
+    update: async ({ id, formData }) => {
+        const { data } = await axiosInstance.put(`/materiaux/${id}`, formData);
+        return data;
+    },
+
+    delete: async (id) => {
+        const { data } = await axiosInstance.delete(`/materiaux/${id}`);
+        return data;
+    },
+
+    // =========================
+    // 🔹 Lecture publique
+    // =========================
+
+    getSpecific: async (id) => {
+        const { data } = await axiosInstance.get(`/materiaux/${id}`);
+        return data;
+    },
+
+    getAll: async () => {
+        const { data } = await axiosInstance.get("/materiaux");
         return data;
     },
 };
@@ -1823,7 +2023,7 @@ export const statutApi = {
 export const stripeApi = {
 
     // =========================
-    // 🔹 Webhook (backend only normalement)
+    // 🔹 Webhook (backend only - à enlever du front normalement)
     // =========================
     webhook: async (payload) => {
         const { data } = await axiosInstance.post("/stripe/webhook", payload);
@@ -1833,7 +2033,6 @@ export const stripeApi = {
     // =========================
     // 🔹 Customer
     // =========================
-
     createCustomer: async (payload) => {
         const { data } = await axiosInstance.post("/stripe/customer", payload);
         return data;
@@ -1842,17 +2041,18 @@ export const stripeApi = {
     // =========================
     // 🔹 Stripe Connect
     // =========================
-
-    createRefugeAccount: async (refugeId) => {
+    createRefugeAccount: async (refugeId, payload) => {  // ← Ajout payload
         const { data } = await axiosInstance.post(
-            `/stripe/connect/refuge/${refugeId}`
+            `/stripe/connect/refuge/${refugeId}`,
+            payload  // ← { email, name }
         );
         return data;
     },
 
-    createPrestataireAccount: async (userId) => {
+    createPrestataireAccount: async (userId, payload) => {  // ← Ajout payload
         const { data } = await axiosInstance.post(
-            `/stripe/connect/prestataire/${userId}`
+            `/stripe/connect/prestataire/${userId}`,
+            payload  // ← { email, name }
         );
         return data;
     },
@@ -1864,14 +2064,28 @@ export const stripeApi = {
         return data;
     },
 
+    getConnectedAccount: async (accountId) => {  // ← NOUVEAU
+        const { data } = await axiosInstance.get(
+            `/stripe/connect/account/${accountId}`
+        );
+        return data;
+    },
+
+    refreshOnboardingLink: async (type, accountId, payload) => {  // ← NOUVEAU
+        const { data } = await axiosInstance.post(
+            `/stripe/connect/refresh/${type}/${accountId}`,
+            payload
+        );
+        return data;
+    },
+
     // =========================
     // 🔹 Payments
     // =========================
-
     payProduct: async (payload) => {
         const { data } = await axiosInstance.post(
             "/stripe/payment/product",
-            payload
+            payload  // { commandeId, userId, totalAmount }
         );
         return data;
     },
@@ -1879,7 +2093,42 @@ export const stripeApi = {
     payService: async (payload) => {
         const { data } = await axiosInstance.post(
             "/stripe/payment/service",
-            payload
+            payload  // { reservationId, userId, amount }
+        );
+        return data;
+    },
+
+    // =========================
+    // 🔹 Multi-vendor payments (NOUVEAU)
+    // =========================
+    payMultiVendor: async (payload) => {  // ← IMPORTANT !
+        const { data } = await axiosInstance.post(
+            "/stripe/payment/multi-vendor",
+            payload  // { commandeId, userId, subOrders: [{ refugeId, Total_prix }] }
+        );
+        return data;
+    },
+
+    getPaymentStatus: async (paymentIntentId) => {  // ← NOUVEAU
+        const { data } = await axiosInstance.get(
+            `/stripe/payment/status/${paymentIntentId}`
+        );
+        return data;
+    },
+
+
+    setupThatRefuge: async (refugeId,payload) => {  // ← IMPORTANT !
+        const { data } = await axiosInstance.post(
+            `/stripe/setup-refuge/${refugeId}`,
+            payload  // { commandeId, userId, subOrders: [{ , Total_prix }] }
+        );
+        return data;
+    },
+
+    refreshThatRefuge: async (refugeId,payload) => {  // ← IMPORTANT !
+        const { data } = await axiosInstance.post(
+            `/stripe/refresh/refuge/${refugeId}`,
+            payload  // { commandeId, userId, subOrders: [{ , Total_prix }] }
         );
         return data;
     },

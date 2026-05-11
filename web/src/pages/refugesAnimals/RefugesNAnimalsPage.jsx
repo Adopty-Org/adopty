@@ -3,6 +3,8 @@ import { useQuery } from '@tanstack/react-query'
 import { animalApi, refugeApi } from '../../lib/api'
 import AnimalCard from '../../components/ui/AnimalCard'
 import { useFilters } from '../../hooks/useFilters'
+import Pagination from '../../components/ui/Pagination'
+import { useState } from 'react'
 
 /*const*/ let  ESPECES = ['Tous']//, 'Chien', 'Chat', 'Lapin']
 const TAILLES = ['Petit', 'Moyen', 'Grand']
@@ -13,18 +15,11 @@ const TRAITS = [
   { id: 'Sportif', label: 'Besoin d\'exercice', icon: 'fitness_center' },
   { id: 'Calme', label: 'Tempérament calme', icon: 'bedtime' }
 ]
+const ITEMS_PER_PAGE = 6
 
 const RefugesNAnimals = () => {
 
-  /*const {data:AnimauxData, isLoading:AnimauxLoading} = useQuery({
-    queryKey: ["animaux"],
-    queryFn: animalApi.getAll,
-  })
-
-  const {data:RefugesData, isLoading:RefugesLoading} = useQuery({
-    queryKey: ["refuges"],
-    queryFn: refugeApi.getAll,
-  })*/
+  const [currentPage, setCurrentPage] = useState(1)
 
   const { 
     especes,
@@ -55,6 +50,12 @@ const RefugesNAnimals = () => {
   if (!filteredAnimaux.length) {
     return <div className="text-center p-12 text-gray-500">Aucun animal disponible</div>
   }
+
+  const totalPages = Math.ceil(filteredAnimaux.length / ITEMS_PER_PAGE)
+  const paginatedProducts = filteredAnimaux.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  )
 
   return (
     <PageTransition>
@@ -182,10 +183,19 @@ const RefugesNAnimals = () => {
                 </FadeIn>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10">
-                  {filteredAnimaux.map((animal, i) => (
+                  {paginatedProducts.map((animal, i) => (
                     <AnimalCard key={animal.Id} animal={animal} delay={i * 0.05} />
                   ))}
                 </div>
+
+                <Pagination 
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={(page) => {
+                    setCurrentPage(page)
+                    window.scrollTo({ top: 0, behavior: 'smooth' })
+                  }}
+                />
               </>
             )}
           </div>

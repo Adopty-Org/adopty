@@ -1,4 +1,9 @@
 import { useState } from 'react'
+import { useCreateDemandeAdoption } from '../../hooks/useDemandeAdoption' // Ajustez le chemin
+import { useUtilisateur } from '../../hooks/useUtilisateur'
+import { useUser } from "@clerk/clerk-react"
+import { NewLoadingLayout } from '../Loadingpage'
+import { useRefuge, useRefugeByAnimal } from '../../hooks/useRefuge'
 
 const AdoptionForm = ({ animal, onClose }) => {
   const [step, setStep] = useState(1)
@@ -9,12 +14,72 @@ const AdoptionForm = ({ animal, onClose }) => {
     animauxActuels: '', enfants: '', motivations: '',
     disponibilite: '', acceptConditions: false,
   })
+  const { user } = useUser()
+
+  const createDemandeAdoption = useCreateDemandeAdoption()
+  const {utilisateur, isLoading} = useUtilisateur(user?.id)
+  const {refuge,RefugesLoading} =useRefugeByAnimal(animal?.Id)
+
+  console.log("refuge", refuge?.Id)
 
   const update = (field, value) => setForm(prev => ({ ...prev, [field]: value }))
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    setSubmitted(true)
+    console.log("animal dans le handle : ", animal)
+    if(isLoading || RefugesLoading) return <NewLoadingLayout/>
+    if (!utilisateur?.Id || !refuge?.Id) {
+      alert("Données utilisateur ou refuge non disponibles. Réessayez dans un instant.")
+      return
+    }
+    // Vérifier que toutes les conditions sont remplies
+    if (!form.acceptConditions) {
+      alert("Vous devez accepter les conditions d'adoption")
+      return
+    }
+
+    // Préparer les données pour l'API
+    const demandeAdoptionData = {
+      // Informations personnelles
+      Prenom: form.prenom,
+      Nom: form.nom,
+      Email: form.email,
+      Telephone: form.telephone,
+      Adresse: form.adresse,
+      
+      // Informations sur le foyer
+      TypeLogement: form.typeLogement,
+      Jardin: form.jardin,
+      Animaux: form.animauxActuels,
+      Enfants: form.enfants,
+      
+      // Motivations et disponibilités
+      CommentaireDepart: form.motivations,
+      Disponibilite: form.disponibilite,
+      
+      // Métadonnées
+      IdUtilisateur: utilisateur?.Id,
+      IdRefuge: refuge?.Id,
+      IdAnimal: animal?.Id || animal?.id, // Selon la structure de votre animal
+      Statut: 2/*"en_attente"*/,
+      DateDemande: new Date().toISOString(),
+      AcceptConditions: form.acceptConditions
+    } 
+
+    try {
+      // Envoyer la demande
+      await createDemandeAdoption.mutateAsync(demandeAdoptionData)
+      
+      // Si succès, afficher l'écran de confirmation
+      setSubmitted(true)
+      
+      // Optionnel : réinitialiser le formulaire
+      // setForm(initialFormState)
+      
+    } catch (error) {
+      console.error("Erreur lors de l'envoi de la demande:", error)
+      alert("Une erreur est survenue lors de l'envoi de votre demande. Veuillez réessayer.")
+    }
   }
 
   const inputCls = "w-full bg-surface-container-lowest border-2 border-black px-4 py-2.5 font-body text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary rounded-lg"
@@ -26,7 +91,7 @@ const AdoptionForm = ({ animal, onClose }) => {
         <span className="material-symbols-outlined text-4xl text-primary">check_circle</span>
       </div>
       <h3 className="font-['Chewy'] text-3xl text-primary">Demande envoyée !</h3>
-      <p className="text-on-surface-variant max-w-sm mx-auto">Notre équipe va étudier votre dossier et vous contactera sous 48h pour organiser une rencontre avec {animal?.nom || 'l\'animal'}.</p>
+      <p className="text-on-surface-variant max-w-sm mx-auto">Notre équipe va étudier votre dossier et vous contactera sous 48h pour organiser une rencontre avec {animal?.Nom || animal?.nom || 'l\'animal'}.</p>
       <button onClick={onClose} className="mt-4 px-8 py-3 bg-primary text-white font-bold border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all">
         Fermer
       </button>
@@ -94,7 +159,7 @@ const AdoptionForm = ({ animal, onClose }) => {
       {step === 3 && (
         <div className="space-y-4">
           <div>
-            <label className={labelCls}>Pourquoi souhaitez-vous adopter {animal?.nom} ? *</label>
+            <label className={labelCls}>Pourquoi souhaitez-vous adopter {animal?.nom || animal?.Nom} ? *</label>
             <textarea required className={inputCls + ' h-28 resize-none'} value={form.motivations} onChange={e => update('motivations', e.target.value)} placeholder="Dites-nous pourquoi vous et votre famille êtes le foyer idéal..." />
           </div>
           <div>
@@ -127,10 +192,20 @@ const AdoptionForm = ({ animal, onClose }) => {
             Continuer →
           </button>
         ) : (
-          <button type="submit"
-            className="flex-1 py-3 bg-primary text-white font-['Plus_Jakarta_Sans'] font-bold text-sm uppercase tracking-wider border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all flex items-center justify-center gap-2">
-            <span className="material-symbols-outlined text-xl">send</span>
-            Envoyer ma demande
+          <button type="submit" 
+            disabled={createDemandeAdoption.isPending}
+            className="flex-1 py-3 bg-primary text-white font-['Plus_Jakarta_Sans'] font-bold text-sm uppercase tracking-wider border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+            {createDemandeAdoption.isPending ? (
+              <>
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                Envoi en cours...
+              </>
+            ) : (
+              <>
+                <span className="material-symbols-outlined text-xl">send</span>
+                Envoyer ma demande
+              </>
+            )}
           </button>
         )}
       </div>

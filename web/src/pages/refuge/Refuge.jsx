@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router'
 import { PageTransition, FadeIn } from '../../components/Animations'
 import Pagination from '../../components/ui/Pagination'
 
-import { useRefuge } from '../../hooks/useRefuge'
+import { useRefuges } from '../../hooks/useRefuge'
 
 //import { getAnimaux, getRefuges } from '../services/publicApi'
 //import { mapAnimals } from '../mappers/animalMapper'
@@ -13,7 +13,7 @@ import { useRefuge } from '../../hooks/useRefuge'
 // Mini animal card for refuge pages
 const MiniAnimalCard = ({ animal }) => (
   <Link
-    to={`/profil/${animal?.id}`}
+    to={`/profil_animal/${animal?.Id}`}
     className="flex items-center gap-3 p-3 bg-white border-2 border-black rounded-xl hover:bg-primary-fixed/30 hover:translate-x-0.5 hover:translate-y-0.5 transition-all shadow-[3px_3px_0px_0px_rgba(21,66,18,1)] hover:shadow-none group"
   >
     <div className="w-12 h-12 rounded-lg bg-surface-container border-2 border-black shrink-0 overflow-hidden">
@@ -21,7 +21,7 @@ const MiniAnimalCard = ({ animal }) => (
     </div>
     <div className="grow min-w-0">
       <p className="font-['Plus_Jakarta_Sans'] font-extrabold text-sm text-primary truncate">{animal?.Nom}</p>
-      <p className="text-xs text-on-surface-variant font-medium">{animal?.Race?.Nom} · {animal?.age}</p>
+      <p className="text-xs text-on-surface-variant font-medium">{animal?.Race?.Nom} · {animal?.Age}</p>
     </div>
     {animal?.urgent && (
       <span className="shrink-0 bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">
@@ -82,7 +82,7 @@ const RefugeCard = ({ refuge, allAnimals }) => {
             </span>
           ))}
           <Link
-            to={`/refuge/${refuge?.Id}`}
+            to={`/refugeProfile/${refuge?.Id}`}
             className="flex items-center gap-2 bg-white text-primary border-2 border-white font-bold text-xs px-4 py-2 rounded-full hover:bg-primary-fixed transition-colors"
           >
             <span className="material-symbols-outlined text-sm">open_in_new</span>
@@ -203,7 +203,7 @@ const Refuges = () => {
   const [refugesData, setRefugesData] = useState([])
   const [animauxData, setAnimauxData] = useState([])
   const [currentPage, setCurrentPage] = useState(1)
-  const { RefugesData, RefugesLoading, isError, error, refugeMap } = useRefuge()
+  const { RefugesData, RefugesLoading, isError, error, refugeMap, refuges } = useRefuges()
 
   useEffect(() => {
     const loadData = async () => {
@@ -214,13 +214,14 @@ const Refuges = () => {
         //const mappedAnimaux = Array.isArray(animauxResponse) ? mapAnimals(animauxResponse) : []
         
         if(!RefugesLoading) {
-          setRefugesData(RefugesData)//(mappedRefuges)
+          setRefugesData(refuges)//(mappedRefuges)
           console.log("refugeData", refugesData)
           }else{
             return 
           }
         
         //setAnimauxData(mappedAnimaux)
+        setAnimauxData(refuges[0]?.animals)
       } catch (error) {
         console.error("Erreur lors du chargement des données:", error)
         setRefugesData([])
@@ -229,7 +230,7 @@ const Refuges = () => {
     }
 
     loadData()
-  }, [RefugesLoading, RefugesData])
+  }, [RefugesLoading, RefugesData, animauxData])
 
   useEffect(() => {
     if (initialScrollDone.current) return
