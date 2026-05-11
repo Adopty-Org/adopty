@@ -3,7 +3,7 @@ import { useCart } from '../../context/CartContext'
 import Badge from './Badge'
 import { useQuery } from '@tanstack/react-query'
 import { produitApi } from '../../lib/api'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 
 const ProductCard = ({ produit, delay = 0 }) => {
   const { addToCart } = useCart()

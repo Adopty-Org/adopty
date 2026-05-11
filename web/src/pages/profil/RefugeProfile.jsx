@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useParams, useNavigate } from 'react-router-dom'
+import { Link, useParams, useNavigate } from 'react-router'
 import { PageTransition, FadeIn } from '../../components/Animations'
 import Pagination from '../../components/ui/Pagination'
 import { useRefuge } from '../../hooks/useRefuge'

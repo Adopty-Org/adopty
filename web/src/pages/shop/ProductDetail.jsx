@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router'
 import { PageTransition, FadeIn } from '../../components/Animations'
 //import { getProduitById, getProduitPhotos, getProduitMateriaux, getRefugeById } from '../services/publicApi'
 ///import { mapProduit } from '../mappers/produitMapper'

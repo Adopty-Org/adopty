@@ -1,5 +1,5 @@
 /*import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import { useCart } from '../../context/CartContext'
 import { PageTransition } from '../../components/Animations'
 //import { useRequireAuthAction } from '../../hooks/useRequireAuthAction'
@@ -213,7 +213,7 @@ const Paiement = () => {
 export default Paiement */
 
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router';
 import { useUser } from '@clerk/clerk-react';
 import { useStripePayment } from '../../hooks/useStripePayment';
 import { PageTransition } from '../../components/Animations';
