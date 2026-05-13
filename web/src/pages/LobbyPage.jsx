@@ -24,7 +24,7 @@ function LobbyPage() {
               Plus de 500 compagnons attendent
             </span>
             <h1 className="font-['Chewy'] text-6xl md:text-8xl text-primary leading-none mb-8">
-              Trouvez votre <span className="text-secondary">nouveau</span> meilleur ami
+              Trouvez votre <span className="text-#944925">nouveau</span> meilleur ami
             </h1>
             <p className="text-xl text-on-[#e4e4cc] mb-10 max-w-xl leading-relaxed">
               Adopty connecte les cœurs solitaires avec des animaux en quête d'un foyer aimant. Une adoption
