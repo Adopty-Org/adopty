@@ -3,7 +3,7 @@ import { Disponibilite } from "../modeles/disponibilite.model.js";
 
 export const createDisponibilite = async (disponibilite) => {
     const [result] = await db.query(
-        `INSERT INTO disponibilite (IdProfil, DateDebut, DateFin, Recurrence, Frequence, Disponibilite) 
+        `INSERT INTO disponibilite (IdProfil, DateDebut, DateFin, Recurrence, Frequence, Disponibilite, RecurrenceFin) 
         VALUES (?, ?, ?, ?, ?, ?)`,
         [
             disponibilite.IdProfil,
@@ -11,7 +11,8 @@ export const createDisponibilite = async (disponibilite) => {
             disponibilite.DateFin,
             disponibilite.Recurrence,
             disponibilite.Frequence,
-            disponibilite.Disponibilite
+            disponibilite.Disponibilite,
+            disponibilite.RecurrenceFin
         ]
     );
 
@@ -42,7 +43,8 @@ export const updateDisponibilite = async (id, disponibilite) => {
       DateFin = ?,
       Recurrence = ?,
       Frequence = ?,
-      Disponibilite = ?
+      Disponibilite = ?,
+      RecurrenceFin = ?
      WHERE Id = ?`,
     [
       disponibilite.IdProfil,
@@ -51,6 +53,7 @@ export const updateDisponibilite = async (id, disponibilite) => {
       disponibilite.Recurrence,
       disponibilite.Frequence,
       disponibilite.Disponibilite,
+      disponibilite.RecurrenceFin,
       id
     ]
   );
@@ -67,3 +70,13 @@ export const deleteDisponibilite = async (id) => {
   return result.affectedRows;
 };
 
+export const getDisponibilitesOfPrestataireId = async (id) => {
+  const [rows] = await db.query(
+    "SELECT * FROM disponibilite WHERE IdProfil = ?",
+    [id]
+  );
+
+  if (!rows[0]) return null;
+
+  return rows.map(row => new Disponibilite(row));
+}

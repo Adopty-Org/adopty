@@ -114,7 +114,7 @@ export const DemandeAdoptionWatcher = ({ refugeId, utilisateur }) => {
         if (!Array.isArray(demandes) || demandes.length === 0) return
 
         const previousDemandes = previousDemandesRef.current
-        console.log("c'est passes donc ca a charges", demandes[0].Statut)
+       // console.log("c'est passes donc ca a charges", demandes[0].Statut)
         // Nouvelles demandes (statut = en_attente)
         const newDemandes = demandes.filter(demande => {
             const isNew = !previousDemandes.some(prev => prev.Id === demande.Id)
@@ -142,18 +142,18 @@ export const DemandeAdoptionWatcher = ({ refugeId, utilisateur }) => {
     }, [demandeAdoptionsRefuge, refugeLoading, addNotification, isRefuge])
 
     useEffect(() => {
-        console.log("ca load toujours ? : " , userLoading, isRefuge, isSignedIn)
+        //console.log("ca load toujours ? : " , userLoading, isRefuge, isSignedIn)
         if (!isSignedIn || isRefuge || userLoading) return
         
         const demandes = demandesUtilisateur || []
-        console.log("les demandes : ", demandes)
+        //console.log("les demandes : ", demandes)
         if (!Array.isArray(demandes) || demandes.length === 0) return
 
         const previousDemandes = previousUserDemandesRef.current
         const isFirstLoad = previousDemandes.length === 0
         
-        console.log("isFirstLoad:", isFirstLoad)
-        console.log("previousDemandes (ancien):", previousDemandes)
+        //console.log("isFirstLoad:", isFirstLoad)
+        //console.log("previousDemandes (ancien):", previousDemandes)
         
         // 🔥 Si c'est la première charge, on ne vérifie pas les changements de statut
         // mais on va notifier pour toutes les demandes existantes (optionnel)
@@ -236,7 +236,7 @@ export const DemandeAdoptionWatcher = ({ refugeId, utilisateur }) => {
             !previousDemandes.some(prev => prev.Id === demande.Id)
         )
         
-        console.log("Demandes à notifier:", demandesANotifier.length)
+        //console.log("Demandes à notifier:", demandesANotifier.length)
         
         demandesANotifier.forEach(demande => {
             console.log("Nouvelle demande détectée:", demande.Id, "statut:", demande.Statut)
@@ -285,14 +285,14 @@ export const DemandeAdoptionWatcher = ({ refugeId, utilisateur }) => {
         if (!isSignedIn || !isRefuge || refugeDepartLoading) return
         
         const demandes = demandeTransfertsRefugeDepart || []
-        console.log("les demandes : ", demandes)
+        //console.log("les demandes : ", demandes)
         if (!Array.isArray(demandes) || demandes.length === 0) return
 
         const previousDemandes = previousTransfertsDepartRef.current
         const isFirstLoad = previousDemandes.length === 0
         
-        console.log("isFirstLoad:", isFirstLoad)
-        console.log("previousDemandes (ancien):", previousDemandes)
+        //console.log("isFirstLoad:", isFirstLoad)
+        //console.log("previousDemandes (ancien):", previousDemandes)
         
         // 🔥 Si c'est la première charge, on ne vérifie pas les changements de statut
         // mais on va notifier pour toutes les demandes existantes (optionnel)
@@ -375,7 +375,7 @@ export const DemandeAdoptionWatcher = ({ refugeId, utilisateur }) => {
             !previousDemandes.some(prev => prev.Id === demande.Id)
         )
         
-        console.log("Demandes à notifier:", demandesANotifier.length)
+        //console.log("Demandes à notifier:", demandesANotifier.length)
         
         demandesANotifier.forEach(demande => {
             console.log("Nouvelle demande détectée:", demande.Id, "statut:", demande.Statut)
@@ -420,18 +420,18 @@ export const DemandeAdoptionWatcher = ({ refugeId, utilisateur }) => {
     }, [demandeTransfertsRefugeDepart, refugeDepartLoading, addNotification, isSignedIn, isRefuge])
 
     useEffect(() => {
-        console.log("ca load toujours ? : " , refugeCibleLoading, isRefuge, isSignedIn)
+        //console.log("ca load toujours ? : " , refugeCibleLoading, isRefuge, isSignedIn)
         if (!isSignedIn || !isRefuge || refugeCibleLoading) return
         
         const demandes = demandeTransfertsRefugeCible || []
-        console.log("les demandes : ", demandes)
+        //console.log("les demandes : ", demandes)
         if (!Array.isArray(demandes) || demandes.length === 0) return
 
         const previousDemandes = previousTransfertsCibleRef.current
         const isFirstLoad = previousDemandes.length === 0
         
-        console.log("isFirstLoad:", isFirstLoad)
-        console.log("previousDemandes (ancien):", previousDemandes)
+        //console.log("isFirstLoad:", isFirstLoad)
+        //console.log("previousDemandes (ancien):", previousDemandes)
         
         // 🔥 Si c'est la première charge, on ne vérifie pas les changements de statut
         // mais on va notifier pour toutes les demandes existantes (optionnel)

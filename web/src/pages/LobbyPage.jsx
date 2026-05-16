@@ -32,7 +32,7 @@ function LobbyPage() {
             </p>
             <div className="flex flex-wrap gap-5">
               <Link
-                to="/animaux"
+                to="/refanimal"
                 className="bg-primary text-white px-8 py-4 font-['Plus_Jakarta_Sans'] font-extrabold text-sm md:text-lg border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none transition-all flex items-center gap-3 uppercase"
               >
                 Découvrir les animaux
@@ -195,7 +195,7 @@ function LobbyPage() {
                   <p className="text-white/80 text-base leading-relaxed">
                     Félicitations ! Après signature du contrat, votre nouveau compagnon peut rejoindre son foyer. Nous restons à vos côtés pour le suivi.
                   </p>
-                  <Link to="/animaux" className="inline-block mt-8 bg-secondary text-white px-8 py-4 font-['Plus_Jakarta_Sans'] font-extrabold text-sm uppercase tracking-widest border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all">
+                  <Link to="/refanimal" className="inline-block mt-8 bg-secondary text-white px-8 py-4 font-['Plus_Jakarta_Sans'] font-extrabold text-sm uppercase tracking-widest border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all">
                     Démarrer mon projet
                   </Link>
                 </div>
@@ -255,7 +255,7 @@ function LobbyPage() {
               <h3 className="font-['Chewy'] text-5xl mb-4">Chiens</h3>
               <p className="text-lg opacity-70 mb-6">Des fidèles compagnons de toutes tailles et de tous âges pour vos aventures.</p>
               <Link
-                to="/animaux"
+                to="/refanimal"
                 className="inline-flex items-center gap-2 font-['Plus_Jakarta_Sans'] font-bold group-hover:gap-4 transition-all"
                 onClick={e => e.stopPropagation()}
               >
@@ -264,7 +264,7 @@ function LobbyPage() {
             </FadeIn>
 
             {/* Chats */}
-            <Link to="/animaux" className="group relative overflow-hidden border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] bg-secondary p-8 cursor-pointer hover:-translate-x-1 hover:-translate-y-1 hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all duration-200 block">
+            <Link to="/refanimal" className="group relative overflow-hidden border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] bg-secondary p-8 cursor-pointer hover:-translate-x-1 hover:-translate-y-1 hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all duration-200 block">
               <FadeIn delay={0.2} className="h-full flex flex-col">
                 <div className="flex justify-between items-start mb-14">
                   <span className="material-symbols-outlined text-5xl text-[#773310]">pets</span>
@@ -278,7 +278,7 @@ function LobbyPage() {
             </Link>
 
             {/* NAC */}
-            <Link to="/animaux" className="group relative overflow-hidden border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] bg-[#8d3220] text-[#ffaf9e] p-8 cursor-pointer hover:bg-tertiary hover:text-white transition-colors duration-200 block">
+            <Link to="/refanimal" className="group relative overflow-hidden border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] bg-[#8d3220] text-[#ffaf9e] p-8 cursor-pointer hover:bg-tertiary hover:text-white transition-colors duration-200 block">
               <FadeIn delay={0.3} className="h-full flex flex-col">
                 <div className="flex justify-between items-start mb-14">
                   <span className="material-symbols-outlined text-5xl">pet_supplies</span>
@@ -340,7 +340,7 @@ function LobbyPage() {
               ))}
             </ul>
             <Link
-              to="/apropos"
+              to="/conserning"
               className="inline-flex items-center gap-3 bg-primary text-white px-8 py-4 font-['Plus_Jakarta_Sans'] font-extrabold text-lg border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none transition-all uppercase tracking-wider"
             >
               Découvrir nos valeurs
@@ -396,7 +396,7 @@ function LobbyPage() {
 
           <FadeIn delay={0.4} className="mt-16 text-center">
             <Link
-              to="/animaux"
+              to="/refanimal"
               className="font-['Plus_Jakarta_Sans'] font-black text-2xl text-primary border-b-4 border-secondary hover:text-secondary transition-colors"
             >
               VOIR TOUTES NOS BOUILLES À ADOPTER →

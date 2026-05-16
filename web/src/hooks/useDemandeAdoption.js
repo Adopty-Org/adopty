@@ -75,7 +75,7 @@ export const useDemandeAdoptionsByRefuge = (id) => {
                 }
             })
         }
-        console.log(`Map créé avec ${map.size} entrées`);
+        //console.log(`Map créé avec ${map.size} entrées`);
         return map
     }, [demandeAdoptionsRefuge])
 
@@ -199,7 +199,7 @@ export const useCreateDemandeAdoption = () => {
                 return [...oldData, data]
             })
             
-            console.log("Demande d'adoption créée avec succès:", data)
+            //console.log("Demande d'adoption créée avec succès:", data)
         },
         onError: (error) => {
             console.error("Erreur lors de la création de la demande d'adoption:", error)
@@ -286,7 +286,7 @@ export const useUpdateDemandeAdoption = () => {
                 )
             })
             
-            console.log("Demande d'adoption mise à jour avec succès:", data)
+            //console.log("Demande d'adoption mise à jour avec succès:", data)
         },
         onError: (error) => {
             console.error("Erreur lors de la mise à jour de la demande d'adoption:", error)

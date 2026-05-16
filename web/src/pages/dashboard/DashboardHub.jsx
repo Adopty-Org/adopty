@@ -24,11 +24,11 @@ const DashboardHub = () => {
 
   /*if (role === ROLE_KEYS.ADMIN) {
     return <Dashboard />
-  }
+  }*/
 
   if (true){//role === ROLE_KEYS.PRESTATAIRE) {
     return <PrestataireDashboard />
-  }* /
+  }/*
 
   if (true/*role === ROLE_KEYS.REFUGE* /) {
     return <RefugeDashboard />

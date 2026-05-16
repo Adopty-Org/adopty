@@ -13,6 +13,7 @@ export const useDisponibilites = (id) => {
     }) 
 
     const disponibilites = DisponibilitesData ?? []
+    //console.log("les disponibilites dans useDisponibilites : ", disponibilites,"avec comme id :  ", id)
 
     const disponibiliteMap = useMemo(
     () => new Map(disponibilites.map(e => [e.Id, e])),

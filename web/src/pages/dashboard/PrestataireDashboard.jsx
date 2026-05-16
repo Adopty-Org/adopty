@@ -7,6 +7,8 @@ import Modal from '../../components/ui/Modal'
 import PrestataireProfileForm from '../../components/forms/PrestataireProfileForm'
 import AvailabilityForm from '../../components/forms/AvailabilityForm'
 import { usePrestataire } from '../../hooks/usePrestataire'
+import AvailabilityCalendar from '../../components/ui/AvailabilityCalendar'
+import { useDisponibilites } from '../../hooks/useDisponibilite'
 
 const toCurrency = (value) => `${Number(value || 0).toLocaleString('fr-FR')} DZD`
 
@@ -46,9 +48,11 @@ const PrestataireDashboard = () => {
   const [isAvailModalOpen, setIsAvailModalOpen] = useState(false)
   const [editingAvail, setEditingAvail] = useState(null)
 
-  const {prestataire} = usePrestataire(1)
+  const {prestataire,isLoading: prestataireLoading} = usePrestataire(210001)
+  const {disponibilites,DisponibilitesLoading} = useDisponibilites(210001);
+    //console.log("les disponibilites  : ", disponibilites)
 
-  console.log("le prestataire : ", prestataire)
+  //console.log("le prestataire : ", prestataire)
 
   const loadData = useCallback(async () => {
     if (false/*!backendUserId*/) return
@@ -80,7 +84,7 @@ const PrestataireDashboard = () => {
 
     setApiIssues(issues)
     setIsLoading(false)
-  }, [/*backendUserId*/])
+  }, [/*backendUserId*/isLoading, prestataireLoading, DisponibilitesLoading])
 
   useEffect(() => {
     loadData()
@@ -240,9 +244,24 @@ const PrestataireDashboard = () => {
             </button>
           </div>
           <div className="p-6">
-            <p className="text-xs font-bold text-on-surface-variant italic">
-              Définissez vos créneaux pour que les clients puissent réserver vos services.
-            </p>
+            {!disponibilites && (
+              <p className="text-xs font-bold text-on-surface-variant italic">
+                Définissez vos créneaux pour que les clients puissent réserver vos services.
+              </p>
+            )} {disponibilites && (
+              disponibilites.map(d => (
+                <div key={d.Id} className="flex items-center justify-between bg-surface-container border-2 border-black rounded-lg px-4 py-2">
+                  <div>
+                    <p className="font-bold text-on-surface-variant">{d.Frequence}</p>
+                    <p className="text-sm text-on-surface-variant">{d.DateDebut} - {d.DateFin}</p>
+                    <p className="text-sm text-on-surface-variant">Récurrence: {d.Recurrence}</p>
+                    <p className="text-sm text-on-surface-variant">Statut: {d.Disponibilite ? 'Disponible' : 'Indisponible'}</p>
+                  </div>
+                </div>
+              ))
+
+            )}
+            {!disponibilites && (
             <div className="mt-4 flex flex-wrap gap-2">
               <span className="px-3 py-1 bg-surface-container border-2 border-black rounded-full text-xs font-bold">
                 Lundi – Vendredi (08:00 – 18:00)
@@ -250,7 +269,7 @@ const PrestataireDashboard = () => {
               <span className="px-3 py-1 bg-surface-container border-2 border-black rounded-full text-xs font-bold">
                 Samedi (09:00 – 14:00)
               </span>
-            </div>
+            </div>)}
           </div>
         </FadeIn>
 
@@ -361,7 +380,7 @@ const PrestataireDashboard = () => {
           onClose={() => setIsAvailModalOpen(false)}
           title="Gérer mes disponibilités"
           size="lg"
-        >
+        ><AvailabilityCalendar profilId={myProfile?.Id} onSlotClick={editingAvail}/>
           <AvailabilityForm
             initialData={editingAvail}
             profilId={myProfile?.Id}

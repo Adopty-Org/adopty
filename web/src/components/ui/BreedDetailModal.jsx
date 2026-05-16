@@ -121,13 +121,17 @@ const BreedDetailModal = ({ breed, isOpen, onClose }) => {
                 <div className="p-8 lg:p-12 space-y-10">
                   <div>
                     <span className="bg-primary-fixed text-primary font-black px-4 py-1.5 rounded-full border-2 border-black text-xs uppercase tracking-widest mb-4 inline-block">Fiche Encyclopédie</span>
-                    <h2 className="font-['Chewy'] text-5xl text-primary mb-6">Tout savoir sur le {breed.Nom}</h2>
+                    <h2 className="font-['Chewy'] text-5xl text-primary mb-6">Tout savoir sur le {breed?.Nom}</h2>
                     <p className="font-['Plus_Jakarta_Sans'] text-lg text-on-surface-variant leading-relaxed">
                       {breed?.Description}
                     </p>
                   </div>
 
                   <div className="grid grid-cols-2 gap-6">
+                    <div className="bg-white border-2 border-black p-4 rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] col-span-2">
+                      <p className="text-xs font-black uppercase tracking-tighter text-on-surface-variant mb-1">Classification</p>
+                      <p className="font-bold text-lg">{breed?.Classification}</p>
+                    </div>
                     <div className="bg-white border-2 border-black p-4 rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
                       <p className="text-xs font-black uppercase tracking-tighter text-on-surface-variant mb-1">Origine</p>
                       <p className="font-bold text-lg">{breed?.Origine}</p>
@@ -138,7 +142,49 @@ const BreedDetailModal = ({ breed, isOpen, onClose }) => {
                     </div>
                     <div className="bg-white border-2 border-black p-4 rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] col-span-2">
                       <p className="text-xs font-black uppercase tracking-tighter text-on-surface-variant mb-1">Caractéristique majeure</p>
-                      <p className="font-bold text-lg">{breed?.traits?.[0] || 'Sociable'}</p>
+                      {breed?.Caracteres ? (
+                        breed?.Caracteres.map((caractere, index) => (
+                          <p key={index} className="font-bold text-lg">{caractere?.Nom}</p>
+                        ))
+                      ) : (
+                        <p className="font-bold text-lg">Sociable</p>
+                      )}
+                    </div>
+                    <div className="bg-white border-2 border-black p-4 rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                      <p className="text-xs font-black uppercase tracking-tighter text-on-surface-variant mb-1">Taille moyenne</p>
+                      <p className="font-bold text-lg">{breed?.TailleMoyenne} cm</p>
+                    </div>
+                    <div className="bg-white border-2 border-black p-4 rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                      <p className="text-xs font-black uppercase tracking-tighter text-on-surface-variant mb-1">Poids moyen</p>
+                      <p className="font-bold text-lg">{breed?.PoidsMoyen} kg</p>
+                    </div>
+                    <div className="bg-white border-2 border-black p-4 rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] col-span-2">
+                      <p className="text-xs font-black uppercase tracking-tighter text-on-surface-variant mb-1">Couleurs</p>
+                      <p className="font-bold text-lg">{breed?.Couleurs}</p>
+                    </div>
+                    <div className="bg-white border-2 border-black p-4 rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                      <p className="text-xs font-black uppercase tracking-tighter text-on-surface-variant mb-1">Pelage</p>
+                      <p className="font-bold text-lg">{breed?.Pelage}</p>
+                    </div>
+                    <div className="bg-white border-2 border-black p-4 rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                      <p className="text-xs font-black uppercase tracking-tighter text-on-surface-variant mb-1">Taille du pelage</p>
+                      <p className="font-bold text-lg">{breed?.TaillePelageMoyen}</p>
+                    </div>
+                    <div className="bg-white border-2 border-black p-4 rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] col-span-2">
+                      <p className="text-xs font-black uppercase tracking-tighter text-on-surface-variant mb-1">Habitat</p>
+                      <p className="font-bold text-lg">{breed?.Habitat}</p>
+                    </div>
+                    <div className="bg-white border-2 border-black p-4 rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] col-span-2">
+                      <p className="text-xs font-black uppercase tracking-tighter text-on-surface-variant mb-1">Intelligence</p>
+                      <p className="font-bold text-lg">{breed?.Inteligence}</p>
+                    </div>
+                    <div className="bg-white border-2 border-black p-4 rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                      <p className="text-xs font-black uppercase tracking-tighter text-on-surface-variant mb-1">Immunité</p>
+                      <p className="font-bold text-lg">{breed?.Imunite}</p>
+                    </div>
+                    <div className="bg-white border-2 border-black p-4 rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                      <p className="text-xs font-black uppercase tracking-tighter text-on-surface-variant mb-1">Allergies</p>
+                      <p className="font-bold text-lg">{breed?.Alergies}</p>
                     </div>
                   </div>
 

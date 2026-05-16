@@ -1,9 +1,9 @@
-import { createDisponibilite, deleteDisponibilite, getAllDisponibilites, getDisponibiliteById, updateDisponibilite } from "../database/disponibilite.db.js";
+import { createDisponibilite, deleteDisponibilite, getAllDisponibilites, getDisponibiliteById, getDisponibilitesOfPrestataireId, updateDisponibilite } from "../database/disponibilite.db.js";
 import { getProfilPrestataireById } from "../database/profil_prestataire.db.js";
 
 export async function createDisponibiliteControlleur(req,res) {
     try {
-        const { IdProfil,DateDebut,DateFin,Recurrence,Frequence,Disponibilite } = req.body;
+        const { IdProfil,DateDebut,DateFin,Recurrence,Frequence,Disponibilite,RecurrenceFin } = req.body;
         const toDbValue = (v) => v === undefined ? null : v;
 
         const isMissing = (v) => v === undefined || v === null || v === "";
@@ -17,7 +17,8 @@ export async function createDisponibiliteControlleur(req,res) {
             DateFin: toDbValue(DateFin),
             Recurrence: toDbValue(Recurrence),
             Frequence: toDbValue(Frequence),
-            Disponibilite: toDbValue(Disponibilite) 
+            Disponibilite: toDbValue(Disponibilite), 
+            RecurrenceFin: toDbValue(RecurrenceFin)
         })
 
         res.status(201).json({ message: "Disponibilite crée avec succès", id: requete });
@@ -30,7 +31,7 @@ export async function createDisponibiliteControlleur(req,res) {
 export async function updateDisponibiliteControlleur(req,res) {
     try {
         const { id } = req.params;
-        const { IdProfil,DateDebut,DateFin,Recurrence,Frequence,Disponibilite } = req.body;
+        const { IdProfil,DateDebut,DateFin,Recurrence,Frequence,Disponibilite,RecurrenceFin } = req.body;
         const toDbValue = (v) => v === undefined ? null : v;
         
         const affectedRows = await updateDisponibilite(id, {
@@ -39,7 +40,8 @@ export async function updateDisponibiliteControlleur(req,res) {
             DateFin: toDbValue(DateFin),
             Recurrence: toDbValue(Recurrence),
             Frequence: toDbValue(Frequence),
-            Disponibilite: toDbValue(Disponibilite)
+            Disponibilite: toDbValue(Disponibilite),
+            RecurrenceFin: toDbValue(RecurrenceFin)
         });
         if (affectedRows === 0) {
             return res.status(404).json({ message: "Disponibilite non trouvée" });
@@ -99,7 +101,7 @@ export async function getAllDisponibilitesControlleur(req,res) {
 export async function getProfilOfDisponibiliteControlleur(req,res) {
     try {
         const { Profil } = req.params;
-        const profil = await getProfilPrestataireById(Profil);
+        const profil = await getDisponibilitesOfPrestataireId(Profil);
         if (!profil) {
             return res.status(404).json({ message: "Disponibilite a un profil inexistant !(non trouvé)" });
         }
