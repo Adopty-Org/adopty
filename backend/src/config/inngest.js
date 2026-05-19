@@ -46,7 +46,7 @@ import * as roleDB from "../database/role.db.js";
 const syncUser = ingest.createFunction(
     { 
         id: "sync-user",
-        event: "clerk/user.created"   // ✅ L'événement est DANS le premier argument
+        trigger: "clerk/user.created"   // ✅ L'événement est DANS le premier argument
     },
     async ({ event }) => {
         await connectDB();
@@ -213,7 +213,7 @@ export const functions = [syncUser, deleteUserFromDB];*/
 
 const deleteUserFromDB = ingest.createFunction(
     { id : "delete-user-from-db",
-     event : "clerk/user.deleted"},
+     trigger : "clerk/user.deleted"},
     async ({ event }) => {
         await connectDB();
         

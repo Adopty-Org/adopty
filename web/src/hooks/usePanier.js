@@ -10,14 +10,17 @@ export const usePaniers = () => {
     const { data: PaniersData, isLoading: PaniersLoading, isError, error, refetch } = useQuery({
         queryKey: ["paniers"],
         queryFn: panierApi.getAll,
+        enabled: !!localStorage.getItem('clerk-user') || !!sessionStorage.getItem('clerk-user'),
     })
+
+    const safePaniersData = Array.isArray(PaniersData) ? PaniersData : []
 
     // Requêtes pour les ligne_paniers de chaque panier
     const ligne_paniersQueries = useQueries({
         queries: (PaniersData ?? []).map(panier => ({
             queryKey: ["Lignes_paniers", panier.Id, "ligne_paniers"],
             queryFn: () => lignePanierApi.getByPanier(panier.Id),
-            enabled: !!panier.Id,
+            enabled: !!panier.Id && Array.isArray(safePaniersData), // ← Vérification supplémentair,
         }))
     })
     
