@@ -47,7 +47,8 @@ const syncUser = ingest.createFunction(
     { 
         id: "sync-user",
         name: "sync-user", 
-        trigger: "clerk/user.created"   // ✅ L'événement est DANS le premier argument
+        triggers: { event: "clerk/user.created" },
+        
     },
     async ({ event }) => {
         await connectDB();
@@ -216,7 +217,7 @@ const deleteUserFromDB = ingest.createFunction(
     {
         id : "delete-user-from-db",
         name: "delete-user-from-db", 
-        trigger : "clerk/user.deleted"
+        triggers: { event: "clerk/user.deleted" },
     },
     async ({ event }) => {
         await connectDB();
