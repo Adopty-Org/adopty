@@ -451,6 +451,7 @@ const Auth = () => {
 
   // Champs refuge
   const [nomRefuge, setNomRefuge] = useState('')
+  const [descriptionRefuge, setDescriptionRefuge] = useState('')
   const [siret, setSiret] = useState('')
   const [capacite, setCapacite] = useState('')
   const [telephone, setTelephone] = useState()
@@ -471,7 +472,7 @@ const Auth = () => {
     setPrenom(''); setNom(''); setWilaya(''); setAdresse('')
     setNomRefuge(''); setSiret(''); setCapacite(''); setTelephone('')
     setNomEntreprise(''); setService(''); setZone(''); setTarifHoraire(''); setExperience('')
-    setPendingVerification(false); setVerificationCode('');setTelephoneUtilisateur(0)
+    setPendingVerification(false); setVerificationCode('');setTelephoneUtilisateur(0);setDescriptionRefuge('')
   }
 
   // LOGIN
@@ -538,6 +539,7 @@ const Auth = () => {
       if (role === 'refuge') {
         metadata.refugeData = {
           nomRefuge,
+          descriptionRefuge,
           siret,
           capacite: parseInt(capacite),
           telephone
@@ -782,6 +784,7 @@ console.log("🔍 pendingVerification:", pendingVerification)
                     {role === 'refuge' && (
                       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
                         <InputField label="Nom du refuge" value={nomRefuge} onChange={setNomRefuge} required />
+                        <InputField label="Description du refuge" value={descriptionRefuge} onChange={setDescriptionRefuge} required />
                         <InputField label="SIRET" value={siret} onChange={setSiret} required />
                         <InputField label="Capacité" value={capacite} onChange={setCapacite} required />
                         <InputField label="Téléphone" value={telephone} onChange={setTelephone} required />
