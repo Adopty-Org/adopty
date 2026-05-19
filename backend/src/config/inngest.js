@@ -104,9 +104,9 @@ const syncUser = ingest.createFunction(
         });
         
         // Déterminer le rôle à attribuer
-        let roleName = 'utilisateur';
-        if (role === 'refuge') roleName = 'refuge';
-        if (role === 'prestataire') roleName = 'prestataire';
+        let roleName = 'Utilisateur';
+        if (role === 'Refuge') roleName = 'Refuge';
+        if (role === 'Prestataire') roleName = 'Prestataire';
         
         const roleId = roleMap[roleName];
         
@@ -118,7 +118,7 @@ const syncUser = ingest.createFunction(
         }
         
         // 5️⃣ Créer l'entrée spécifique selon le rôle
-        if (role === 'refuge' && refugeData) {
+        if (role === 'Refuge' && refugeData) {
             // Créer le refuge
             const refuge = {
                 Nom: refugeData.nomRefuge,
@@ -137,7 +137,7 @@ const syncUser = ingest.createFunction(
             await utiliDB.addRefugeToUtilisateurByIds(refugeId, userId);
             console.log("✅ Utilisateur lié au refuge");
             
-        } else if (role === 'prestataire' && prestataireData) {
+        } else if (role === 'Prestataire' && prestataireData) {
             // Mapping des services vers les IDs de ta table TypeService
             const serviceMapping = {
                 'toilettage': 1,
@@ -185,7 +185,7 @@ const syncUser = ingest.createFunction(
             console.log(`✅ Profil prestataire créé avec service ID: ${typeServiceId}`);
             
         } else {
-            console.log(`👤 Utilisateur simple créé (rôle: ${role || 'utilisateur'})`);
+            console.log(`👤 Utilisateur simple créé (rôle: ${role || 'Utilisateur'})`);
         }
         
         console.log("🎉 Synchronisation terminée !");
