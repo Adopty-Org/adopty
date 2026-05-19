@@ -122,7 +122,7 @@ const syncUser = ingest.createFunction(
             // Créer le refuge
             const refuge = {
                 Nom: refugeData.nomRefuge,
-                Description: null,
+                Description: refugeData.descriptionRefuge,
                 Addresse: adresse,
                 AddresseGPS: null,
                 Telephone: refugeData.telephone,
