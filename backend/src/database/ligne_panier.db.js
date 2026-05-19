@@ -39,14 +39,10 @@ export const updateLignePanier = async (id, ligne_panier) => {
     throw new Error("Quantite must be a positive integer");
   }
   const [result] = await db.query(
-    `UPDATE ligne_panier SET 
-      IdPanier = ?, 
-      IdProduit = ?,
+    `UPDATE ligne_panier SET
       Quantite = ?
      WHERE Id = ?`,
     [
-      ligne_panier.IdPanier,
-      ligne_panier.IdProduit,
       ligne_panier.Quantite,
       id
     ]
@@ -64,3 +60,13 @@ export const deleteLignePanier = async (id) => {
   return result.affectedRows;
 };
 
+
+
+export const getLignePaniersByPanier = async (id) => {
+  const [rows] = await db.query("SELECT * FROM ligne_panier WHERE IdPanier = ?",
+    [
+      id
+    ]
+  );
+  return rows.map(row => new LignePanier(row));
+};

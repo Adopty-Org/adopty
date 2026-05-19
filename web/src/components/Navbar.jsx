@@ -26,7 +26,7 @@ function Navbar() {
 
   const location = useLocation()
 
-  const { cartItems, totalItems, removeFromCart, totalPrice } = useCart()
+  const { cartItems, totalItems, removeFromCart, totalPrice, updateQty } = useCart()
   const [cartOpen, setCartOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { user } = useUser()
@@ -381,6 +381,25 @@ function Navbar() {
                                     <div className="flex-1 min-w-0">
                                         <p className="font-['Plus_Jakarta_Sans'] font-bold text-sm truncate">{item?.Nom}</p>
                                         <p className="text-xs text-on-surface-variant">{item?.Categorie}</p>
+                                        {/* ✅ Boutons + et - */}
+                                        <div className="flex items-center gap-2 mt-2">
+                                            <button 
+                                                onClick={() => updateQty(item?.Id, item?.Quantite - 1)}
+                                                className="w-7 h-7 flex items-center justify-center border-2 border-black rounded-lg bg-white hover:bg-gray-100 transition-colors"
+                                                disabled={item?.Quantite <= 1}
+                                            >
+                                                <span className="material-symbols-outlined text-sm">remove</span>
+                                            </button>
+                                            
+                                            <span className="font-bold text-sm w-8 text-center">{item?.Quantite}</span>
+                                            
+                                            <button 
+                                                onClick={() => updateQty(item?.Id, item?.Quantite + 1)}
+                                                className="w-7 h-7 flex items-center justify-center border-2 border-black rounded-lg bg-white hover:bg-gray-100 transition-colors"
+                                            >
+                                                <span className="material-symbols-outlined text-sm">add</span>
+                                            </button>
+                                        </div>
                                         <p className="font-extrabold text-primary mt-1">{item?.Prix.toFixed(2)}€ × {item?.Quantite}</p>
                                     </div>
                                     <button onClick={() => removeFromCart(item?.Id)} className="p-1.5 border border-black hover:bg-error-container text-error rounded transition-colors shrink-0">

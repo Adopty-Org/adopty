@@ -1,4 +1,4 @@
-import { createLignePanier, deleteLignePanier, getAllLignePaniers, getLignePanierById, updateLignePanier } from "../database/ligne_panier.db.js";
+import { createLignePanier, deleteLignePanier, getAllLignePaniers, getLignePanierById, getLignePaniersByPanier, updateLignePanier } from "../database/ligne_panier.db.js";
 import { getPanierById } from "../database/panier.db.js";
 import { getProduitById } from "../database/produit.db.js";
 
@@ -37,8 +37,10 @@ export async function updateLignePanierControlleur(req,res) {// just la au cas o
             IdProduit,
             Quantite
         })
+
+        const ligne = await getLignePanierById(id)
         
-        res.status(200).json({ message: "LignePanier modifié avec succès" });
+        res.status(200).json(ligne);//{ message: "LignePanier modifié avec succès", ligne: ligne });
         
     } catch (error) {
         console.error("Erreur lors de la modification de la ligne_panier:", error);
@@ -93,7 +95,7 @@ export async function getAllLignePaniersControlleur(req,res) {
 export async function getPanierOfLignePanierControlleur(req,res) {
     try {
         const { Panier } = req.params;
-        const ligne_panier = await getPanierById(Panier);
+        const ligne_panier = await getLignePaniersByPanier(Panier);
         if (!ligne_panier) {
             return res.status(404).json({ message: "LignePanier a un ligne_panier inexistant !(non trouvé)" });
         }

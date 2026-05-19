@@ -158,17 +158,17 @@ export const DemandeAdoptionWatcher = ({ refugeId, utilisateur }) => {
         // 🔥 Si c'est la première charge, on ne vérifie pas les changements de statut
         // mais on va notifier pour toutes les demandes existantes (optionnel)
         if (!isFirstLoad) {
-            console.log("Vérification des changements de statut...")
+            //console.log("Vérification des changements de statut...")
             
             // Vérifier les changements de statut
             demandes.forEach(demande => {
                 const previousDemande = previousDemandes.find(prev => prev.Id === demande.Id)
-                console.log("Comparaison:", {
+                /*console.log("Comparaison:", {
                     id: demande.Id,
                     ancienStatut: previousDemande?.Statut,
                     nouveauStatut: demande.Statut,
                     aChange: previousDemande && previousDemande.Statut !== demande.Statut
-                })
+                })*/
                 
                 if (previousDemande && previousDemande.Statut !== demande.Statut) {
                     // Le statut a changé !
@@ -239,7 +239,7 @@ export const DemandeAdoptionWatcher = ({ refugeId, utilisateur }) => {
         //console.log("Demandes à notifier:", demandesANotifier.length)
         
         demandesANotifier.forEach(demande => {
-            console.log("Nouvelle demande détectée:", demande.Id, "statut:", demande.Statut)
+            //console.log("Nouvelle demande détectée:", demande.Id, "statut:", demande.Statut)
             
             let title = ''
             let message = ''
@@ -281,7 +281,7 @@ export const DemandeAdoptionWatcher = ({ refugeId, utilisateur }) => {
     }, [demandesUtilisateur, userLoading, addNotification, isSignedIn, isRefuge])
 
     useEffect(() => {
-        console.log("ca load toujours ? : " , refugeDepartLoading, isRefuge, isSignedIn)
+        //console.log("ca load toujours ? : " , refugeDepartLoading, isRefuge, isSignedIn)
         if (!isSignedIn || !isRefuge || refugeDepartLoading) return
         
         const demandes = demandeTransfertsRefugeDepart || []
@@ -302,12 +302,12 @@ export const DemandeAdoptionWatcher = ({ refugeId, utilisateur }) => {
             // Vérifier les changements de statut
             demandes.forEach(demande => {
                 const previousDemande = previousDemandes.find(prev => prev.Id === demande.Id)
-                console.log("Comparaison:", {
+                /*console.log("Comparaison:", {
                     id: demande.Id,
                     ancienStatut: previousDemande?.Statut,
                     nouveauStatut: demande.Statut,
                     aChange: previousDemande && previousDemande.Statut !== demande.Statut
-                })
+                })*/
                 
                 if (previousDemande && previousDemande.Statut !== demande.Statut) {
                     // Le statut a changé !

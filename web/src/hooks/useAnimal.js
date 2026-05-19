@@ -7,7 +7,6 @@ import { useRaces } from "./useRace"
 import { useMemo } from "react"
 import { useStatut } from "./useStatut"
 import { useCaracteres } from "./useCaractere"
-//import { Statut } from "../../../backend/src/modeles/statut.model"
 
 export const useAnimals = () => {
     const { caracteresByAnimal } = useCaracteres()
@@ -83,7 +82,7 @@ export const useAnimals = () => {
     }, [AnimauxData, raceMap, especeMap, statutMap, photosQueries])
 
     const animalMap = useMemo(
-        () => new Map(animals.map(e => [e.Id, e])),
+        () => new Map(animals.map(e => [e.IdRefuge, e])),
         [animals]
     )
 

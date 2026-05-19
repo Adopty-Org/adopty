@@ -28,7 +28,7 @@ export const useDemandeTransfertsByRefugeDepart = (id) => {
     const demandeTransfertsRefugeDepart = useMemo(() => {
         // Étape 1: Vérifier les données
         if (!DemandeTransfertsDepartData) {
-            console.log("Aucune donnée reçue");
+            //console.log("Aucune donnée reçue");
             return []
         }
         
@@ -74,7 +74,7 @@ export const useDemandeTransfertsByRefugeDepart = (id) => {
                 }
             })
         }
-        console.log(`Map créé avec ${map.size} entrées`);
+        //console.log(`Map créé avec ${map.size} entrées`);
         return map
     }, [demandeTransfertsRefugeDepart])
 
@@ -155,7 +155,7 @@ export const useDemandeTransfertsByRefugeCible = (id) => {
                 }
             })
         }
-        console.log(`Map créé avec ${map.size} entrées`);
+        //console.log(`Map créé avec ${map.size} entrées`);
         return map
     }, [demandeTransfertsRefugeCible])
 

@@ -178,3 +178,63 @@ If you have any questions or need help, please open an issue on [GitHub](https:/
 
 - Built with ❤️ for animal welfare
 - Thanks to all contributors and the open-source community
+
+
+
+backend/
+├── sockets/
+│   ├── chat.socket.js      ← Nouveau (propre)
+│   └── typing.socket.js    ← Optionnel
+├── dto/
+│   ├── message.dto.js      ← Transforme Message → MessageDTO
+│   └── conversation.dto.js
+└── middleware/
+    └── socket.auth.js      ← Auth Clerk pour Socket
+
+
+frontend/src/
+├── components/
+│   ├── chat/
+│   │   ├── ChatRoom.jsx        ← Nouveau
+│   │   ├── MessageList.jsx
+│   │   ├── MessageInput.jsx
+│   │   └── ConversationList.jsx ← Nouveau (propre)
+├── hooks/
+│   ├── useSocket.js            ← Hook personnalisé
+│   └── useChat.js              ← Logique chat
+└── contexts/
+    └── SocketContext.jsx       ← Provider Socket
+
+
+
+    🚀 Plan d'attaque (par ordre)
+Je te propose qu'on construise pas à pas, en validant chaque étape :
+
+Étape 1 : DTO et transformation
+Créer message.dto.js avec une fonction toMessageDTO(message, options).
+
+Étape 2 : Socket Auth
+Créer un middleware Socket propre avec Clerk.
+
+Étape 3 : Socket Chat (back)
+Implémenter join_conversation, send_message, mark_read avec callbacks.
+
+Étape 4: Hook useSocket (front)
+Hook React pour gérer la connexion, reconnexion, et les listeners.
+
+Étape 5: Composant ChatRoom
+Interface minimaliste mais fonctionnelle.
+
+Étape 6: ConversationList
+Liste des conversations avec messages non lus.
+
+Étape 7: Typing indicator
+Ajout du "en train d'écrire".
+
+
+Fichier	Rôle	Pourquoi avant l'autre
+SocketContext	Crée UNE SEULE instance de socket pour toute l'app	Sans lui, chaque composant créerait sa propre connexion
+useSocket	Facilite l'accès au contexte	Évite de faire useContext(SocketContext) partout
+useChat	Contient la logique (messages, envoi, historique)	Sépare la logique de l'affichage
+ChatRoom	Affiche les messages	A besoin de useChat
+ConversationList	Liste les conversations	Indépendant, peut venir après
