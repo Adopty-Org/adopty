@@ -532,11 +532,11 @@ const Auth = () => {
         nom,
         wilaya,
         adresse,
-        role: role || 'utilisateur'
+        role: role || 'Utilisateur'
       }
 
       // Ajouter les données spécifiques au rôle
-      if (role === 'refuge') {
+      if (role === 'Refuge') {
         metadata.refugeData = {
           nomRefuge,
           descriptionRefuge,
@@ -544,7 +544,7 @@ const Auth = () => {
           capacite: parseInt(capacite),
           telephone
         }
-      } else if (role === 'prestataire') {
+      } else if (role === 'Prestataire') {
         metadata.prestataireData = {
           nomEntreprise,
           service,
@@ -768,8 +768,8 @@ console.log("🔍 pendingVerification:", pendingVerification)
                   <form onSubmit={handleStep1} className="space-y-5">
                     <div className="grid grid-cols-2 gap-3">
                       {[
-                        { id: 'refuge', icon: 'home_work', label: 'Refuge' },
-                        { id: 'prestataire', icon: 'handshake', label: 'Prestataire' },
+                        { id: 'Refuge', icon: 'home_work', label: 'Refuge' },
+                        { id: 'Prestataire', icon: 'handshake', label: 'Prestataire' },
                       ].map(opt => (
                         <button key={opt.id} type="button" onClick={() => setRole(opt.id)}
                           className={`p-5 border-4 border-black text-center transition-all rounded-xl
@@ -781,7 +781,7 @@ console.log("🔍 pendingVerification:", pendingVerification)
                     </div>
 
                     {/* Champs Refuge */}
-                    {role === 'refuge' && (
+                    {role === 'Refuge' && (
                       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
                         <InputField label="Nom du refuge" value={nomRefuge} onChange={setNomRefuge} required />
                         <InputField label="Description du refuge" value={descriptionRefuge} onChange={setDescriptionRefuge} required />
@@ -792,7 +792,7 @@ console.log("🔍 pendingVerification:", pendingVerification)
                     )}
 
                     {/* Champs Prestataire */}
-                    {role === 'prestataire' && (
+                    {role === 'Prestataire' && (
                       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
                         <InputField label="Nom entreprise" value={nomEntreprise} onChange={setNomEntreprise} required />
                         <select value={service} onChange={e => setService(e.target.value)} required className={inputCls}>
