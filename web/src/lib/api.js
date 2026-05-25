@@ -140,6 +140,12 @@ export const utilisateurApi = {
         const { data } = await axiosInstance.get(`/utilisateurs/roles/${id}`);
         return data;
     },
+
+    transferToRefuge: async (animalId, userId, refugeId) => {
+        const { data } = await axiosInstance.post(`/utilisateurs/transfer_animal_user_to_refuge/${animalId}/${userId}/${refugeId}`);
+        return data;
+    }
+
 };
 
 /*
@@ -349,34 +355,44 @@ export const refugeApi = {
     // 🔹 Gestion animaux (refuge only)
     // =========================
 
-    addAnimal: async (id, payload) => {
+    addAnimal: async (id, refugeId, payload) => {
         const { data } = await axiosInstance.post(
-            `/refuges/ajout_animal/${id}`,
+            `/refuges/ajout_animal/${id}/${refugeId}`,
             payload
         );
         return data;
     },
 
-    removeAnimal: async (id) => {
+    removeAnimal: async (id, refugeId) => {
         const { data } = await axiosInstance.delete(
-            `/refuges/supprime_animal/${id}`
+            `/refuges/supprime_animal/${id}/${refugeId}`
         );
         return data;
     },
 
-    setAnimal: async (id, payload) => {
+    setAnimal: async (id, refugeId, payload) => {
         const { data } = await axiosInstance.put(
-            `/refuges/set_animal/${id}`,
+            `/refuges/set_animal/${id}/${refugeId}`,
             payload
         );
         return data;
     },
 
-    unsetAnimal: async (id, payload) => {
+    unsetAnimal: async (id, refugeId, payload) => {
         const { data } = await axiosInstance.put(
-            `/refuges/unset_animal/${id}`,
+            `/refuges/unset_animal/${id}/${refugeId}`,
             payload
         );
+        return data;
+    },
+
+    transferToUtilisateur: async (animalId, refugeId, userId) => {
+        const { data } = await axiosInstance.post(`/refuges/transfer_animal_refuge_to_user/${animalId}/${refugeId}/${userId}`);
+        return data;
+    },
+
+    transferBetweenRefuges: async (animalId, fromRefugeId, toRefugeId) => {
+        const { data } = await axiosInstance.post(`/refuges/transfer_animal_between_refuges/${animalId}/${fromRefugeId}/${toRefugeId}`);
         return data;
     },
 };
@@ -839,18 +855,18 @@ export const demandeAdoptionApi = {
     // 🔹 CRUD (protégé - refuge seulement)
     // =========================
 
-    create: async (formData) => {
-        const { data } = await axiosInstance.post("/demande_adoptions", formData);
+    create: async (refugeId, formData) => {
+        const { data } = await axiosInstance.post(`/demande_adoptions/${refugeId}`, formData);
         return data;
     },
 
-    update: async ({ id, formData }) => {
-        const { data } = await axiosInstance.put(`/demande_adoptions/${id}`, formData);
+    update: async (refugeId, { id, formData }) => {
+        const { data } = await axiosInstance.put(`/demande_adoptions/${id}/${refugeId}`, formData);
         return data;
     },
 
-    delete: async (id) => {
-        const { data } = await axiosInstance.delete(`/demande_adoptions/${id}`);
+    delete: async (refugeId, id) => {
+        const { data } = await axiosInstance.delete(`/demande_adoptions/${id}/${refugeId}`);
         return data;
     },
 
@@ -872,18 +888,18 @@ export const demandeAdoptionApi = {
     // 🔹 Filtres (réservés aux refuges)
     // =========================
 
-    getByAnimal: async (animalId) => {
-        const { data } = await axiosInstance.get(`/demande_adoptions/animal/${animalId}`);
+    getByAnimal: async (refugeId, animalId) => {
+        const { data } = await axiosInstance.get(`/demande_adoptions/animal/${animalId}/${refugeId}`);
         return data;
     },
 
     getByRefuge: async (refugeId) => {
-        const { data } = await axiosInstance.get(`/demande_adoptions/refuge/${refugeId}`);
+        const { data } = await axiosInstance.get(`/demande_adoptions/refuge/${refugeId}/${refugeId}`);
         return data;
     },
 
     getEmByRefuge: async (refugeId) => {
-        const { data } = await axiosInstance.get(`/demande_adoptions/demandes_refuge/${refugeId}`);
+        const { data } = await axiosInstance.get(`/demande_adoptions/demandes_refuge/${refugeId}/${refugeId}`);
         return data;
     },
 
@@ -897,16 +913,16 @@ export const demandeAdoptionApi = {
         return data;
     },
 
-    getByStatut: async (statut) => {
-        const { data } = await axiosInstance.get(`/demande_adoptions/statut/${statut}`);
+    getByStatut: async (refugeId, statut) => {
+        const { data } = await axiosInstance.get(`/demande_adoptions/statut/${statut}/${refugeId}`);
         return data;
     },
 
     // Mettre à jour le statut d'une demande
-    updateStatut: async (demandeId, statut) => {
+    updateStatut: async (refugeId, demandeId, statut) => {
         const { data } = await axiosInstance.patch(
-            `/demande_adoptions/demandes/statut/${demandeId}`,
-            { statut }
+            `/demande_adoptions/demandes/statut/${demandeId}/${refugeId}`,
+            statut 
         );
         return data;
     }
@@ -956,30 +972,39 @@ export const demandeTransfertApi = {
     // 🔹 Filtres (réservés aux refuges)
     // =========================
 
-    getByAnimal: async (animalId) => {
-        const { data } = await axiosInstance.get(`/demande_transferts/animal/${animalId}`);
+    getByAnimal: async (refugeId, animalId) => {
+        const { data } = await axiosInstance.get(`/demande_transferts/animal/${animalId}/${refugeId}`);
         return data;
     },
 
     getByRefuge: async (refugeId) => {
-        const { data } = await axiosInstance.get(`/demande_transferts/refuge/${refugeId}`);
+        const { data } = await axiosInstance.get(`/demande_transferts/refuge/${refugeId}/${refugeId}`);
         return data;
     },
 
-    getByStatut: async (statut) => {
-        const { data } = await axiosInstance.get(`/demande_transferts/statut/${statut}`);
+    getByStatut: async (refugeId, statut) => {
+        const { data } = await axiosInstance.get(`/demande_transferts/statut/${statut}/${refugeId}`);
         return data;
     },
 
     getEmByRefugeDepart: async (refugeId) => {
-        const { data } = await axiosInstance.get(`/demande_transferts/demandes_refuge_depart/${refugeId}`);
+        const { data } = await axiosInstance.get(`/demande_transferts/demandes_refuge_depart/${refugeId}/${refugeId}`);
         return data;
     },
 
     getEmByRefugeCible: async (refugeId) => {
-        const { data } = await axiosInstance.get(`/demande_transferts/demandes_refuge_cible/${refugeId}`);
+        const { data } = await axiosInstance.get(`/demande_transferts/demandes_refuge_cible/${refugeId}/${refugeId}`);
         return data;
     },
+
+    // Mettre à jour le statut d'une demande
+    updateStatut: async (refugeId, demandeId, statut) => {
+        const { data } = await axiosInstance.patch(
+            `/demande_transferts/demandes/statut/${demandeId}/${refugeId}`,
+            statut 
+        );
+        return data;
+    }
 };
 
 
@@ -1571,28 +1596,28 @@ export const produitApi = {
     // 🔹 CRUD (protégé)
     // =========================
 
-    create: async (formData) => {
-        const { data } = await axiosInstance.post("/produits", formData);
+    create: async (refugeId, formData) => {
+        const { data } = await axiosInstance.post(`/produits/${refugeId}`, formData);
         return data;
     },
 
-    update: async ({ id, formData }) => {
-        const { data } = await axiosInstance.put(`/produits/${id}`, formData);
+    update: async (refugeId, { id, formData }) => {
+        const { data } = await axiosInstance.put(`/produits/${id}/${refugeId}`, formData);
         return data;
     },
 
-    delete: async (id) => {
-        const { data } = await axiosInstance.delete(`/produits/${id}`);
+    delete: async (refugeId, id) => {
+        const { data } = await axiosInstance.delete(`/produits/${id}/${refugeId}`);
         return data;
     },
 
-    addMateriaux: async (id, materiauxId) => {
-        const { data } = await axiosInstance.post(`/produits/materiaux/ajout/${id}/${materiauxId}`);
+    addMateriaux: async (refugeId, id, materiauxId) => {
+        const { data } = await axiosInstance.post(`/produits/materiaux/ajout/${id}/${materiauxId}/${refugeId}`);
         return data;
     },
 
-    removeMateriaux: async (id, materiauxId) => {
-        const { data } = await axiosInstance.delete(`/produits/materiaux/supprime/${id}/${materiauxId}`);
+    removeMateriaux: async (refugeId, id, materiauxId) => {
+        const { data } = await axiosInstance.delete(`/produits/materiaux/supprime/${id}/${materiauxId}/${refugeId}`);
         return data;
     },
 
@@ -1867,6 +1892,12 @@ export const sousCommandeApi = {
 
     update: async ({ id, formData }) => {
         const { data } = await axiosInstance.put(`/sous_commandes/${id}`, formData);
+        return data;
+    },
+
+    
+    updateStatut: async ({ id, formData }) => {
+        const { data } = await axiosInstance.put(`/sous_commandes/statut/${id}`, formData);
         return data;
     },
 
@@ -2308,60 +2339,6 @@ export const caracteristiqueApi = {
 };
 
 
-export const demande_transfertApi = {
-
-    // =========================
-    // 🔹 CRUD demande_transfert (protégé)
-    // =========================
-
-    create: async (formData) => {
-        const { data } = await axiosInstance.post("/demande_transferts", formData);
-        return data;
-    },
-
-    update: async ({ id, formData }) => {
-        const { data } = await axiosInstance.put(`/demande_transferts/${id}`, formData);
-        return data;
-    },
-
-    delete: async (id) => {
-        const { data } = await axiosInstance.delete(`/demande_transferts/${id}`);
-        return data;
-    },
-
-    // =========================
-    // 🔹 Lecture publique
-    // =========================
-
-    getSpecific: async (id) => {
-        const { data } = await axiosInstance.get(`/demande_transferts/${id}`);
-        return data;
-    },
-
-    getAll: async () => {
-        const { data } = await axiosInstance.get("/demande_transferts");
-        return data;
-    },
-
-    // =========================
-    // 🔹 Filtres / recherches
-    // =========================
-
-    getByAnimal: async (animal) => {
-        const { data } = await axiosInstance.get(`/demande_transferts/animal/${animal}`);
-        return data;
-    },
-
-    getByRefuge: async (refuge) => {
-        const { data } = await axiosInstance.get(`/demande_transferts/refuge/${refuge}`);
-        return data;
-    },
-
-    getByStatut: async (statut) => {
-        const { data } = await axiosInstance.get(`/demande_transferts/statut/${statut}`);
-        return data;
-    },
-};
 
 /*
 ========================================================

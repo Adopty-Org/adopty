@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { use } from 'react'
 import {  SignInButton, SignUpButton, useAuth, UserButton } from '@clerk/clerk-react'
 import { Navigate, Route, Routes }from "react-router"
 import LoginPage from './pages/auth/LoginPage'
@@ -9,8 +9,8 @@ import RefugesNAnimals from './pages/refugesAnimals/RefugesNAnimalsPage'
 import ConserningPage from './pages/conserning/ConserningPage'
 import LobbyLayout from './layouts/LobbyLayout'
 import LoadingLayout from './components/Loadingpage'
-import SignUpPage from './pages/auth/step0'
-import TestChat from './pages/messagerie/goofy'
+//import SignUpPage from './pages/auth/step0'
+//import TestChat from './pages/messagerie/goofy'
 import Signalement from './pages/signalement/Signalement'
 import Encyclopedie from './pages/encyclopedie/enciclopedie'
 import Profil from './pages/profil/profil'
@@ -18,11 +18,11 @@ import UserProfile from './pages/profil/userProfile'
 
 import { useEffect } from "react";
 import { setAuthTokenGetter } from "./lib/axios.js";
-import ConversationsList from './pages/messagerie/conversations.jsx'
-import { ChatRoom } from './components/chat/ChatRoom.jsx'
-import { ChatPage } from './pages/messagerie/ChatPage.jsx'
+//import ConversationsList from './pages/messagerie/conversations.jsx'
+//import { ChatRoom } from './components/chat/ChatRoom.jsx'
+//import { ChatPage } from './pages/messagerie/ChatPage.jsx'
 import Refuges from './pages/refuge/Refuge.jsx'
-import Dashboard from './pages/dashboard/Dashboard.jsx'
+//import Dashboard from './pages/dashboard/Dashboard.jsx'
 import DashboardHub from './pages/dashboard/DashboardHub.jsx'
 import RefugeProfile from './pages/profil/RefugeProfile.jsx'
 import Paiement from './pages/paiements/Paiement.jsx'
@@ -34,12 +34,28 @@ import Auth from './pages/auth/Auth.jsx'
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
+sessionStorage.setItem('clerk-user', null) // Assurez-vous que c'est fait avant tout rendu
 
 
 function App() {
 
-  const { isSignedIn,isLoaded,getToken } = useAuth()
+  const { isSignedIn,isLoaded,getToken,user } = useAuth()
 
+  useEffect(() => {
+    if (user) {
+    sessionStorage.setItem('clerk-user', JSON.stringify(user))
+    } else {
+    sessionStorage.removeItem('clerk-user')
+    }
+  }, [user])
+
+  useEffect(() => {
+    if (isSignedIn) {
+      localStorage.setItem('clerk-user', JSON.stringify(user))
+    } else {
+      localStorage.removeItem('clerk-user')
+    }
+  }, [isSignedIn, user])
   useEffect(() => {
     setAuthTokenGetter(getToken);
   }, []);
@@ -48,15 +64,14 @@ function App() {
 
   return (
     <Routes>
-      <Route path="/login" element={ isSignedIn ? <Navigate to = {"/lobby"}/> : <LoginPage/> }/>
+      <Route path="/login" element={ isSignedIn ? <Navigate to = {"/lobby"}/> : /*<Auth />*/ <LoginPage/>}/>
       {/* on l'a fait sortir car le navbar et le sidebar se metais a travers de notre chemin */}
       {/*<Route path="/sign-up" element={<SignUpPage/>}/>*/}
-      <Route path="/testChat" element={<TestChat/>}/>
-      <Route path="/testConversation" element={<ConversationsList/>}/>
-      <Route path="/testConversation2" element={<ChatRoom conversationId="1" currentUserId="1" />}/>
-      <Route path="/testConversation3" element={<ChatPage />}/>
-      <Route path="/realrefuge" element={<Refuges />}/>
-      <Route path="/log" element={<Auth />}/>
+      {/*<Route path="/testChat" element={<TestChat/>}/>*/}
+      {/*<Route path="/testConversation" element={<ConversationsList/>}/>*/}
+      {/*<Route path="/testConversation2" element={<ChatRoom conversationId="1" currentUserId="1" />}/>*/}
+      {/*<Route path="/testConversation3" element={<ChatPage />}/>*/}
+      {/*<Route path="/log" element={<Auth />}/>*/}
       {/* pas de isSignedIn car debile */}
       <Route path="/" element={<LobbyLayout/>}>
         <Route index element={<Navigate to={"lobby"}/>}/>
@@ -72,6 +87,7 @@ function App() {
         <Route path="profil_animal/:id"element={<Profil/>}/>
         <Route path="dashboard"element={<DashboardHub />}/>
         <Route path="refugeProfile/:id"element={<RefugeProfile/>}/>
+        <Route path="/realrefuge" element={<Refuges />}/>
 
         <Route path="paiement"element={
           <Elements stripe={stripePromise}>

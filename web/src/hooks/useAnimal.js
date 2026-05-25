@@ -9,9 +9,9 @@ import { useStatut } from "./useStatut"
 import { useCaracteres } from "./useCaractere"
 
 export const useAnimals = () => {
-    const { caracteresByAnimal } = useCaracteres()
+    const { caracteresByAnimal, caracteresByRace } = useCaracteres()
     const { especeMap, EspecesLoading } = useEspeces()
-    const { raceMap, RacesLoading } = useRaces(especeMap)
+    const { raceMap, RacesLoading } = useRaces(especeMap, caracteresByRace)
     const { statutMap } = useStatut()
 
     const { data: AnimauxData, isLoading: AnimauxLoading, isError, error } = useQuery({
@@ -50,8 +50,7 @@ export const useAnimals = () => {
                 photos: photos, // Ajout des photos
                 statut: statut ? {
                     Id: statut.Id,
-                    Nom: statut.Nom,
-                    Description: statut.Description
+                    Statut: statut.Statut
                 } : null,
                 Race: race ? {
                     Id: race.Id,
@@ -86,6 +85,11 @@ export const useAnimals = () => {
         [animals]
     )
 
+    const animalMips = useMemo(
+        () => new Map(animals.map(e => [e.Id, e])),
+        [animals]
+    )
+
     const isLoadingPhotos = photosQueries.some(query => query.isLoading)
     
     return {
@@ -93,7 +97,8 @@ export const useAnimals = () => {
         isLoading: AnimauxLoading || EspecesLoading || RacesLoading || isLoadingPhotos,
         isError,
         error,
-        animalMap
+        animalMap,
+        animalMips
     }
 }
 
@@ -113,9 +118,9 @@ export const useAnimal = (id) => {
         enabled: !!id
     })
 
-    const { caracteresByAnimal } = useCaracteres()
+    const { caracteresByAnimal, caracteresByRace } = useCaracteres()
     const { especeMap, EspecesLoading } = useEspeces()
-    const { raceMap, RacesLoading } = useRaces(especeMap)
+    const { raceMap, RacesLoading } = useRaces(especeMap, caracteresByRace)
     const { statutMap } = useStatut()
 
     const { data: PhotosAnimalData, isLoading: isPhotosAnimalLoading, isError: isPhotosAnimalError, error: PhotosAnimalError } = useQuery({
@@ -181,7 +186,7 @@ export const useAnimal = (id) => {
 
     console.log("animal , dans useAnimal", animal)
 
-    return { animal, isLoading, isError, error }
+    return { animal, isLoading: isLoading || isPhotosAnimalLoading || RacesLoading || EspecesLoading, isError, error }
 }
 
 // a changer (ajouter les photos ici car sinon ca ne va pas etre acceptes par le backend tu vois ?)

@@ -147,3 +147,136 @@ export const unsetAnimalToRefugeByIds = async (animalId, refugeId) => {
 
     return result.affectedRows;
 }
+
+
+
+// Transfert d'un refuge vers un utilisateur
+export const transferRefugeToUser = async (animalId, refugeId, userId) => {
+    const connection = await db.getConnection();
+    
+    try {
+        await connection.beginTransaction();
+        
+        // 1. Vérifier que l'animal est bien au refuge
+        const [checkRefuge] = await connection.query(
+            `SELECT IdAnimal FROM possession 
+             WHERE IdAnimal = ? AND IdRefuge = ? AND IdUtilisateur IS NULL`,
+            [animalId, refugeId]
+        );
+        
+        if (checkRefuge.length === 0) {
+            throw new Error("L'animal n'est pas dans ce refuge");
+        }
+        
+        // 2. Enlever l'animal du refuge
+        const [unsetRefuge] = await connection.query(
+            `UPDATE possession SET 
+             IdRefuge = NULL
+            WHERE IdAnimal = ? AND IdRefuge = ? AND IdUtilisateur IS NULL`,
+            [animalId, refugeId]
+        );
+        
+        if (unsetRefuge.affectedRows === 0) {
+            throw new Error("Erreur lors du retrait de l'animal du refuge");
+        }
+        
+        // 3. Attribuer l'animal à l'utilisateur
+        const [setUser] = await connection.query(
+            `UPDATE possession SET 
+             IdUtilisateur = ?
+            WHERE IdAnimal = ? AND IdUtilisateur IS NULL AND IdRefuge IS NULL`,
+            [userId, animalId]
+        );
+        
+        if (setUser.affectedRows === 0) {
+            throw new Error("Erreur lors de l'attribution à l'utilisateur");
+        }
+        
+        await connection.commit();
+        
+        return {
+            success: true,
+            message: "Animal transféré avec succès du refuge vers l'utilisateur",
+            animalId,
+            from: { type: "refuge", id: refugeId },
+            to: { type: "user", id: userId }
+        };
+        
+    } catch (error) {
+        await connection.rollback();
+        throw error;
+    } finally {
+        connection.release();
+    }
+};
+
+// ==================== TRANSFERT ENTRE DEUX REFUGES ====================
+
+// Version 1: Transfert simple entre deux refuges
+export const transferBetweenRefuges = async (animalId, fromRefugeId, toRefugeId) => {
+    const connection = await db.getConnection();
+    
+    try {
+        await connection.beginTransaction();
+        
+        // 1. Vérifier que l'animal est bien dans le refuge source
+        const [checkSource] = await connection.query(
+            `SELECT IdAnimal FROM possession 
+             WHERE IdAnimal = ?              AND IdRefuge = ? 
+             AND IdUtilisateur IS NULL`,
+            [animalId, fromRefugeId]
+        );
+        
+        if (checkSource.length === 0) {
+            throw new Error(`L'animal ${animalId} n'est pas dans le refuge ${fromRefugeId}`);
+        }
+        
+        // 2. Vérifier que le refuge destination existe (optionnel)
+        const [checkDestRefuge] = await connection.query(
+            `SELECT Id FROM refuges WHERE IdRefuge = ?`,
+            [toRefugeId]
+        );
+        
+        if (checkDestRefuge.length === 0) {
+            throw new Error(`Le refuge destination ${toRefugeId} n'existe pas`);
+        }
+        
+        // 3. Transférer l'animal vers le nouveau refuge
+        const [result] = await connection.query(
+            `UPDATE possession SET 
+             IdRefuge = ?
+            WHERE IdAnimal = ? 
+            AND IdRefuge = ? 
+            AND IdUtilisateur IS NULL`,
+            [toRefugeId, animalId, fromRefugeId]
+        );
+        
+        if (result.affectedRows === 0) {
+            throw new Error("Erreur lors du transfert entre refuges");
+        }
+        
+        // 4. Optionnel: Enregistrer l'historique du transfert
+        await connection.query(
+            `INSERT INTO historique_transferts (IdAnimal, FromRefuge, ToRefuge, DateTransfert)
+             VALUES (?, ?, ?, NOW())`,
+            [animalId, fromRefugeId, toRefugeId]
+        );
+        
+        await connection.commit();
+        
+        return {
+            success: true,
+            message: `Animal ${animalId} transféré avec succès du refuge ${fromRefugeId} vers le refuge ${toRefugeId}`,
+            animalId,
+            fromRefuge: fromRefugeId,
+            toRefuge: toRefugeId,
+            dateTransfert: new Date()
+        };
+        
+    } catch (error) {
+        await connection.rollback();
+        throw error;
+    } finally {
+        connection.release();
+    }
+};

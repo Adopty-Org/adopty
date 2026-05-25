@@ -51,7 +51,20 @@ export const useProduits = () => {
         [produits]
     )
 
-    return { produits, isLoading: ProduitsLoading, isError, error, produitMap }
+    // ✅ CORRECTION : Chaque refuge pointe vers un TABLEAU de produits
+    const produitMips = useMemo(() => {
+        const map = new Map();
+        produits.forEach(produit => {
+            const refugeId = produit.IdRefuge;
+            if (!map.has(refugeId)) {
+                map.set(refugeId, []);
+            }
+            map.get(refugeId).push(produit);
+        });
+        return map;
+    }, [produits]);
+
+    return { produits, isLoading: ProduitsLoading, isError, error, produitMap, produitMips }
 
 }
 
@@ -81,7 +94,7 @@ export const useCreateProduit = () => {
     const queryClient = useQueryClient()
 
     const mutation = useMutation({
-        mutationFn: (produitData) => produitApi.create(produitData),
+        mutationFn: (refugeId, produitData) => produitApi.create(refugeId, produitData),
         onSuccess: (data) => {
             // Invalider la liste des produits
             queryClient.invalidateQueries({ queryKey: ["produits"] })
@@ -106,7 +119,7 @@ export const useUpdateProduit = () => {
     const queryClient = useQueryClient()
 
     const mutation = useMutation({
-        mutationFn: ({ id, data }) => produitApi.update(id, data),
+        mutationFn: (refugeId, { id, data }) => produitApi.update(refugeId, { id, data }),
         onSuccess: (data, variables) => {
             // 1. Mettre à jour le cache individuel
             queryClient.setQueryData(["produit", variables.id], data)
@@ -141,7 +154,7 @@ export const useDeleteProduit = () => {
     const queryClient = useQueryClient()
 
     const mutation = useMutation({
-        mutationFn: (id) => produitApi.delete(id),
+        mutationFn: (refugeId, id) => produitApi.delete(refugeId, id),
         onSuccess: (data, id) => {
             // 1. Retirer de la liste des produits
             queryClient.setQueryData(["produits"], (oldData) => {

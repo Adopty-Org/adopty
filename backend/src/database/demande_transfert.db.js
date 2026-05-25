@@ -3,15 +3,15 @@ import { DemandeTransfert } from "../modeles/demande_transfert.model.js";
 
 export const createDemandeTransfert = async (demande_transfert) => {
     const [result] = await db.query(
-        `INSERT INTO demande_transfert (IdRefugeDepart, IdAnimal, IdRefugeCible, CommantaireDepart, CommentaireRetour, DateDepart, Statut, DateRetours) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO demande_transfert (IdRefugeDepart, IdAnimal, IdRefugeCible, CommentaireDepart, CommentaireRetour, DateDemande, Statut, DateRetours) 
+        VALUES (?, ?, ?, ?, ?, NOW(), ?, ?)`,
         [
             demande_transfert.IdRefugeDepart,
             demande_transfert.IdAnimal,
             demande_transfert.IdRefugeCible,
-            demande_transfert.CommantaireDepart,
+            demande_transfert.CommentaireDepart,
             demande_transfert.CommentaireRetour,
-            demande_transfert.DateDepart,
+            
             demande_transfert.Statut,
             demande_transfert.DateRetours
         ]
@@ -42,21 +42,21 @@ export const updateDemandeTransfert = async (id, demande_transfert) => {
       IdRefugeDepart = ?, 
       IdAnimal = ?,
       IdRefugeCible = ?,
-      CommantaireDepart = ?,
+      CommentaireDepart = ?,
       CommentaireRetour = ?,
-      DateDepart = ?,
+      
       Statut = ?,
-      DateRetours = ?
+      DateRetours = NOW()
      WHERE Id = ?`,
     [
       demande_transfert.IdRefugeDepart,
       demande_transfert.IdAnimal,
       demande_transfert.IdRefugeCible,
-      demande_transfert.CommantaireDepart,
+      demande_transfert.CommentaireDepart,
       demande_transfert.CommentaireRetour,
-      demande_transfert.DateDepart,
+      
       demande_transfert.Statut,
-      demande_transfert.DateRetours,
+      
       id
     ]
   );
@@ -93,3 +93,42 @@ export const getDemandeTransfertByRefugeCibleId = async (id) => {
   )
   return rows.map(row => new DemandeTransfert(row));
 }
+
+// Mettre à jour le statut d'une demande
+export const updateDemandeTripleTStatut = async (demandeId, nouveauStatut, CommentaireRetour) => {
+    try {
+        console.log(`Mise à jour de la demande ${demandeId} vers le statut ${nouveauStatut}`);
+        
+        // Vérifier si la demande existe
+        const [demandeExistante] = await db.execute(
+            'SELECT Id, Statut FROM demande_transfert WHERE Id = ?',
+            [demandeId]
+        );
+        
+        if (demandeExistante.length === 0) {
+            throw new Error(`Demande ${demandeId} non trouvée`);
+        }
+        
+        console.log(`Demande trouvée, statut actuel: ${demandeExistante[0].Statut}`);
+        
+        // Mettre à jour le statut
+        const [result] = await db.execute(
+            'UPDATE demande_transfert SET Statut = ?, CommentaireRetour = ?, DateRetours = NOW() WHERE Id = ?',
+            [nouveauStatut, CommentaireRetour, demandeId]
+        );
+        
+        console.log(`Mise à jour effectuée, lignes affectées: ${result.affectedRows}`);
+        
+        // Récupérer la demande mise à jour
+        const [demandeMaj] = await db.execute(
+            'SELECT * FROM demande_transfert WHERE Id = ?',
+            [demandeId]
+        );
+        
+        return demandeMaj[0];
+        
+    } catch (error) {
+        console.error("Erreur dans updateDemandeStatut:", error);
+        throw error;
+    }
+};

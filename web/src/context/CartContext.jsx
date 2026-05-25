@@ -105,6 +105,7 @@ const CartContext = createContext(null)
 
 export const CartProvider = ({ children }) => {
   const {user} = useUser()
+  console.log("user dans CartProvider : ", user)
   const { utilisateur, isLoading: isLoadingUtilisateur, refetch } = useUtilisateur(user?.id) // ← Ajouter isLoading
   const { panierMips, isLoading: isLoadingPaniers } = usePaniers() // ← Récupérer isLoading
   
@@ -218,13 +219,26 @@ export const CartProvider = ({ children }) => {
 
   // Vider le panier (BDD)
   const clearCart = async () => {
-    if (!panier?.Id) return
+    console.log("📞 Appel de clearPanier.mutateAsync avec Id:", panier?.Id);
+    if (!panier?.Id) {
+      console.log("⚠️ Pas de panier.Id, abandon");
+      return;
+    }
     try {
-      await clearPanier.mutateAsync(panier.Id)
+      
+      const result = await clearPanier.mutateAsync(panier.Id)
+      console.log("✅ Résultat clearPanier:", result);
 
+      console.log("🔄 Refetch en cours...");
       await refetch()
+
+      console.log("🔄 UpdateKey incrémenté");
       setUpdateKey(prev => prev + 1) // ← Force recalcul
 
+      console.log("🗑️ CartItemsWithPhotos vidé localement");
+      setCartItemsWithPhotos([]);
+
+      console.log("✅ CLEARCART TERMINE AVEC SUCCES");
     } catch (error) {
       console.error("Erreur lors du vidage du panier:", error)
     }

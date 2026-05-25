@@ -1,6 +1,6 @@
 import { Router } from "express";
 import * as produit from "../controlleurs/produit.controlleur.js"
-import { protectRoute, hasAnyRole, isOwnerOrAdmin } from "../midleware/auth.midleware.js";
+import { protectRoute, hasAnyRole, isOwnerOrAdmin, refugeOnly } from "../midleware/auth.midleware.js";
 
 const router = Router()
 
@@ -11,11 +11,11 @@ router.get("/refuge/:Refuge", produit.getRefugeOfProduitControlleur);
 router.get("/:id/photos", produit.getPhotosOfProduitControlleur)
 
 // Routes protégées - création, modification, suppression (refuge ou admin et propriétaire)
-router.post("/materiaux/ajout/:id/:materiauxId", protectRoute, hasAnyRole(["Refuge", "Admin"]), isOwnerOrAdmin, produit.addMateriauxToProduitControlleur);
-router.delete("/materiaux/supprimer/:id/:materiauxId", protectRoute, hasAnyRole(["Refuge", "Admin"]), isOwnerOrAdmin, produit.RemoveMateriauxFromProduitControlleur);
-router.post("/", protectRoute, hasAnyRole(["Refuge", "Admin"]), produit.createProduitControlleur);
-router.put("/:id", protectRoute, hasAnyRole(["Refuge", "Admin"]), isOwnerOrAdmin, produit.updateProduitControlleur);
-router.delete("/:id", protectRoute, hasAnyRole(["Refuge", "Admin"]), isOwnerOrAdmin, produit.deleteProduitControlleur);
+router.post("/materiaux/ajout/:id/:materiauxId/:refugeId", protectRoute, /*hasAnyRole(["Refuge", "Admin"]), isOwnerOrAdmin*/refugeOnly, produit.addMateriauxToProduitControlleur);
+router.delete("/materiaux/supprimer/:id/:materiauxId/:refugeId", protectRoute, /*hasAnyRole(["Refuge", "Admin"]), isOwnerOrAdmin*/refugeOnly, produit.RemoveMateriauxFromProduitControlleur);
+router.post("/:refugeId", protectRoute, /*hasAnyRole(["Refuge", "Admin"])*/refugeOnly, produit.createProduitControlleur);
+router.put("/:id/:refugeId", /*hasAnyRole(["Refuge", "Admin"]), isOwnerOrAdmin*/protectRoute, refugeOnly, produit.updateProduitControlleur);
+router.delete("/:id/:refugeId", /*hasAnyRole(["Refuge", "Admin"]), isOwnerOrAdmin*/protectRoute, refugeOnly, produit.deleteProduitControlleur);
 
 // Routes de lecture publiques
 router.get("/:id", produit.getProduitControlleur);

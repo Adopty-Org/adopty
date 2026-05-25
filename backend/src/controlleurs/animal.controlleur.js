@@ -211,7 +211,7 @@ export async function getPhotosOfAnimalControlleur(req, res) {
 
         const photos = await getAnimalPhotosById(id);
 
-        console.log("Photos trouvées:", photos); // 👈 ET ÇA
+        //console.log("Photos trouvées:", photos); // 👈 ET ÇA
 
         /*if (!photos || photos.length === 0) {
             return res.status(404).json({ message: "Aucune photo trouvée pour cet animal" });

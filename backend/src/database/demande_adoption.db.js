@@ -109,7 +109,7 @@ export const getDemandeAdoptionByUtilisateurId = async (id) => {
 // backend/services/demandeAdoptionService.js
 
 // Mettre à jour le statut d'une demande
-export const updateDemandeStatut = async (demandeId, nouveauStatut) => {
+export const updateDemandeStatut = async (demandeId, nouveauStatut, CommentaireRetour) => {
     try {
         console.log(`Mise à jour de la demande ${demandeId} vers le statut ${nouveauStatut}`);
         
@@ -127,8 +127,8 @@ export const updateDemandeStatut = async (demandeId, nouveauStatut) => {
         
         // Mettre à jour le statut
         const [result] = await db.execute(
-            'UPDATE demande_adoption SET Statut = ? WHERE Id = ?',
-            [nouveauStatut, demandeId]
+            'UPDATE demande_adoption SET Statut = ?, CommentaireRetour = ?, DateRetours = NOW() WHERE Id = ?',
+            [nouveauStatut, CommentaireRetour, demandeId]
         );
         
         console.log(`Mise à jour effectuée, lignes affectées: ${result.affectedRows}`);

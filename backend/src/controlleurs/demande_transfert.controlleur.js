@@ -1,12 +1,14 @@
 import { getAnimalById } from "../database/animal.db.js";
-import { createDemandeTransfert, deleteDemandeTransfert, getAllDemandeTransferts, getDemandeTransfertById, getDemandeTransfertByRefugeCibleId, getDemandeTransfertByRefugeDepartId, updateDemandeTransfert } from "../database/demande_transfert.db.js";
+import { createDemandeTransfert, deleteDemandeTransfert, getAllDemandeTransferts, getDemandeTransfertById, getDemandeTransfertByRefugeCibleId, getDemandeTransfertByRefugeDepartId, updateDemandeTransfert, updateDemandeTripleTStatut } from "../database/demande_transfert.db.js";
+import { getRefugeById } from "../database/refuge.db.js";
 import { getStatutById } from "../database/statut.db.js";
 
 export async function createDemandeTransfertControlleur(req,res) {
     try {
         const { IdRefugeDepart,IdAnimal,IdRefugeCible,CommentaireDepart,CommentaireRetour,DateDepart,Statut,DateRetours } = req.body;
 
-        if(!IdRefugeDepart || !IdRefugeCible && !CommentaireDepart || !CommentaireRetour){
+        console.log("Données reçues pour la création de la demande de transfert:", IdRefugeDepart,IdAnimal,IdRefugeCible,CommentaireDepart,CommentaireRetour,DateDepart,Statut,DateRetours);
+        if(!IdRefugeDepart || !IdRefugeCible && !CommentaireDepart /*|| !CommentaireRetour*/){
             return res.status(400).json({ message: "Le strict minimum en information est requis! "})
         }
 
@@ -147,6 +149,7 @@ export async function getAnimalOfDemandeTransfertControlleur(req,res) {
 
 export async function getDemandeTransfertByRefugeCibleIdControlleur(req,res) {
     try {
+        console.log("le refuge cible", req.params)
         const { Refuge } = req.params;
         console.log("le refuge", Refuge)
         const refuge = await getDemandeTransfertByRefugeCibleId(Refuge);
@@ -157,7 +160,7 @@ export async function getDemandeTransfertByRefugeCibleIdControlleur(req,res) {
         res.status(200).json(refuge);
         
     } catch (error) {
-        console.error("Erreur lors de l'obtention du refuge de l'demande_adoption:", error);
+        console.error("Erreur lors de l'obtention du refuge de l'demande_transfert:", error);
         res.status(500).json({ message: "Erreur interne du serveur" });
     }
 }
@@ -174,7 +177,60 @@ export async function getDemandeTransfertByRefugeDepartIdControlleur(req,res) {
         res.status(200).json(refuge);
         
     } catch (error) {
-        console.error("Erreur lors de l'obtention du refuge de l'demande_adoption:", error);
+        console.error("Erreur lors de l'obtention du refuge de l'demande_transfert:", error);
         res.status(500).json({ message: "Erreur interne du serveur" });
     }
 }
+
+// PATCH /api/demandes/:id/statut
+export const updateDemandeTripleTStatutController = async (req, res) => {
+    try {
+        const { id } = req.params;      // Récupère l'ID de la demande
+        const { Statut,CommentaireRetour } = req.body;    // Récupère le nouveau statut
+        
+        console.log(`Requête PATCH reçue - Demande ID: ${id}, Nouveau statut: ${Statut}`);
+        
+        // Validation: vérifier que l'ID est valide
+        if (!id || isNaN(parseInt(id))) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "ID de demande invalide" 
+            });
+        }
+        
+        // Validation: vérifier que le statut est valide (1-6)
+        const statutsValides = [1, 2, 3, 4, 5, 6];
+        if (!Statut || !statutsValides.includes(Statut)) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "Statut invalide. Utilisez 1,2,3,4,5 ou 6" 
+            });
+        }
+        
+        // Appeler le service
+        const demandeMaj = await updateDemandeTripleTStatut(id, Statut, CommentaireRetour);
+        
+        // Retourner la réponse
+        res.status(200).json({
+            success: true,
+            message: `Statut de la demande ${id} mis à jour avec succès`,
+            demande: demandeMaj,
+            nouveauStatut: Statut
+        });
+        
+    } catch (error) {
+        console.error("Erreur dans updateDemandeTripleTStatutController:", error);
+        
+        if (error.message.includes('non trouvée')) {
+            return res.status(404).json({ 
+                success: false, 
+                message: error.message 
+            });
+        }
+        
+        res.status(500).json({ 
+            success: false, 
+            message: "Erreur interne du serveur" 
+        });
+    }
+};

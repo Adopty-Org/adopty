@@ -19,6 +19,7 @@ router.put("/animal/unset/:id", protectRoute, utilisateur.unsetAnimalToUtilisate
 router.put("/animal/set/:id", protectRoute, utilisateur.setAnimalToUtilisateurByIdsControlleur);
 router.delete("/animal/:id", protectRoute, utilisateur.removeAnimalFromUtilisateurByIdsControlleur);
 router.post("/animal/:id", protectRoute, utilisateur.addAnimalToUtilisateurByIdsControlleur);
+router.post("/transfer_animal_user_to_refuge/:animalId/:userId/:refugeId", protectRoute, utilisateur.transferAnimalFromUserToRefugeControlleur);
 
 // Routes protégées - gestion des refuges de l'utilisateur
 router.delete("/refuge/:id", protectRoute, utilisateur.removeRefugeToUtilisateurByIdsControlleur);

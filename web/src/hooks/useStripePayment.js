@@ -1,6 +1,6 @@
 // hooks/useStripePayment.js
 import { useState } from 'react';
-import { sousCommandeApi, commandeApi, stripeApi } from '../lib/api.js';
+import { sousCommandeApi, commandeApi, stripeApi, ligneCommandeApi } from '../lib/api.js';
 import { useCart } from '../context/CartContext';
 // ❌ SUPPRIME loadStripe et stripePromise - c'est le composant qui doit s'en occuper
 
@@ -14,7 +14,7 @@ export const useStripePayment = () => {
     const groups = new Map();
     
     items.forEach(item => {
-      const refugeId = item.IdRefuge;
+      const refugeId = item.produit.IdRefuge;
       if (!groups.has(refugeId)) {
         groups.set(refugeId, {
           refugeId,
@@ -51,13 +51,23 @@ export const useStripePayment = () => {
         });
         
         subOrders.push({
-          id: sousCommande.Id,
+          id: sousCommande.id,
           refugeId: group.refugeId,
           totalPrix: group.totalPrix,
           items: group.items
         });
         
-        console.log(`✅ Sous-commande créée pour refuge ${group.refugeId}:`, sousCommande.Id);
+        console.log(`✅ Sous-commande créée pour refuge ${group.refugeId}:`, sousCommande.id);
+
+        for (const item of group.items){
+          const ligneCommande = await ligneCommandeApi.create({
+            IdSousCommande: sousCommande.id,
+            IdProduit: item.produit.Id,
+            Quantite: item.Quantite
+          })
+
+          console.log(`✅ Ligne-commande créée pour refuge ${group.refugeId}:`, ligneCommande.Id);
+        }
       }
       
       return { commande, subOrders };
@@ -150,7 +160,7 @@ export const useStripePayment = () => {
       });
       
       for (const sub of subOrders) {
-        await sousCommandeApi.update({
+        await sousCommandeApi.updateStatut({
           id: sub.id,
           formData: { Statut: 2 }
         });

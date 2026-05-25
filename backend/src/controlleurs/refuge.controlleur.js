@@ -1,4 +1,4 @@
-import { addAnimalToRefugeByIds, CreateRefuge, deleteRefuge, getAllRefuges, getRefugeAnimalsById, getRefugeById, removeAnimalFromRefugeByIds, setAnimalToRefugeByIds, unsetAnimalToRefugeByIds, updateRefuge } from "../database/refuge.db.js";
+import { addAnimalToRefugeByIds, CreateRefuge, deleteRefuge, getAllRefuges, getRefugeAnimalsById, getRefugeById, removeAnimalFromRefugeByIds, setAnimalToRefugeByIds, transferBetweenRefuges, transferRefugeToUser, unsetAnimalToRefugeByIds, updateRefuge } from "../database/refuge.db.js";
 
 export async function createRefugeControlleur(req,res) {
     try {
@@ -169,3 +169,49 @@ export async function unsetAnimalToRefugeByIdsControlleur(req,res) {
         res.status(500).json({ message: "Erreur interne du serveur" });
     }
 }
+
+// Contrôleur: Transfert d'un refuge vers un utilisateur
+export async function transferAnimalFromRefugeToUserControlleur(req,res) {
+    try {
+        const { animalId, refugeId, userId } = req.params;
+        // Utilisation directe de la fonction transactionnelle
+        const result = await transferRefugeToUser(animalId, refugeId, userId);
+        
+        return res.status(200).json({
+            success: true,
+            message: result.message,
+            data: {
+                animalId: result.animalId,
+                from: result.from,
+                to: result.to
+            }
+        });
+        
+    } catch (error) {
+        console.error("Erreur lors du transfert refuge → utilisateur:", error);
+        return res.status(500).json({ message: `Échec du transfert refuge → utilisateur: ${error.message}` });
+    }
+};
+
+// Contrôleur: Transfert entre deux refuges
+export async function transferAnimalBetweenRefugesControlleur(req,res) {
+    try {
+        const { animalId, fromRefugeId, toRefugeId } = req.params;
+        // Utilisation directe de la fonction transactionnelle
+        const result = await transferBetweenRefuges(animalId, fromRefugeId, toRefugeId);
+        
+        return {
+            success: true,
+            message: result.message,
+            data: {
+                animalId: result.animalId,
+                fromRefuge: result.fromRefuge,
+                toRefuge: result.toRefuge,
+                dateTransfert: result.dateTransfert
+            }
+        };
+        
+    } catch (error) {
+        throw new Error(`Échec du transfert entre refuges: ${error.message}`);
+    }
+};

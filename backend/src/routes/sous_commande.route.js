@@ -9,6 +9,8 @@ router.get("/statut/:Statut", protectRoute, sous_commande.getStatutOfSousCommand
 router.get("/refuge/:Refuge", protectRoute, sous_commande.getRefugeOfSousCommandeControlleur);
 router.get("/commande/:Commande", protectRoute, sous_commande.getCommandeOfSousCommandeControlleur);
 
+router.put("/statut/:id", protectRoute, sous_commande.updateSousCommandeStatutControlleur);
+
 // Routes protégées - création, modification, suppression (utilisateurs authentifiés)
 router.post("/", protectRoute, sous_commande.createSousCommandeControlleur);
 router.put("/:id", protectRoute, sous_commande.updateSousCommandeControlleur);

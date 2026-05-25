@@ -91,7 +91,10 @@ export const DemandeAdoptionWatcher = ({ refugeId, utilisateur }) => {
     const previousTransfertsCibleRef = useRef([])   // ← NOUVEAU
     
     // Récupérer les demandes selon le rôle
-    const isRefuge = utilisateur?.Refuge?.Id
+    //const isRefuge = utilisateur?.Refuge?.Id
+    const isRefuge = utilisateur?.Roles?.some(role => role.Nom === 'refuge') || 
+                 utilisateur?.Refuge[0]?.Id || 
+                 utilisateur?.refugeId
     //const refugeId = isRefuge ? (user?.refugeId || user?.Refuge?.Id) : null
     
     const { demandeAdoptionsRefuge, DemandeAdoptionsLoading: refugeLoading } = 
@@ -105,6 +108,21 @@ export const DemandeAdoptionWatcher = ({ refugeId, utilisateur }) => {
 
     const { demandeTransfertsRefugeCible, DemandeTransfertsCibleLoading: refugeCibleLoading }=
         useDemandeTransfertsByRefugeCible(refugeId, {enabled: !!isRefuge})
+
+    console.log("=== DemandeAdoptionWatcher ===")
+    console.log("utilisateur:", utilisateur)
+    console.log("isSignedIn:", isSignedIn)
+    console.log("isRefuge:", isRefuge)
+    console.log("refugeId:", refugeId)
+    console.log("refugeLoading:", refugeLoading)
+    console.log("demandeAdoptionsRefuge:", demandeAdoptionsRefuge)
+    console.log("demandesUtilisateur:", demandesUtilisateur)
+    console.log("userLoading:", userLoading)
+    console.log("refugeDepartLoading:", refugeDepartLoading)
+    console.log("demandeTransfertsRefugeDepart:", demandeTransfertsRefugeDepart)
+    console.log("refugeCibleLoading:", refugeCibleLoading)
+    console.log("demandeTransfertsRefugeCible:", demandeTransfertsRefugeCible)
+        
 
     // Watcher pour le refuge (nouvelles demandes entrants)
     useEffect(() => {
@@ -388,17 +406,17 @@ export const DemandeAdoptionWatcher = ({ refugeId, utilisateur }) => {
             switch (demande.Statut) {
                 case 1:
                     title = '📝 Demande envoyée'
-                    message = `Votre demande pour ${demande?.animal?.Nom || 'l\'animal'} a été envoyée au refuge.`
+                    message = `Votre demande de transfert pour ${demande?.animal?.Nom || 'l\'animal'} a été envoyée au refuge.`
                     type = 'info'
                     break
                 case 6:
                     title = '👀 Demande consultée'
-                    message = `Votre demande pour ${demande?.animal?.Nom || 'l\'animal'} a été consultée par le refuge.`
+                    message = `Votre demande de transfert pour ${demande?.animal?.Nom || 'l\'animal'} a été consultée par le refuge.`
                     type = 'info'
                     break
                 default:
                     title = '📋 Nouvelle demande'
-                    message = `Votre demande pour ${demande?.animal?.Nom || 'l\'animal'} a été enregistrée (statut: ${getStatutLabel(demande.Statut)})`
+                    message = `Votre demande de transfert pour ${demande?.animal?.Nom || 'l\'animal'} a été enregistrée (statut: ${getStatutLabel(demande.Statut)})`
                     type = 'info'
             }
             
@@ -421,6 +439,13 @@ export const DemandeAdoptionWatcher = ({ refugeId, utilisateur }) => {
 
     useEffect(() => {
         //console.log("ca load toujours ? : " , refugeCibleLoading, isRefuge, isSignedIn)
+        console.log("=== DEBUG TRANSFERTS CIBLE ===")
+        console.log("l'utilisateur:", utilisateur)
+    console.log("isSignedIn:", isSignedIn)
+    console.log("isRefuge:", isRefuge)
+    console.log("refugeCibleLoading:", refugeCibleLoading)
+    console.log("demandeTransfertsRefugeCible:", demandeTransfertsRefugeCible)
+    console.log("demandeTransfertsRefugeCible length:", demandeTransfertsRefugeCible?.length)
         if (!isSignedIn || !isRefuge || refugeCibleLoading) return
         
         const demandes = demandeTransfertsRefugeCible || []
@@ -526,18 +551,38 @@ export const DemandeAdoptionWatcher = ({ refugeId, utilisateur }) => {
             // Choisir le message selon le statut initial
             switch (demande.Statut) {
                 case 1:
-                    title = '📝 Demande envoyée'
-                    message = `Votre demande pour ${demande?.animal?.Nom || 'l\'animal'} a été envoyée au refuge.`
+                    title = '📝 Demande de transfert envoyée'
+                    message = `Votre demande de transfert pour ${demande?.animal?.Nom || 'l\'animal'} a bien été envoyée au refuge cible.`
                     type = 'info'
                     break
+                case 2:
+                    title = '🔍 Demande de transfert en cours'
+                    message = `Votre demande de transfert pour ${demande?.animal?.Nom || 'l\'animal'} est en cours d'étude par le refuge cible.`
+                    type = 'info'
+                    break
+                case 3:
+                    title = '❌ Demande de transfert refusée'
+                    message = `Votre demande de transfert pour ${demande?.animal?.Nom || 'l\'animal'} a été refusée.`
+                    type = 'error'
+                    break
+                case 4:
+                    title = '🔄 Demande de transfert annulée'
+                    message = `Votre demande de transfert pour ${demande?.animal?.Nom || 'l\'animal'} a été annulée.`
+                    type = 'warning'
+                    break
+                case 5:
+                    title = '✅ Demande de transfert acceptée !'
+                    message = `Félicitations ! La demande de transfert pour ${demande?.animal?.Nom || 'l\'animal'} a été acceptée. Le transfert va être organisé.`
+                    type = 'success'
+                    break
                 case 6:
-                    title = '👀 Demande consultée'
-                    message = `Votre demande pour ${demande?.animal?.Nom || 'l\'animal'} a été consultée par le refuge.`
+                    title = '👀 Demande de transfert consultée'
+                    message = `Le refuge cible a consulté votre demande de transfert pour ${demande?.animal?.Nom || 'l\'animal'}.`
                     type = 'info'
                     break
                 default:
-                    title = '📋 Nouvelle demande'
-                    message = `Votre demande pour ${demande?.animal?.Nom || 'l\'animal'} a été enregistrée (statut: ${getStatutLabel(demande.Statut)})`
+                    title = '📬 Mise à jour du transfert'
+                    message = `Votre demande de transfert a été mise à jour (statut: ${getStatutLabel(demande.Statut)})`
                     type = 'info'
             }
             

@@ -260,9 +260,9 @@ export async function getDemandeAdoptionByUtilisateurIdControlleur(req,res) {
 export const updateDemandeStatutController = async (req, res) => {
     try {
         const { id } = req.params;      // Récupère l'ID de la demande
-        const { statut } = req.body;    // Récupère le nouveau statut
+        const { Statut,CommentaireRetour } = req.body;    // Récupère le nouveau statut
         
-        console.log(`Requête PATCH reçue - Demande ID: ${id}, Nouveau statut: ${statut}`);
+        console.log(`Requête PATCH reçue - Demande ID: ${id}, Nouveau statut: ${Statut}`);
         
         // Validation: vérifier que l'ID est valide
         if (!id || isNaN(parseInt(id))) {
@@ -274,7 +274,7 @@ export const updateDemandeStatutController = async (req, res) => {
         
         // Validation: vérifier que le statut est valide (1-6)
         const statutsValides = [1, 2, 3, 4, 5, 6];
-        if (!statut || !statutsValides.includes(statut)) {
+        if (!Statut || !statutsValides.includes(Statut)) {
             return res.status(400).json({ 
                 success: false, 
                 message: "Statut invalide. Utilisez 1,2,3,4,5 ou 6" 
@@ -282,14 +282,14 @@ export const updateDemandeStatutController = async (req, res) => {
         }
         
         // Appeler le service
-        const demandeMaj = await updateDemandeStatut(id, statut);
+        const demandeMaj = await updateDemandeStatut(id, Statut, CommentaireRetour);
         
         // Retourner la réponse
         res.status(200).json({
             success: true,
             message: `Statut de la demande ${id} mis à jour avec succès`,
             demande: demandeMaj,
-            nouveauStatut: statut
+            nouveauStatut: Statut
         });
         
     } catch (error) {

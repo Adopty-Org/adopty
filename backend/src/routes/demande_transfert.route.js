@@ -4,17 +4,24 @@ import { protectRoute, isOwnerOrAdmin, refugeOnly } from "../midleware/auth.midl
 
 const router = Router()
 
+router.use((req, res, next) => {
+  console.log(`🔵 ${req.method} ${req.originalUrl}`);
+  next();
+})
+
+router.patch('/demandes/statut/:id/:refugeId', protectRoute, refugeOnly, demande_transfert.updateDemandeTripleTStatutController);
+
 // Routes spéciales de lecture (publiques)
-router.get("/animal/:Animal", refugeOnly, demande_transfert.getAnimalOfDemandeTransfertControlleur);
-router.get("/refuge/:Refuge", refugeOnly, demande_transfert.getRefugeOfDemandeTransfertControlleur);
-router.get("/statut/:Statut", refugeOnly, demande_transfert.getStatutOfDemandeTransfertControlleur);
-router.get("/demandes_refuge_depart/:Refuge", protectRoute, refugeOnly, demande_transfert.getDemandeTransfertByRefugeDepartIdControlleur);
-router.get("/demandes_refuge_cible/:Refuge", protectRoute, refugeOnly, demande_transfert.getDemandeTransfertByRefugeCibleIdControlleur);
+router.get("/animal/:Animal/:refugeId", refugeOnly, demande_transfert.getAnimalOfDemandeTransfertControlleur);
+router.get("/refuge/:Refuge/:refugeId", refugeOnly, demande_transfert.getRefugeOfDemandeTransfertControlleur);
+router.get("/statut/:Statut/:refugeId", refugeOnly, demande_transfert.getStatutOfDemandeTransfertControlleur);
+router.get("/demandes_refuge_depart/:Refuge/:refugeId", protectRoute, refugeOnly, demande_transfert.getDemandeTransfertByRefugeDepartIdControlleur);
+router.get("/demandes_refuge_cible/:Refuge/:refugeId", protectRoute, refugeOnly, demande_transfert.getDemandeTransfertByRefugeCibleIdControlleur);
 
 // Routes protégées - création, modification, suppression (utilisateurs authentifiés)
-router.post("/", protectRoute, refugeOnly, demande_transfert.createDemandeTransfertControlleur);
-router.put("/:id", protectRoute, refugeOnly, demande_transfert.updateDemandeTransfertControlleur);
-router.delete("/:id", protectRoute, refugeOnly, demande_transfert.deleteDemandeTransfertControlleur);
+router.post("/", protectRoute, /*refugeOnly,*/ demande_transfert.createDemandeTransfertControlleur);
+router.put("/:id/:refugeId", protectRoute, refugeOnly, demande_transfert.updateDemandeTransfertControlleur);
+router.delete("/:id/:refugeId", protectRoute, refugeOnly, demande_transfert.deleteDemandeTransfertControlleur);
 
 // Routes de lecture (publiques pour demande_transferts)
 router.get("/:id", demande_transfert.getDemandeTransfertControlleur);
