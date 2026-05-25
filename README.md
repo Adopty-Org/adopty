@@ -238,3 +238,6 @@ useSocket	Facilite l'accès au contexte	Évite de faire useContext(SocketContext
 useChat	Contient la logique (messages, envoi, historique)	Sépare la logique de l'affichage
 ChatRoom	Affiche les messages	A besoin de useChat
 ConversationList	Liste les conversations	Indépendant, peut venir après
+
+fin6942069420@gmail.com
+Lagoon_station67
