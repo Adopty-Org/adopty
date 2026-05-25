@@ -475,7 +475,7 @@ export const useDeleteDemandeAdoption = () => {
     const queryClient = useQueryClient()
 
     const mutation = useMutation({
-        mutationFn: (id) => demandeAdoptionApi.delete(id),
+        mutationFn: (id, refugeId) => demandeAdoptionApi.delete(refugeId,id),
         onSuccess: (data, variables, context) => {
             const deletedId = variables // l'ID passé à mutationFn
             

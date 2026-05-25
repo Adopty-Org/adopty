@@ -233,7 +233,7 @@ export const transferBetweenRefuges = async (animalId, fromRefugeId, toRefugeId)
         
         // 2. Vérifier que le refuge destination existe (optionnel)
         const [checkDestRefuge] = await connection.query(
-            `SELECT IdRefuge FROM refuges WHERE IdRefuge = ?`,
+            `SELECT Id FROM refuges WHERE IdRefuge = ?`,
             [toRefugeId]
         );
         

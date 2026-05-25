@@ -37,9 +37,9 @@ const ProductForm = ({ initialData = null, refugeId, onClose, onSuccess }) => {
 
     try {
       if (productId) {
-        updateProduit.mutate(productId, formData)
+        updateProduit.mutate( refugeId, { productId, formData })
       } else {
-        createProduit.mutate(formData)
+        createProduit.mutate( refugeId, formData )
       }
       onSuccess()
       onClose()

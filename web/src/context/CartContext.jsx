@@ -226,7 +226,7 @@ export const CartProvider = ({ children }) => {
     }
     try {
       
-      await clearPanier.mutateAsync(panier.Id)
+      const result = await clearPanier.mutateAsync(panier.Id)
       console.log("✅ Résultat clearPanier:", result);
 
       console.log("🔄 Refetch en cours...");

@@ -177,7 +177,7 @@ export async function transferAnimalFromRefugeToUserControlleur(req,res) {
         // Utilisation directe de la fonction transactionnelle
         const result = await transferRefugeToUser(animalId, refugeId, userId);
         
-        return {
+        return res.status(200).json({
             success: true,
             message: result.message,
             data: {
@@ -185,10 +185,11 @@ export async function transferAnimalFromRefugeToUserControlleur(req,res) {
                 from: result.from,
                 to: result.to
             }
-        };
+        });
         
     } catch (error) {
-        throw new Error(`Échec du transfert refuge → utilisateur: ${error.message}`);
+        console.error("Erreur lors du transfert refuge → utilisateur:", error);
+        return res.status(500).json({ message: `Échec du transfert refuge → utilisateur: ${error.message}` });
     }
 };
 

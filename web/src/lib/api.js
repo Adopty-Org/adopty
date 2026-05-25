@@ -860,13 +860,13 @@ export const demandeAdoptionApi = {
         return data;
     },
 
-    update: async ({ id, formData }) => {
-        const { data } = await axiosInstance.put(`/demande_adoptions/${id}`, formData);
+    update: async (refugeId, { id, formData }) => {
+        const { data } = await axiosInstance.put(`/demande_adoptions/${id}/${refugeId}`, formData);
         return data;
     },
 
-    delete: async (id) => {
-        const { data } = await axiosInstance.delete(`/demande_adoptions/${id}`);
+    delete: async (refugeId, id) => {
+        const { data } = await axiosInstance.delete(`/demande_adoptions/${id}/${refugeId}`);
         return data;
     },
 
@@ -1596,28 +1596,28 @@ export const produitApi = {
     // 🔹 CRUD (protégé)
     // =========================
 
-    create: async (formData) => {
-        const { data } = await axiosInstance.post("/produits", formData);
+    create: async (refugeId, formData) => {
+        const { data } = await axiosInstance.post(`/produits/${refugeId}`, formData);
         return data;
     },
 
-    update: async ({ id, formData }) => {
-        const { data } = await axiosInstance.put(`/produits/${id}`, formData);
+    update: async (refugeId, { id, formData }) => {
+        const { data } = await axiosInstance.put(`/produits/${id}/${refugeId}`, formData);
         return data;
     },
 
-    delete: async (id) => {
-        const { data } = await axiosInstance.delete(`/produits/${id}`);
+    delete: async (refugeId, id) => {
+        const { data } = await axiosInstance.delete(`/produits/${id}/${refugeId}`);
         return data;
     },
 
-    addMateriaux: async (id, materiauxId) => {
-        const { data } = await axiosInstance.post(`/produits/materiaux/ajout/${id}/${materiauxId}`);
+    addMateriaux: async (refugeId, id, materiauxId) => {
+        const { data } = await axiosInstance.post(`/produits/materiaux/ajout/${id}/${materiauxId}/${refugeId}`);
         return data;
     },
 
-    removeMateriaux: async (id, materiauxId) => {
-        const { data } = await axiosInstance.delete(`/produits/materiaux/supprime/${id}/${materiauxId}`);
+    removeMateriaux: async (refugeId, id, materiauxId) => {
+        const { data } = await axiosInstance.delete(`/produits/materiaux/supprime/${id}/${materiauxId}/${refugeId}`);
         return data;
     },
 

@@ -293,7 +293,7 @@ export const transferUserToRefuge = async (animalId, userId, refugeId) => {
         // 2. Enlever l'animal à l'utilisateur
         const [unsetUser] = await connection.query(
             `UPDATE possession SET 
-             IdUtilisateur = NULL,
+             IdUtilisateur = NULL
             WHERE IdAnimal = ? AND IdUtilisateur = ? AND IdRefuge IS NULL`,
             [animalId, userId]
         );
@@ -305,7 +305,7 @@ export const transferUserToRefuge = async (animalId, userId, refugeId) => {
         // 3. Attribuer l'animal au refuge
         const [setRefuge] = await connection.query(
             `UPDATE possession SET 
-             IdRefuge = ?,
+             IdRefuge = ?
             WHERE IdAnimal = ? AND IdRefuge IS NULL AND IdUtilisateur IS NULL`,
             [refugeId, animalId]
         );

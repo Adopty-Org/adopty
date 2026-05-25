@@ -8,7 +8,7 @@ import { NewLoadingLayout } from '../../components/Loadingpage'
 import { useUtilisateur, useUtilisateurs } from '../../hooks/useUtilisateur'
 import { useUser } from '@clerk/clerk-react'
 import DemandeDetailModal from '../../components/ui/DemandeDetailModal'
-import { demandeAdoptionApi, demandeTransfertApi, refugeApi, sousCommandeApi, utilisateurApi } from '../../lib/api'
+import { animalApi, demandeAdoptionApi, demandeTransfertApi, produitApi, refugeApi, sousCommandeApi, utilisateurApi } from '../../lib/api'
 import TransfertModal from '../../components/ui/TransfertModal'
 import UpdateStatusModal from '../../components/ui/UpdateStatusModal'
 
@@ -33,7 +33,7 @@ const RefugeDashboard = () => {
 
   const [hasLoaded, setHasLoaded] = useState(false) // ✅ Flag pour éviter les rechargements
   const {user}= useUser()
-  const {utilisateur, isLoading: UtilisateurLoading} = useUtilisateur(user?.id)
+  const {utilisateur, isLoading: UtilisateurLoading, refetch} = useUtilisateur(user?.id)
   const {utilisateurMap} = useUtilisateurs()
   const {refuge, RefugesLoading} = useRefuge(utilisateur?.Refuge[0]?.Id, utilisateurMap)
   const {refuges,RefugesLoading: refugesLoading} = useRefuges()
@@ -186,7 +186,7 @@ const RefugeDashboard = () => {
   const handleDeleteAnimal = async (id) => {
     if (!window.confirm('Êtes-vous sûr de vouloir supprimer cet animal ?')) return
     try {
-      await deleteAnimal(id)
+      await animalApi.delete(id)
       loadDashboardData()
     } catch {
       alert('Erreur lors de la suppression')
@@ -200,7 +200,7 @@ const RefugeDashboard = () => {
   const handleDeleteProduit = async (id) => {
     if (!window.confirm('Êtes-vous sûr de vouloir supprimer ce produit ?')) return
     try {
-      await deleteProduit(id)
+      await produitApi.delete(refuge?.Id, id)
       loadDashboardData()
     } catch {
       alert('Erreur lors de la suppression')

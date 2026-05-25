@@ -1,5 +1,6 @@
 import { getAnimalById } from "../database/animal.db.js";
-import { createDemandeTransfert, deleteDemandeTransfert, getAllDemandeTransferts, getDemandeTransfertById, getDemandeTransfertByRefugeCibleId, getDemandeTransfertByRefugeDepartId, updateDemandeTransfert } from "../database/demande_transfert.db.js";
+import { createDemandeTransfert, deleteDemandeTransfert, getAllDemandeTransferts, getDemandeTransfertById, getDemandeTransfertByRefugeCibleId, getDemandeTransfertByRefugeDepartId, updateDemandeTransfert, updateDemandeTripleTStatut } from "../database/demande_transfert.db.js";
+import { getRefugeById } from "../database/refuge.db.js";
 import { getStatutById } from "../database/statut.db.js";
 
 export async function createDemandeTransfertControlleur(req,res) {

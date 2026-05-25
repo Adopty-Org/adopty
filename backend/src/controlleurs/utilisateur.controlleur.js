@@ -311,7 +311,7 @@ export async function transferAnimalFromUserToRefugeControlleur(req,res) {
         // Utilisation directe de la fonction transactionnelle
         const result = await transferUserToRefuge(animalId, userId, refugeId);
         
-        return {
+        return res.status(200).json({
             success: true,
             message: result.message,
             data: {
@@ -319,10 +319,11 @@ export async function transferAnimalFromUserToRefugeControlleur(req,res) {
                 from: result.from,
                 to: result.to
             }
-        };
+        });
         
     } catch (error) {
         // La transaction a déjà fait rollback automatiquement
-        throw new Error(`Échec du transfert utilisateur → refuge: ${error.message}`);
+        console.error("Erreur lors du transfert utilisateur → refuge:", error);
+        return res.status(500).json({ message: `Échec du transfert utilisateur → refuge: ${error.message}` });
     }
 };
