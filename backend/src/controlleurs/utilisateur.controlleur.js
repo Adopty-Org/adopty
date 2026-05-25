@@ -1,4 +1,5 @@
-import { addAnimalToUtilisateurByIds, addRefugeToUtilisateurByIds, addRoleToUtilisateurByIds, createUtilisateur, deleteUtilisateur, getAllUtilisateurs, getUtilisateurAnimalsById, getUtilisateurByClerkId, getUtilisateurById, getUtilisateurRefugesById, getUtilisateurRolesById, removeAnimalFromUtilisateurByIds, removeRefugeToUtilisateurByIds, removeRoleToUtilisateurByIds, setAnimalToUtilisateurByIds, unsetAnimalToUtilisateurByIds, updateUtilisateur } from "../database/utilisateur.db.js";
+import { setAnimalToRefugeByIds } from "../database/refuge.db.js";
+import { addAnimalToUtilisateurByIds, addRefugeToUtilisateurByIds, addRoleToUtilisateurByIds, createUtilisateur, deleteUtilisateur, getAllUtilisateurs, getUtilisateurAnimalsById, getUtilisateurByClerkId, getUtilisateurById, getUtilisateurRefugesById, getUtilisateurRolesById, removeAnimalFromUtilisateurByIds, removeRefugeToUtilisateurByIds, removeRoleToUtilisateurByIds, setAnimalToUtilisateurByIds, transferUserToRefuge, unsetAnimalToUtilisateurByIds, updateUtilisateur } from "../database/utilisateur.db.js";
 
 export async function createAccountControlleur(req,res) {// pas utilisable je crois
     try {
@@ -283,3 +284,45 @@ export async function unsetAnimalToUtilisateurByIdsControlleur (req,res) {
         res.status(500).json({ message: "Erreur interne du serveur" });
     }
 }
+
+/*export const transferAnimalFromUserToRefugeControlleur = async (animalId, userId, refugeId) => {
+    // 1. D'abord, enlever l'animal à l'utilisateur
+    const unsetResult = await unsetAnimalToUtilisateurByIds(animalId, userId);
+    
+    if (unsetResult === 0) {
+        throw new Error("L'animal n'appartient pas à cet utilisateur");
+    }
+    
+    // 2. Ensuite, attribuer l'animal au refuge
+    const setResult = await setAnimalToRefugeByIds(animalId, refugeId);
+    
+    if (setResult === 0) {
+        // Optionnel: restaurer l'état précédent en cas d'erreur
+        throw new Error("Impossible d'attribuer l'animal au refuge");
+    }
+    
+    return { success: true, message: "Animal transféré au refuge" };
+}*/
+
+// Contrôleur: Transfert d'un utilisateur vers un refuge
+export async function transferAnimalFromUserToRefugeControlleur(req,res) {
+    try {
+        const { animalId, userId, refugeId } = req.params;
+        // Utilisation directe de la fonction transactionnelle
+        const result = await transferUserToRefuge(animalId, userId, refugeId);
+        
+        return {
+            success: true,
+            message: result.message,
+            data: {
+                animalId: result.animalId,
+                from: result.from,
+                to: result.to
+            }
+        };
+        
+    } catch (error) {
+        // La transaction a déjà fait rollback automatiquement
+        throw new Error(`Échec du transfert utilisateur → refuge: ${error.message}`);
+    }
+};

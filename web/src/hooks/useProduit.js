@@ -51,7 +51,20 @@ export const useProduits = () => {
         [produits]
     )
 
-    return { produits, isLoading: ProduitsLoading, isError, error, produitMap }
+    // ✅ CORRECTION : Chaque refuge pointe vers un TABLEAU de produits
+    const produitMips = useMemo(() => {
+        const map = new Map();
+        produits.forEach(produit => {
+            const refugeId = produit.IdRefuge;
+            if (!map.has(refugeId)) {
+                map.set(refugeId, []);
+            }
+            map.get(refugeId).push(produit);
+        });
+        return map;
+    }, [produits]);
+
+    return { produits, isLoading: ProduitsLoading, isError, error, produitMap, produitMips }
 
 }
 

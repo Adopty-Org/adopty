@@ -1,6 +1,6 @@
 import { getCommandeById } from "../database/commande.db.js";
 import { getRefugeById } from "../database/refuge.db.js";
-import { createSousCommande, deleteSousCommande, getAllSousCommandes, getSousCommandeById, getSousCommandesOfCommande, updateSousCommande } from "../database/sous_commande.db.js";
+import { createSousCommande, deleteSousCommande, getAllSousCommandes, getSousCommandeById, getSousCommandesOfCommande, updateSousCommande, updateSousCommandeStatut } from "../database/sous_commande.db.js";
 import { getStatutById } from "../database/statut.db.js";
 
 export async function createSousCommandeControlleur(req,res) {
@@ -44,6 +44,28 @@ export async function updateSousCommandeControlleur(req,res) {
             Total_prix,
             stripe_transfer_id,
             platformFee
+        })
+        
+        res.status(200).json({ message: "SousCommande modifiée avec succès" });
+        
+    } catch (error) {
+        console.error("Erreur lors de la modification de la sous_commande:", error);
+        res.status(500).json({ message: "Erreur interne du serveur" });
+    }
+}
+
+export async function updateSousCommandeStatutControlleur(req,res) {
+    try {
+        const { id } = req.params;
+        const { Statut } = req.body;
+        console.log("le statut donnes : ", Statut)
+        const sous_commande = await getSousCommandeById(id);
+        if (!sous_commande) {
+            return res.status(404).json({ message: "SousCommande non trouvée" });
+        }
+        await updateSousCommandeStatut( id ,{
+            
+            Statut,
         })
         
         res.status(200).json({ message: "SousCommande modifiée avec succès" });

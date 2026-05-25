@@ -1,6 +1,6 @@
 import Dashboard from './Dashboard'
 import PrestataireDashboard from './PrestataireDashboard'
-import RefugeDashboard from './RefugeDashboard'
+import RefugeDashboard from './RefugeDashboard_2'
 import { ROLE_KEYS } from '../../hooks/useRole'
 import { useUser } from "@clerk/clerk-react"
 import { useUtilisateur } from "../../hooks/useUtilisateur"
@@ -24,15 +24,15 @@ const DashboardHub = () => {
 
   /*if (role === ROLE_KEYS.ADMIN) {
     return <Dashboard />
-  }*/
+  }* /
 
   if (true){//role === ROLE_KEYS.PRESTATAIRE) {
     return <PrestataireDashboard />
-  }/*
-
-  if (true/*role === ROLE_KEYS.REFUGE* /) {
-    return <RefugeDashboard />
   }*/
+
+  if (true/*role === ROLE_KEYS.REFUGE*/) {
+    return <RefugeDashboard />
+  }
 
   return null
 }

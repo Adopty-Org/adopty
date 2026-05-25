@@ -58,6 +58,24 @@ export const updateSousCommande = async (id, sous_commande) => {
   return result.affectedRows;
 };
 
+export const updateSousCommandeStatut = async (id, sous_commande) => {
+  const [result] = await db.query(
+    `UPDATE sous_commande SET 
+      
+      Statut = ?
+      
+     WHERE Id = ?`,
+    [
+      
+      sous_commande.Statut,
+      
+      id
+    ]
+  );
+
+  return result.affectedRows;
+};
+
 export const deleteSousCommande = async (id) => {
   const [result] = await db.query(
     "DELETE FROM sous_commande WHERE Id = ?",

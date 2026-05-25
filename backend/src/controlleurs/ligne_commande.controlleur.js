@@ -5,6 +5,7 @@ import { getSousCommandeById } from "../database/sous_commande.db.js";
 export async function createLigneCommandeControlleur(req,res) {// pas utilisable je crois
     try {
         const { IdSousCommande, IdProduit,Quantite } = req.body;
+        console.log("les informations de ca ", IdSousCommande, IdProduit,Quantite)
 
         if (
             IdSousCommande == null ||

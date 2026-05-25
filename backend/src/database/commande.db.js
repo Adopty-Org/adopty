@@ -33,11 +33,11 @@ export const getCommandeById = async (id) => {
 export const updateCommande = async (id, commande) => {
   const [result] = await db.query(
     `UPDATE commande SET 
-      IdUtilisateur = ?, 
+       
       Statut = ?
      WHERE Id = ?`,
     [
-      commande.IdUtilisateur,
+      //commande.IdUtilisateur,
       commande.Statut,
       id
     ]

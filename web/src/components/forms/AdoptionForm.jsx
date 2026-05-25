@@ -3,7 +3,7 @@ import { useCreateDemandeAdoption } from '../../hooks/useDemandeAdoption' // Aju
 import { useUtilisateur } from '../../hooks/useUtilisateur'
 import { useUser } from "@clerk/clerk-react"
 import { NewLoadingLayout } from '../Loadingpage'
-import { useRefuge, useRefugeByAnimal } from '../../hooks/useRefuge'
+import { useRefugeByAnimal } from '../../hooks/useRefuge'
 
 const AdoptionForm = ({ animal, onClose }) => {
   const [step, setStep] = useState(1)

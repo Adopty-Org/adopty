@@ -1,7 +1,7 @@
 import { useQueries, useQuery } from "@tanstack/react-query"
 import { utilisateurApi } from "../lib/api"
 import { useMemo } from "react"
-import { usePanier, usePaniers } from "./usePanier"
+import { usePaniers } from "./usePanier"
 
 
 export const useUtilisateurs = () => {
@@ -41,7 +41,7 @@ export const useUtilisateurs = () => {
             }
             
         })
-    }, [utilisateursData, rolesQueries, isLoading, panierMips]) // Recalculer si les utilisateurs, les rôles ou les paniers changent
+    }, [utilisateursData, rolesQueries, ])//isLoading, panierMips]) // Recalculer si les utilisateurs, les rôles ou les paniers changent
 
     //console.log("utilisateursfini : ", utilisateurs)
 
@@ -54,7 +54,7 @@ export const useUtilisateurs = () => {
 
     return { 
         utilisateurs,  // 👈 Tableau d'utilisateurs avec leurs rôles
-        isLoading: utilisateursLoading || isLoadingRoles, 
+        isLoading: utilisateursLoading || isLoadingRoles ,//|| isLoading, // 👈 Considérer le chargement si les utilisateurs, les rôles ou les paniers sont en cours de chargement
         utilisateurMap,
         isError, 
         error 
@@ -88,7 +88,7 @@ export const useUtilisateur = (id) => {
 
     // ✅ Fonction pour forcer le refetch
     const refetch = async () => {
-        await refetchPaniers()
+        // await refetchPaniers()
         await refetchUtilisateur()
     }
 

@@ -6,7 +6,7 @@ export async function createCommandeControlleur(req,res) {// pas utilisable je c
     try {
         const { IdUtilisateur, Statut } = req.body;
 
-        if(!IdUtilisateur || !Statut ){
+        if(!IdUtilisateur|| IdUtilisateur === null || !Statut ){
             return res.status(400).json({ message: "Le strict minimun en information est requis! "})
         }
 
@@ -27,13 +27,13 @@ export async function createCommandeControlleur(req,res) {// pas utilisable je c
 export async function updateCommandeControlleur(req,res) {// just la au cas ou 
     try {
         const { id } = req.params;
-        const { IdUtilisateur, Statut } = req.body;
+        const { /*IdUtilisateur,*/ Statut } = req.body;
         const commande = await getCommandeById(id);
         if (!commande) {
             return res.status(404).json({ message: "Commande non trouvé" });
         }
         await updateCommande( id ,{
-            IdUtilisateur, 
+            /*IdUtilisateur,*/ 
             Statut
         })
         

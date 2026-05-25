@@ -36,10 +36,23 @@ export const useSousCommandes = () => {
         [sousCommandes]
     );
 
+    const sousCommandeMips = useMemo(() => {
+    const map = new Map();
+    sousCommandes.forEach(commande => {
+        const refugeId = commande.IdRefuge;
+        if (!map.has(refugeId)) {
+            map.set(refugeId, []);
+        }
+        map.get(refugeId).push(commande);
+    });
+    return map;
+}, [sousCommandes]);
+
     return ({
         sousCommandes,
         sousCommandeMap,
         SousCommandesLoading,
+        sousCommandeMips,
         isError,
         error
     })

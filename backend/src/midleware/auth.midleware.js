@@ -1,7 +1,7 @@
 import { requireAuth } from "@clerk/express";
 import { Utilisateur } from "../modeles/utilisateur.model.js";
 import { ENV } from "../config/env.js";
-import { getUtilisateurByClerkId ,getUtilisateurRefugesById,getUtilisateurRolesById } from "../database/utilisateur.db.js";
+import { getUtilisateurByClerkId ,getUtilisateurRefugeByIds,getUtilisateurRefugesById,getUtilisateurRolesById } from "../database/utilisateur.db.js";
 
 // ==================== PROTECTION DE BASE ====================
 export const protectRoute = [
@@ -45,13 +45,19 @@ export const hasRole = async (utilisateurId, roleName) => {
     }
 }
 
-export const hasRefuge = async (utilisateurId, roleName) => {
+export const hasRefuge = async (utilisateurId, refugeId) => {
     try {
-        const roles = await getUtilisateurRefugesById(utilisateurId);
-        console.log(`Rôles de l'utilisateur ${utilisateurId}:`, roles, "\n le l\'id du refuge : ", roleName, "\n et le resultat tant atendu  :  ", roles.some(role => Number(role?.Id) === Number(roleName)));
-        return roles.some(role => Number(role?.Id) === Number(roleName));
+        const refuges = await getUtilisateurRefugeByIds(utilisateurId, refugeId);
+        console.log(`Vérification refuge pour l'utilisateur ${utilisateurId}:`, {
+            refugeIdCherche: refugeId,
+            refugesTrouves: refuges,
+            aLeRole: refuges.length > 0
+        });
+        
+        // Correction : Vérifier si le tableau n'est PAS vide
+        return refuges.length > 0;
     } catch (error) {
-        console.error("Erreur lors de la vérification du rôle:", error);
+        console.error("Erreur lors de la vérification du refuge:", error);
         return false;
     }
 }
@@ -62,14 +68,14 @@ export const hasRefuge = async (utilisateurId, roleName) => {
  * Middleware pour vérifier si l'utilisateur est un Refuge
  */
 export const refugeOnly = async (req, res, next) => {
-    try {console.log("l\'utilisateur  " , req.user)
+    try {//console.log("l\'utilisateur  " , req.user)
         if (!req.user) {
             return res.status(401).json({ message: "Pas autorisé - le token est erroné" });
         }
 
-        const {Refuge} = req.params
+        const {refugeId} = req.params
 
-        const isRefuge = await hasRefuge(req?.user?.Id, Refuge)//await hasRole(req.user.Id, "Refuge");
+        const isRefuge = await hasRefuge(req?.user?.Id, refugeId)//await hasRole(req.user.Id, "Refuge");
         
         if (!isRefuge) {
             return res.status(403).json({ message: "Accès refusé - seuls les refuges peuvent accéder à cette ressource" });
@@ -201,7 +207,7 @@ export const isOwnerOrAdmin = (req, res, next) => {
         ?.split(',')
         .map(e => e.trim())
         .includes(req.user.AddresseEmail);
-        console.log("l'email : ", req.user?.AddresseEmail)
+        //console.log("l'email : ", req.user?.AddresseEmail)
 
     if (isOwner || isAdmin) {
         return next();

@@ -5,6 +5,7 @@ import { demandeTransfertApi } from "../lib/api"
 import { useMemo } from "react"
 import { useUtilisateur, useUtilisateurs } from "./useUtilisateur"
 import { useAnimals } from "./useAnimal"
+import { useRefuges } from "./useRefuge"
 
 export const useDemandeTransfertsByRefugeDepart = (id) => {
     const { data: DemandeTransfertsDepartData, isLoading: DemandeTransfertsDepartLoading, isError, error } = useQuery({
@@ -91,11 +92,13 @@ export const useDemandeTransfertsByRefugeCible = (id) => {
     const { data: DemandeTransfertsCibleData, isLoading: DemandeTransfertsCibleLoading, isError, error } = useQuery({
         queryKey: ["demandeTransfertsRefugeCible", id],
         queryFn: () => demandeTransfertApi.getEmByRefugeCible(id),
-        enabled: !!id,
+        enabled: !!id ,
     })
     
-    const { utilisateurMap } = useUtilisateurs()
-    const { animalMap } = useAnimals()
+    
+    const { utilisateurMap, isLoading: UtilisateurLoading } = useUtilisateurs()
+    const { animalMips, isLoading: AnimalLoading } = useAnimals()
+    //const { refugeMap, RefugesLoading } = useRefuges()
 
     // Debug: Afficher la structure des maps
     /*console.log("=== Débogage useDemandeTransfertsCibleByRefuge ===");
@@ -111,6 +114,10 @@ export const useDemandeTransfertsByRefugeCible = (id) => {
         if (!DemandeTransfertsCibleData) {
             console.log("Aucune donnée reçue");
             return []
+        }
+        if (AnimalLoading) {
+            console.log("Chargement des animaux en cours...");
+            return [] // Retourner vide pendant le chargement
         }
         
         // Étape 2: Convertir en tableau si nécessaire
@@ -129,22 +136,24 @@ export const useDemandeTransfertsByRefugeCible = (id) => {
         
         // Étape 3: Enrichir chaque demande
         const result = demandesArray.map(demande => {
-            const utilisateur = utilisateurMap?.get(demande.IdUtilisateur)
-            const animal = animalMap?.get(demande.IdAnimal)
+            const utilisateur = utilisateurMap?.get(demande.IdUtilisateur) || null
+            const animal = animalMips?.get(demande.IdAnimal) || null
+            //const refuge = refugeMap?.get(id)
             
             //console.log(`Demande ${demande.Id}: Utilisateur ${demande.IdUtilisateur} -> ${utilisateur ? 'trouvé' : 'non trouvé'}, Animal ${demande.IdAnimal} -> ${animal ? 'trouvé' : 'non trouvé'}`);
             
             return {
                 ...demande,
                 utilisateur: utilisateur || null,
-                animal: animal || null
+                animal: animal || null,
+                //refuge: refuge || null
             }
         })
         
         //console.log(`${result.length} demandes enrichies`);
         return result
         
-    }, [DemandeTransfertsCibleData, utilisateurMap, animalMap])
+    }, [DemandeTransfertsCibleData, utilisateurMap, animalMips, UtilisateurLoading, AnimalLoading])
 
     const demandeTransfertCibleMap = useMemo(() => {
         const map = new Map()
@@ -159,21 +168,35 @@ export const useDemandeTransfertsByRefugeCible = (id) => {
         return map
     }, [demandeTransfertsRefugeCible])
 
+    const demandeTransfertCibleByRefuge = useMemo(() => {
+        const map = new Map()
+        if (demandeTransfertsRefugeCible && demandeTransfertsRefugeCible.length > 0) {
+            demandeTransfertsRefugeCible.forEach(demande => {
+                if (demande && demande.IdRefugeCible) {
+                    map.set(demande.IdRefugeCible, demande)
+                }
+            })
+        }
+        //console.log(`Map créé avec ${map.size} entrées`);
+        return map
+    }, [demandeTransfertsRefugeCible])
+
     return {
         demandeTransfertsRefugeCible,
         demandeTransfertCibleMap,
-        DemandeTransfertsCibleLoading,
+        DemandeTransfertsCibleLoading: DemandeTransfertsCibleLoading || UtilisateurLoading || AnimalLoading ,//RefugesLoading,
+        demandeTransfertCibleByRefuge,
         isError,
         error
     }
 }
 
-export const useDemandeTransfertsByAnimal = (id) => {
+export const useDemandeTransfertsByAnimal = (refugeId, animalId) => {
 
     const {data:DemandeTransfertsData, isLoading:DemandeTransfertsLoading, isError, error } = useQuery({
-        queryKey: ["demandeTransfertsAnimal", id],
-        queryFn: () => demandeTransfertApi.getByAnimal(id),
-        enabled: !!id,
+        queryKey: ["demandeTransfertsAnimal", refugeId, animalId],
+        queryFn: () => demandeTransfertApi.getByAnimal(refugeId, animalId),
+        enabled: !!animalId,
     }) 
 
     const demandeTransfertsAnimal = DemandeTransfertsData ?? []

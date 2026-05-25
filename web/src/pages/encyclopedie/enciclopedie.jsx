@@ -4,6 +4,7 @@ import BreedDetailModal from '../../components/ui/BreedDetailModal'
 import { useRaces } from '../../hooks/useRace'
 import { useEspeces } from '../../hooks/useEspece'
 import Pagination from '../../components/ui/Pagination'
+import { useCaracteres } from '../../hooks/useCaractere'
 
 const ITEMS_PER_PAGE = 8
 
@@ -13,7 +14,8 @@ const Encyclopedie = () => {
   const [selectedBreed, setSelectedBreed] = useState(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const {especes, especeMap, EspecesLoading} = useEspeces()
-  const {racesWithEspece, races, raceMap, RacesLoading} = useRaces(especeMap)
+  const { caracteresByRace } = useCaracteres()
+  const {racesWithEspece, races, raceMap, RacesLoading} = useRaces(especeMap, caracteresByRace)
   const [currentPage, setCurrentPage] = useState(1)
 
   console.log("racesraw:", races)
