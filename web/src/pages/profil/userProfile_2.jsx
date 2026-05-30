@@ -11,7 +11,7 @@ import { useUtilisateur, useUtilisateurs } from '../../hooks/useUtilisateur'
 import { useDemandeAdoptions } from '../../hooks/useDemandeAdoption'
 import { useCommandes } from '../../hooks/useCommande'
 import { useReservations } from '../../hooks/useReservation'
-import { utilisateurApi } from '../../lib/api'
+import { animalApi, utilisateurApi } from '../../lib/api'
 import AnimalForm from '../../components/forms/AnimalForm'
 
 
@@ -98,6 +98,8 @@ const UserProfile = () => {
   const { demandeAdoptionUtilisateurMap, DemandeAdoptionsLoading } = useDemandeAdoptions(utilisateurMap)
   const {commandeUtilisateurMap, isLoading: commandesLoading } = useCommandes()
   const { reservationUtilisateurMap, ReservationsLoading } = useReservations()
+
+  const isloading = utilisateursLoading || utilisateurLoading || DemandeAdoptionsLoading || commandesLoading || ReservationsLoading
 
   console.log("utilisateur", utilisateur)
 
@@ -186,7 +188,7 @@ const UserProfile = () => {
       
       try {
         await animalApi.delete(animalId)
-        refetch() // Recharge la liste
+        refetchUtilisateur() // Recharge la liste
       } catch (err) {
         console.error('Erreur suppression:', err)
         alert('Erreur lors de la suppression')
@@ -203,7 +205,7 @@ const UserProfile = () => {
         await utilisateurApi.addAnimal(id, utilisateur?.Id)
       }
       
-      refetch()
+      refetchUtilisateur()
       handleModalClose()
     }
 
@@ -404,7 +406,7 @@ const UserProfile = () => {
                     </Link>
                   </div>
 
-                  {isLoading ? (
+                  {isloading ? (
                     <div className="py-10 flex justify-center">
                       <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
                     </div>
@@ -475,7 +477,7 @@ const UserProfile = () => {
                     </Link>
                   </div>
 
-                  {isLoading ? (
+                  {isloading ? (
                     <div className="py-10 flex justify-center">
                       <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
                     </div>
@@ -566,7 +568,7 @@ const UserProfile = () => {
                     </Link>
                   </div>
 
-                  {isLoading ? (
+                  {isloading ? (
                     <div className="py-10 flex justify-center">
                       <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
                     </div>

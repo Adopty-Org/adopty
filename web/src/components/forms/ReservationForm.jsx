@@ -7,7 +7,23 @@ const ReservationForm = ({utilisateur, prestataire, initialSlot, onClose }) => {
     animal: '', date: '', heure: '', duree: '1',
     notes: '',
   })*/
- if(!utilisateur?.animals?.length) {
+ 
+
+
+  const [form, setForm] = useState({
+    IdUtilisateur: utilisateur?.Id,
+    IdProfil: initialSlot?.IdProfil || prestataire?.Id,
+    IdAnimal: '',
+    IdAnnonce: null,
+    TypeService: prestataire?.TypeService || prestataire?.typeService?.Id,
+    DateDebut: initialSlot?.DateDebut || '',
+    DateFin: initialSlot?.DateFin || '',
+    Statut: 'En attente',
+    PrixFinal: 0,
+    Notes: '',
+  })
+
+  if(!utilisateur?.animals?.length) {
     return (
       <div className="text-center py-8 space-y-4">
         <div className="w-20 h-20 bg-error-container border-4 border-black rounded-full flex items-center justify-center mx-auto">
@@ -23,20 +39,6 @@ const ReservationForm = ({utilisateur, prestataire, initialSlot, onClose }) => {
       </div>
     )
   }
-
-
-  const [form, setForm] = useState({
-  IdUtilisateur: utilisateur?.Id,
-  IdProfil: initialSlot?.IdProfil || prestataire?.Id,
-  IdAnimal: '',
-  IdAnnonce: null,
-  TypeService: prestataire?.TypeService || prestataire?.typeService?.Id,
-  DateDebut: initialSlot?.DateDebut || '',
-  DateFin: initialSlot?.DateFin || '',
-  Statut: 'En attente',
-  PrixFinal: 0,
-  Notes: '',
-})
 
   const update = (field, value) => setForm(prev => ({ ...prev, [field]: value }))
 
