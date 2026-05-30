@@ -1,5 +1,9 @@
 import { useState, useEffect } from 'react'
 import { animalApi } from '../../lib/api'
+import { useEspeces } from '../../hooks/useEspece'
+import { useRaces } from '../../hooks/useRace'
+import { useStatut } from '../../hooks/useStatut'
+import { useCaracteres } from '../../hooks/useCaractere'
 //import { createAnimal, updateAnimal } from '../../services/authApi'
 //import { getRaces, getStatuts } from '../../services/publicApi'
 
@@ -8,6 +12,11 @@ const AnimalForm = ({ initialData = null, refugeId, onClose, onSuccess }) => {
   const [error, setError] = useState(null)
   const [races, setRaces] = useState([])
   const [statuts, setStatuts] = useState([])
+
+  const {EspecesLoading, especeMap} =useEspeces()
+  const {isLoading:CaracteresLoading, caracteresByRace} = useCaracteres()
+  const {isLoading:RacesLoading, raceMap} = useRaces(especeMap, caracteresByRace)
+  const {isLoading:StatutsLoading, statutMap} = useStatut()
   
   const animalId = initialData?.id ?? initialData?.Id ?? null
 
@@ -36,15 +45,25 @@ const AnimalForm = ({ initialData = null, refugeId, onClose, onSuccess }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [racesData, statutsData] = await Promise.all([getRaces(), getStatuts()])
-        setRaces(Array.isArray(racesData) ? racesData : [])
-        setStatuts(Array.isArray(statutsData) ? statutsData : [])
+        //const [racesData, statutsData] = await Promise.all([getRaces(), getStatuts()])
+        //setRaces(Array.isArray(racesData) ? racesData : [])
+        //setStatuts(Array.isArray(statutsData) ? statutsData : [])
+        const racesArray = Array.from(raceMap.values())
+        // ou
+        // const racesArray = [...raceMap.values()]
+        
+        const statutsArray = Array.from(statutMap.values())
+        // ou
+        // const statutsArray = [...statutMap.values()]
+        
+        setRaces(racesArray)
+        setStatuts(statutsArray)
       } catch (err) {
         console.error('Erreur chargement listes:', err)
       }
     }
     fetchData()
-  }, [])
+  }, [especeMap, raceMap, statutMap, caracteresByRace, RacesLoading, StatutsLoading, CaracteresLoading]) // Recharger si les maps changent (ex: après fetch) pour avoir les bonnes données dans les selects
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
@@ -64,8 +83,12 @@ const AnimalForm = ({ initialData = null, refugeId, onClose, onSuccess }) => {
     setError(null)
 
     try {
+      let isEdit
+      let AnimalId
       if (animalId) {
         await animalApi.update(animalId, formData)
+        isEdit = true
+        AnimalId = animalId
       } else {
         const data = new FormData()
         Object.entries(formData).forEach(([key, value]) => {
@@ -74,9 +97,11 @@ const AnimalForm = ({ initialData = null, refugeId, onClose, onSuccess }) => {
         photos.forEach(photo => {
           data.append('photos', photo)
         })
-        await animalApi.create(data)
+        const animalId = await animalApi.create(data)
+        isEdit = false
+        AnimalId = animalId.id
       }
-      onSuccess()
+      onSuccess(AnimalId, isEdit)
       onClose()
     } catch (err) {
       const msg = err?.response?.data?.message || err?.message || "Une erreur est survenue lors de l'enregistrement."
@@ -211,16 +236,15 @@ const AnimalForm = ({ initialData = null, refugeId, onClose, onSuccess }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <label className="text-xs font-bold uppercase tracking-wider text-on-surface-variant">Taille</label>
-          <select
+          <input
+            required
+            type="number"
             name="Taille"
             value={formData.Taille}
             onChange={handleChange}
             className="w-full bg-white border-2 border-black px-4 py-3 text-sm font-body focus:outline-none focus:ring-2 focus:ring-primary rounded-lg"
-          >
-            <option value="Petit">Petit</option>
-            <option value="Moyen">Moyen</option>
-            <option value="Grand">Grand</option>
-          </select>
+          />
+          
         </div>
         <div className="space-y-2">
           <label className="text-xs font-bold uppercase tracking-wider text-on-surface-variant">Énergie</label>

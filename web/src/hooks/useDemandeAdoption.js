@@ -87,6 +87,22 @@ export const useDemandeAdoptions = (utilisateurMap = null) => {
         return map
     }, [demandeAdoptionsRefuge])
 
+    const demandeAdoptionUtilisateurMap = useMemo(() => {
+        const map = new Map()
+
+        demandeAdoptionsRefuge.forEach(demande => {
+            if (!demande?.IdUtilisateur) return
+
+            if (!map.has(demande.IdUtilisateur)) {
+            map.set(demande.IdUtilisateur, [])
+            }
+
+            map.get(demande.IdUtilisateur).push(demande)
+        })
+
+        return map
+    }, [demandeAdoptionsRefuge])
+
     // ✅ CHAQUE refuge pointe vers un TABLEAU de demandes
     /*const demandesByRefuge = useMemo(() => {
         const map = new Map();
@@ -154,6 +170,7 @@ export const useDemandeAdoptions = (utilisateurMap = null) => {
         demandeAdoptionMap,
         demandesByRefuge,
         DemandeAdoptionsLoading : /*UtilisateurLoading ||*/ DemandeAdoptionsLoading || /*animalLoading,*/ StatutsLoading,
+        demandeAdoptionUtilisateurMap,
         isError,
         error
     }

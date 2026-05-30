@@ -4,7 +4,7 @@ import { Disponibilite } from "../modeles/disponibilite.model.js";
 export const createDisponibilite = async (disponibilite) => {
     const [result] = await db.query(
         `INSERT INTO disponibilite (IdProfil, DateDebut, DateFin, Recurrence, Frequence, Disponibilite, RecurrenceFin) 
-        VALUES (?, ?, ?, ?, ?, ?)`,
+        VALUES (?, ?, ?, ?, ?, ?, ?)`,
         [
             disponibilite.IdProfil,
             disponibilite.DateDebut,

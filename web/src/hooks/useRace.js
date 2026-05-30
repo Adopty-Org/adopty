@@ -11,6 +11,11 @@ export const useRaces = (especeMap, caracteresByRace) => {
     const { data: RacesData, isLoading: RacesLoading, isError, error } = useQuery({
         queryKey: ["races"],
         queryFn: raceApi.getAll,
+        staleTime: 5 * 60 * 1000,
+        gcTime: 30 * 60 * 1000,
+        refetchOnMount: false,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
     })
     
     const races = RacesData ?? []

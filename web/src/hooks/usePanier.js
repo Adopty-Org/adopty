@@ -6,64 +6,76 @@ import { lignePanierApi, panierApi } from "../lib/api"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 
 export const usePaniers = () => {
+  const isConnected =
+    !!localStorage.getItem('clerk-user') ||
+    !!sessionStorage.getItem('clerk-user')
 
-    const { data: PaniersData, isLoading: PaniersLoading, isError, error, refetch } = useQuery({
-        queryKey: ["paniers"],
-        queryFn: panierApi.getAll,
-        enabled: !!localStorage.getItem('clerk-user') || !!sessionStorage.getItem('clerk-user'),
-    })
+  const {
+    data: PaniersData,
+    isLoading: PaniersLoading,
+    isError,
+    error,
+    refetch
+  } = useQuery({
+    queryKey: ["paniers"],
+    queryFn: panierApi.getAll,
+    enabled: isConnected,
+  })
 
-    const safePaniersData = Array.isArray(PaniersData) ? PaniersData : []
+  const paniers = useMemo(() => {
+    return Array.isArray(PaniersData) ? PaniersData : []
+  }, [PaniersData])
 
-    // Requêtes pour les ligne_paniers de chaque panier
-    const ligne_paniersQueries = useQueries({
-        queries: (PaniersData ?? []).map(panier => ({
-            queryKey: ["Lignes_paniers", panier.Id, "ligne_paniers"],
-            queryFn: () => lignePanierApi.getByPanier(panier.Id),
-            enabled: !!panier.Id && Array.isArray(safePaniersData), // ← Vérification supplémentair,
+  const ligne_paniersQueries = useQueries({
+    queries: isConnected
+      ? paniers.map(panier => ({
+          queryKey: ["Lignes_paniers", panier.Id, "ligne_paniers"],
+          queryFn: () => lignePanierApi.getByPanier(panier.Id),
+          enabled: !!panier.Id,
         }))
+      : []
+  })
+
+  const paniersWithLignePaniers = useMemo(() => {
+    return paniers.map((panier, index) => {
+      const ligne_paniers = Array.isArray(ligne_paniersQueries[index]?.data)
+        ? ligne_paniersQueries[index].data
+        : []
+
+      return {
+        ...panier,
+        Ligne_paniers: ligne_paniers
+      }
     })
-    
-    const paniers = PaniersData ?? []
+  }, [paniers, ligne_paniersQueries])
 
-    
+  const panierMap = useMemo(
+    () => new Map(paniersWithLignePaniers.map(p => [p.Id, p])),
+    [paniersWithLignePaniers]
+  )
 
-    // ✅ CORRECTION ICI
-    const paniersWithLignePaniers = useMemo(() => {
-        return paniers.map((r,index) => {
-            const ligne_paniers = ligne_paniersQueries[index]?.data ?? []
-            return {
-                ...r, 
-                Ligne_paniers: ligne_paniers
-            }
-        })
-    }, [paniers, ligne_paniersQueries])  // ← Dépendances ici
-    const panierMap = useMemo(
-        () => new Map(paniersWithLignePaniers.map(r => [r.Id, r])),
-        [paniersWithLignePaniers]
-    )
+  const panierMips = useMemo(
+    () => new Map(paniersWithLignePaniers.map(p => [p.IdUtilisateur, p])),
+    [paniersWithLignePaniers]
+  )
 
-    const panierMips = useMemo(
-        () => new Map(paniersWithLignePaniers.map(r => [r.IdUtilisateur, r])),
-        [paniersWithLignePaniers]
-    )
-
-    //console.log("prob :", panierMips)
-        
-    return {
-        paniers,
-        panierMap,
-        panierMips,
-        paniersWithLignePaniers,
-        isLoading: PaniersLoading,
-        isError,
-        error,
-        refetch
-
-    }
+  return {
+    paniers,
+    panierMap,
+    panierMips,
+    paniersWithLignePaniers,
+    isLoading: isConnected ? PaniersLoading : false,
+    isError,
+    error,
+    refetch
+  }
 }
 
 export const usePanier = (id) => {
+    if (!id) {
+        return { panier: undefined, PaniersLoading: false, refetch: () => {} }
+    }
+
     const {panierMap, PaniersLoading, refetch} = usePaniers()
 
     // ✅ Convertir l'ID en nombre si nécessaire

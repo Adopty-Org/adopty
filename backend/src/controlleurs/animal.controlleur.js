@@ -1,6 +1,6 @@
 import cloudinary from "../config/cloudinary.js"
 import { Animal } from "../modeles/animal.model.js";
-import { createAnimal, deleteAnimal, getAllAnimals, getAnimalById, updateAnimal } from "../database/animal.db.js";
+import { createAnimal, deleteAnimal, getAllAnimals, getAnimalById, getAnimalsPossession, updateAnimal } from "../database/animal.db.js";
 import { createPhotoAnimal, getAnimalPhotosById } from "../database/photo.db.js";
 import { getStatutById } from "../database/statut.db.js";
 import { getRaceById } from "../database/race.db.js";
@@ -9,36 +9,71 @@ import { getCaracteristiquesByAnimalId } from "../database/caracteristique.db.js
 export async function createAnimalControlleur(req,res) {
     try {
         //sort les infos de la requete
-        const { Nom, Prenom, Age, Genre, Poids, Taille, Couleur, EtatSantee, Sterilise, Temperament, NiveauEnergetique, SociableEnfant, SociableAnimaux, Statut, Race} = req.body;
+        let { Nom, Prenom, Age, Genre, Poids, Taille, Couleur, EtatSantee, Sterilise, Temperament, NiveauEnergetique, SociableEnfant, SociableAnimaux, Statut, Race} = req.body;
 
+        Age = Number(Age)
+        Poids = Poids === "" || Poids == null ? null : Number(Poids)
+        Statut = Number(Statut)
+        Race = Number(Race)
+        if(Genre === "Male"){
+            Genre = 1
+        } else if (Genre === "Femelle"){
+            Genre = 0
+        }
+
+        if(Sterilise === "true"){
+            Sterilise = "oui"
+        } else if (Sterilise === "false"){
+            Sterilise = "non"
+        }
+
+        if(SociableEnfant === "true"){
+            SociableEnfant = "oui"
+        } else if (SociableEnfant === "false"){
+            SociableEnfant = "non"
+        }
+
+        if(SociableAnimaux === "true"){
+            SociableAnimaux = "oui"
+        } else if (SociableAnimaux === "false"){
+            SociableAnimaux = "non"
+        }
+
+        
         // verif les infos
         if (Nom == null || Age == null || Genre == null || Race == null){
+            console.log("Informations manquantes"); // 👈 AJOUTE ÇA
             return res.status(400).json({ message: "Le strict minimun en information est requis! "});
         }
 
         if(Age<=0 || !Number.isInteger(Age)){
+            console.log("Age reçu:", Age); // 👈 AJOUTE ÇA
             return res.status(400).json({ message: "L'age dois etre un entier positif! "});
         }
 
-        if(Genre !== "Male" && Genre !== "Femelle"){
+        if(Genre !== 1 && Genre !== 0){
+            console.log("Genre reçu:", Genre); // 👈 AJOUTE ÇA
             return res.status(400).json({ message: "Le genre dois etre soit \"Male\" soit\"Femelle\" ! "});
         }
 
-        if(Poids<=0 || Poids>1000000){ // 1.000.000 kg
+        if(Poids != null && (Poids <= 0 || Poids > 1000000)){ // 1.000.000 kg
+            console.log("Poids reçu:", Poids); // 👈 AJOUTE ÇA
             return res.status(400).json({ message: "Le poids doit etre un positif non demesures ! "});
         }
 
         // verif si pas de photo
         if(!req.files || req.files.length === 0){
+            console.log("Aucune photo reçue"); // 👈 AJOUTE ÇA
             return res.status(400).json({ message: "une photo au minimun est requise" });
         }
 
         // si on veux limiteur le nombre de photos 
-        /*
-        if(req.files.length> 3){
-            return res.status(400).json({ message: "Un maximum de 3 photos sont permises"});
+        
+        if(req.files.length> 5){
+            console.log("Nombre de photos reçues:", req.files.length); // 👈 AJOUTE ÇA
+            return res.status(400).json({ message: "Un maximum de 5 photos sont permises"});
         }
-        */
+        
 
         // les upload vers cloudinary
         const uploadPromises = req.files.map((file) => {
@@ -79,6 +114,8 @@ export async function createAnimalControlleur(req,res) {
                         Statut,
                         Race
         });
+
+        console.log("ID de l'animal créé:", requete); // 👈 AJOUTE ÇA
         
 
         // Création photos
@@ -239,6 +276,24 @@ export async function getCaracteristiquesOfAnimalIdControlleur(req, res) {
         res.status(200).json(caracteristiques ?? []);
     } catch (error) {
         console.error("Erreur lors de la récupération des caractéristiques:", error);
+        res.status(500).json({ message: "Erreur interne du serveur" });
+    }
+}
+
+ export async function getAnimalsPossessionControlleur(req, res) {
+    try {
+        const { id } = req.params;
+        const animal = await getAnimalById(id);
+        if (!animal) {
+            return res.status(404).json({ message: "Animal non trouvé" });
+        }
+        const possessions = await getAnimalsPossession(id);
+        if (!possessions || possessions.length === 0) {
+            return res.status(404).json({ message: "Aucune possession trouvée pour cet animal" });
+        }
+        res.status(200).json(possessions ?? []);
+    } catch (error) {
+        console.error("Erreur lors de la récupération des possessions:", error);
         res.status(500).json({ message: "Erreur interne du serveur" });
     }
 }

@@ -346,6 +346,15 @@ const handleRefuseTransfert = async (demandeId, commentaire) => {
     }
   }
 
+  const handleAnimalSuccess = async (id, isEdit) => {
+    if(!isEdit){
+      await refugeApi.addAnimal(id, utilisateur?.Id)
+    }
+    
+    refetch()
+    handleModalClose()
+  }
+
 
   return (
     <PageTransition>
@@ -730,7 +739,7 @@ const handleRefuseTransfert = async (demandeId, commentaire) => {
         <Modal isOpen={isAnimalModalOpen} onClose={() => setIsAnimalModalOpen(false)}
           title={editingAnimal ? `Modifier ${editingAnimal.nom}` : 'Ajouter un animal'} size="lg">
           <AnimalForm initialData={editingAnimal} refugeId={myRefuges[0]?.id}
-            onClose={() => setIsAnimalModalOpen(false)} onSuccess={loadDashboardData} />
+            onClose={() => setIsAnimalModalOpen(false)} onSuccess={ (id,isEdit) => { loadDashboardData(), handleAnimalSuccess(id, isEdit)}} />
         </Modal>
 
         {/* Modal Produits */}

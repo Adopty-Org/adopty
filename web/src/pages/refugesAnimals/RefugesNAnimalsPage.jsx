@@ -5,8 +5,9 @@ import AnimalCard from '../../components/ui/AnimalCard'
 import { useFilters } from '../../hooks/useFilters'
 import Pagination from '../../components/ui/Pagination'
 import { useState } from 'react'
+import { useCaracteres } from '../../hooks/useCaractere'
 
-/*const*/ let  ESPECES = ['Tous']//, 'Chien', 'Chat', 'Lapin']
+/*const*/ //let  ESPECES = ['Tous']//, 'Chien', 'Chat', 'Lapin']
 const TAILLES = ['Petit', 'Moyen', 'Grand']
 const CARACTERES = ['Joueur', 'Calme', 'Sociable', 'Sportif', 'Affectueux']
 const TRAITS = [
@@ -20,6 +21,7 @@ const ITEMS_PER_PAGE = 6
 const RefugesNAnimals = () => {
 
   const [currentPage, setCurrentPage] = useState(1)
+  const {CaracteresLoading,caracteres} = useCaracteres()
 
   const { 
     especes,
@@ -34,10 +36,16 @@ const RefugesNAnimals = () => {
     isLoading
   } = useFilters()
 
-  ESPECES = [
-    'Tous',
-    ...new Set((especes ?? []).map(e => e.Nom))
-  ]
+  const ESPECES = especes ?? ['Tous']
+  const [showCaracteres, setShowCaracteres] = useState(false)
+  //const activeFilterCount = [race !== 'Tous', search.trim(), prixMin !== '', prixMax !== '', stockOnly].filter(Boolean).length
+  const activeFilterCount =
+    (espece !== 'Tous' ? 1 : 0) +
+    (race !== 'Tous' ? 1 : 0) +
+    (search.trim() !== '' ? 1 : 0) +
+    taille.length +
+    caractere.length +
+    selectedTraits.length
 
   // 🛡️ GARDE-FOU N°2 : Affichage conditionnel
   if (isLoading) {
@@ -47,9 +55,9 @@ const RefugesNAnimals = () => {
   }
 
   // 🛡️ GARDE-FOU N°3 : Sécurité absolue
-  if (!filteredAnimaux.length) {
+  /*if (!filteredAnimaux.length) {
     return <div className="text-center p-12 text-gray-500">Aucun animal disponible</div>
-  }
+  }*/
 
   const totalPages = Math.ceil(filteredAnimaux.length / ITEMS_PER_PAGE)
   const paginatedProducts = filteredAnimaux.slice(
@@ -72,8 +80,15 @@ const RefugesNAnimals = () => {
               <div className="flex items-center justify-between mb-6">
                 <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-xl flex items-center gap-2 text-primary">
                   <span className="material-symbols-outlined text-secondary">tune</span> Filtres
+                  {activeFilterCount > 0 && (
+                    <span className="w-5 h-5 bg-secondary text-white text-[11px] font-extrabold rounded-full flex items-center justify-center border border-black">
+                      {activeFilterCount}
+                    </span>
+                  )}
                 </h2>
-                <button onClick={reset} className="text-xs font-bold text-secondary hover:underline uppercase tracking-wider">Reset</button>
+                {activeFilterCount > 0 && (
+                  <button onClick={reset} className="text-xs font-bold text-secondary hover:underline uppercase tracking-wider">Reset</button>
+                )}
               </div>
 
               {/* Search */}
@@ -118,18 +133,18 @@ const RefugesNAnimals = () => {
                 </select>
               </div>
 
-              {/* Traits (VRAIS FILTRES) *}
+              {/* Traits (VRAIS FILTRES) */}
               <div className="mb-6">
                 <label className="block font-bold text-xs uppercase tracking-widest mb-3 text-on-surface-variant">Adapté pour :</label>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {TRAITS.map(t => (
                     <button 
                       key={t.id} 
                       onClick={() => toggleTrait(t.id)}
-                      className={`w-full flex items-center gap-3 p-3 border-2 border-black transition-all rounded-xl
+                      className={`w-full flex items-center gap-3 p-3 border-[2px] border-black transition-all rounded-lg font-['Plus_Jakarta_Sans']
                         ${selectedTraits.includes(t.id) 
-                          ? 'bg-secondary text-white shadow-none translate-x-1px translate-y-1px' 
-                          : 'bg-white hover:bg-surface-container shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]'}`}
+                          ? 'bg-secondary text-white shadow-none translate-x-[2px] translate-y-[2px]' 
+                          : 'bg-white text-primary hover:bg-primary/5 shadow-[3px_3px_0px_0px_rgba(21,66,18,1)]'}`}
                     >
                       <span className="material-symbols-outlined text-lg">{t.icon}</span>
                       <span className="text-sm font-bold">{t.label}</span>
@@ -137,7 +152,119 @@ const RefugesNAnimals = () => {
                     </button>
                   ))}
                 </div>
-              </div>*/}
+              </div>
+
+              <div className="mb-6">
+
+                <label className="block font-bold text-xs uppercase tracking-widest mb-3 text-on-surface-variant">
+                  Caractères
+                </label>
+
+                {/* Trigger */}
+                <button
+                  onClick={() => setShowCaracteres(prev => !prev)}
+                  className="
+                    w-full flex items-center justify-between
+                    p-3 bg-white border-2 border-black rounded-xl
+                    shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]
+                    hover:bg-secondary-container
+                    transition-all
+                    font-bold
+                  "
+                >
+                  <span>
+                    {caractere.length > 0
+                      ? `${caractere.length} sélectionné(s)`
+                      : 'Choisir des caractères'}
+                  </span>
+
+                  <span
+                    className={`material-symbols-outlined transition-transform ${
+                      showCaracteres ? 'rotate-180' : ''
+                    }`}
+                  >
+                    expand_more
+                  </span>
+                </button>
+
+                {/* Dropdown */}
+                {showCaracteres && (
+                  <div
+                    className="
+                      mt-3 bg-white border-2 border-black rounded-xl
+                      p-2 max-h-64 overflow-y-auto
+                      shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]
+                    "
+                  >
+                    {caracteres.map(c => (
+                      <button
+                        key={c.Id}
+                        onClick={() => toggleCaractere(c.Id)}
+                        className={`
+                          w-full flex items-center gap-3
+                          p-3 rounded-lg text-left transition-all
+
+                          ${
+                            caractere.includes(c.Id)
+                              ? 'bg-secondary text-white'
+                              : 'hover:bg-primary/5'
+                          }
+                        `}
+                      >
+                        <div
+                          className={`
+                            w-5 h-5 border-2 border-current rounded
+                            flex items-center justify-center
+                          `}
+                        >
+                          {caractere.includes(c.Id) && (
+                            <span className="material-symbols-outlined text-sm">
+                              check
+                            </span>
+                          )}
+                        </div>
+
+                        <span className="font-bold">
+                          {c.Nom}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {/* Badges sélectionnés */}
+                {caractere.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-3">
+
+                    {caracteres
+                      .filter(c => caractere.includes(c.Id))
+                      .map(c => (
+                        <span
+                          key={c.Id}
+                          className="
+                            flex items-center gap-1
+                            px-3 py-1
+                            bg-secondary
+                            text-white
+                            border-2 border-black
+                            rounded-full
+                            text-xs
+                            font-black
+                            shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]
+                          "
+                        >
+                          {c.Nom}
+
+                          <button
+                            onClick={() => toggleCaractere(c.Id)}
+                          >
+                            ✕
+                          </button>
+                        </span>
+                      ))}
+                  </div>
+                )}
+              </div>
 
               {/* Taille */}
               <div className="mb-6">

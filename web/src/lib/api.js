@@ -88,23 +88,23 @@ export const utilisateurApi = {
     // 🔹 Gestion des animaux
     // =========================
 
-    addAnimal: async (id, payload) => {
-        const { data } = await axiosInstance.post(`/utilisateurs/animal/${id}`, payload);
+    addAnimal: async (id, utilisateurId) => {
+        const { data } = await axiosInstance.post(`/utilisateurs/animal/${id}/${utilisateurId}`);
         return data;
     },
 
-    removeAnimal: async (id) => {
-        const { data } = await axiosInstance.delete(`/utilisateurs/animal/${id}`);
+    removeAnimal: async (id, utilisateurId) => {
+        const { data } = await axiosInstance.delete(`/utilisateurs/animal/${id}/${utilisateurId}`);
         return data;
     },
 
-    setAnimal: async (id) => {
-        const { data } = await axiosInstance.put(`/utilisateurs/animal/set/${id}`);
+    setAnimal: async (id, utilisateurId) => {
+        const { data } = await axiosInstance.put(`/utilisateurs/animal/set/${id}/${utilisateurId}`);
         return data;
     },
 
-    unsetAnimal: async (id) => {
-        const { data } = await axiosInstance.put(`/utilisateurs/animal/unset/${id}`);
+    unsetAnimal: async (id, utilisateurId) => {
+        const { data } = await axiosInstance.put(`/utilisateurs/animal/unset/${id}/${utilisateurId}`);
         return data;
     },
 
@@ -160,9 +160,18 @@ export const animalApi = {
     // =========================
 
     create: async (formData) => {
-        const { data } = await axiosInstance.post("/animaux", formData);
-        return data;
+       // const { data } = await axiosInstance.post("/animaux", formData);
+        //return data;
+        
+        const { data } = await axiosInstance.post('/animaux', formData, {
+            headers: {
+            'Content-Type': 'multipart/form-data',
+            },
+        })
+        return data
+        
     },
+    
 
     update: async ({ id, formData }) => {
         const { data } = await axiosInstance.put(`/animaux/${id}`, formData);
@@ -203,7 +212,7 @@ export const animalApi = {
     },
 
     getPhotos: async (id) => {
-        const { data } = await axiosInstance.get(`/animaux/${id}/photos`);
+        const { data } = await axiosInstance.get(`/animaux/photos/${id}`);
         return data;
     },
 
@@ -211,6 +220,12 @@ export const animalApi = {
         const { data } = await axiosInstance.get(`/animaux/caracteristiques/${id}`);
         return data;
     },
+
+    getPossessions: async (id) => {
+        const { data } = await axiosInstance.get(`/animaux/possessions/${id}`);
+        return data;
+    },
+
 };
 
 /*
@@ -355,10 +370,9 @@ export const refugeApi = {
     // 🔹 Gestion animaux (refuge only)
     // =========================
 
-    addAnimal: async (id, refugeId, payload) => {
+    addAnimal: async (id, refugeId, ) => {
         const { data } = await axiosInstance.post(
-            `/refuges/ajout_animal/${id}/${refugeId}`,
-            payload
+            `/refuges/ajout_animal/${id}/${refugeId}`
         );
         return data;
     },
@@ -370,18 +384,16 @@ export const refugeApi = {
         return data;
     },
 
-    setAnimal: async (id, refugeId, payload) => {
+    setAnimal: async (id, refugeId) => {
         const { data } = await axiosInstance.put(
-            `/refuges/set_animal/${id}/${refugeId}`,
-            payload
+            `/refuges/set_animal/${id}/${refugeId}`
         );
         return data;
     },
 
-    unsetAnimal: async (id, refugeId, payload) => {
+    unsetAnimal: async (id, refugeId) => {
         const { data } = await axiosInstance.put(
-            `/refuges/unset_animal/${id}/${refugeId}`,
-            payload
+            `/refuges/unset_animal/${id}/${refugeId}`
         );
         return data;
     },
@@ -1587,7 +1599,7 @@ export const panierApi = {
 
 /*
 ========================================================
-🛡️ PAIEMENTS
+🛡️ PRODUITS
 ========================================================
 */
 export const produitApi = {
@@ -1647,18 +1659,45 @@ export const produitApi = {
     },
 
     getPhotos: async (photo) => {
-        const { data } = await axiosInstance.get(`/produits/${photo}/photos`);
-        return data;
+        //const { data } = await axiosInstance.get(`/produits/${photo}/photos`);
+        //return data;
+        try {
+            const response = await axiosInstance.get(`/produits/${photo}/photos`)
+            return response.data
+        } catch (error) {
+            if (error?.response?.status === 404) {
+            return []
+            }
+            throw error
+        }
     },
 
     getAllMateriaux: async (id) => {
-        const { data } = await axiosInstance.get(`/produits/materiaux/${id}`);
-        return data;
+        //const { data } = await axiosInstance.get(`/produits/materiaux/${id}`);
+        //return data;
+        try {
+            const response = await axiosInstance.get(`/produits/materiaux/${id}`)
+            return response.data
+        } catch (error) {
+            if (error?.response?.status === 404) {
+            return []
+            }
+            throw error
+        }
     },
 
     getSpecificMateriaux: async (id) => {
-        const { data } = await axiosInstance.get(`/produits/materiaux/Ids/${id}`);
-        return data;
+        //const { data } = await axiosInstance.get(`/produits/materiaux/Ids/${id}`);
+        //return data;
+        try {
+            const response = await axiosInstance.get(`/produits/materiaux/Ids/${id}`)
+            return response.data
+        } catch (error) {
+            if (error?.response?.status === 404) {
+            return []
+            }
+            throw error
+        }
     },
 };
 

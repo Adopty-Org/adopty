@@ -16,6 +16,7 @@ export const useProduits = () => {
             queryKey: ["produits", produit.Id, "photos"],
             queryFn: () => produitApi.getPhotos(produit.Id),
             enabled: !!produit.Id,
+            retry: false
         }))
     })
 
@@ -25,6 +26,7 @@ export const useProduits = () => {
             queryKey: ["produits", produit.Id, "materiaux"],
             queryFn: () => produitApi.getAllMateriaux(produit.Id),
             enabled: !!produit.Id,
+            retry: false
         }))
     })
 

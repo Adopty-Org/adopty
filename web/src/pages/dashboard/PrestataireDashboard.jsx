@@ -48,11 +48,11 @@ const PrestataireDashboard = () => {
   const [isAvailModalOpen, setIsAvailModalOpen] = useState(false)
   const [editingAvail, setEditingAvail] = useState(null)
 
-  const {prestataire,isLoading: prestataireLoading} = usePrestataire(210001)
-  const {disponibilites,DisponibilitesLoading} = useDisponibilites(210001);
+  const {prestataire,isLoading: prestataireLoading} = usePrestataire(270001)
+  const {disponibilites,DisponibilitesLoading} = useDisponibilites(270001);
     //console.log("les disponibilites  : ", disponibilites)
 
-  //console.log("le prestataire : ", prestataire)
+  console.log("le prestataire : ", prestataire)
 
   const loadData = useCallback(async () => {
     if (false/*!backendUserId*/) return
@@ -380,7 +380,7 @@ const PrestataireDashboard = () => {
           onClose={() => setIsAvailModalOpen(false)}
           title="Gérer mes disponibilités"
           size="lg"
-        ><AvailabilityCalendar profilId={myProfile?.Id} onSlotClick={editingAvail}/>
+        ><AvailabilityCalendar mode="provider" profilId={myProfile?.Id} onSlotClick={editingAvail}/>
           <AvailabilityForm
             initialData={editingAvail}
             profilId={myProfile?.Id}

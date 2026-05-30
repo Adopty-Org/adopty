@@ -108,7 +108,7 @@ const ProductDetail = () => {
     <PageTransition>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Back Link */}
-        <Link to="/boutique" className="inline-flex items-center gap-2 mb-8 text-primary font-bold group">
+        <Link to="/shop" className="inline-flex items-center gap-2 mb-8 text-primary font-bold group">
           <span className="material-symbols-outlined transition-transform group-hover:-translate-x-1">arrow_back</span>
           <span className="font-['Plus_Jakarta_Sans'] uppercase tracking-wider text-sm">Retour à la boutique</span>
         </Link>
@@ -118,7 +118,7 @@ const ProductDetail = () => {
           <FadeIn className="lg:col-span-6 space-y-4">
             <div className="relative overflow-hidden rounded-2xl border-4 border-black shadow-[8px_8px_0px_0px_rgba(21,66,18,1)] aspect-square bg-white">
               <img 
-                alt={produit.nom} 
+                alt={produit.Nom} 
                 className="w-full h-full object-contain p-4" 
                 src={photos.length > 0 ? photos[0].Url : produit?.photo} 
               />
@@ -138,8 +138,8 @@ const ProductDetail = () => {
           {/* Product Info */}
           <div className="lg:col-span-6 flex flex-col gap-6">
             <FadeIn delay={0.1} className="bg-surface-container-lowest p-8 rounded-2xl border-4 border-black shadow-[10px_10px_0px_0px_rgba(0,0,0,1)]">
-              <span className="text-xs font-bold text-secondary uppercase tracking-widest mb-2 block">{produit.categorie}</span>
-              <h1 className="text-4xl md:text-5xl font-['Plus_Jakarta_Sans'] font-extrabold text-primary mb-4 leading-tight">{produit.nom}</h1>
+              <span className="text-xs font-bold text-secondary uppercase tracking-widest mb-2 block">{produit.Categorie}</span>
+              <h1 className="text-4xl md:text-5xl font-['Plus_Jakarta_Sans'] font-extrabold text-primary mb-4 leading-tight">{produit.Nom}</h1>
               
               <div className="flex items-center gap-4 mb-6">
                 <span className="text-4xl font-['Plus_Jakarta_Sans'] font-extrabold text-primary">
@@ -149,7 +149,7 @@ const ProductDetail = () => {
 
               <div className="p-4 bg-surface-container rounded-xl border-2 border-black/10 mb-8">
                 <p className="text-on-surface-variant leading-relaxed">
-                  {produit?.description}
+                  {produit?.Description ?? "Aucune description disponible pour ce produit."}
                 </p>
               </div>
 
@@ -200,7 +200,7 @@ const ProductDetail = () => {
           <div className="bg-white rounded-3xl border-4 border-black overflow-hidden shadow-[12px_12px_0px_0px_rgba(21,66,18,1)] flex flex-col md:flex-row">
             <div className="md:w-1/3 bg-secondary p-8 flex flex-col justify-center text-white">
               <p className="text-white/70 text-xs font-bold uppercase tracking-[0.2em] mb-2">Partenaire Adopty</p>
-              <h3 className="text-3xl font-extrabold mb-4">{refugeData?.nom || "Refuge Partenaire"}</h3>
+              <h3 className="text-3xl font-extrabold mb-4">{refugeData?.Nom || "Refuge Partenaire"}</h3>
               <p className="text-sm opacity-90 leading-relaxed mb-6">
                 En achetant ce produit, vous soutenez directement les actions de ce refuge. 100% des bénéfices sont reversés aux soins des animaux.
               </p>
