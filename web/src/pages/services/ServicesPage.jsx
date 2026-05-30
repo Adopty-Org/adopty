@@ -6,8 +6,32 @@ import ReservationForm from '../../components/forms/ReservationForm'
 import { usePrestataires } from '../../hooks/usePrestataire'
 import { useTypeServices } from '../../hooks/useType_service'
 import Pagination from '../../components/ui/Pagination'
+import { useEffect } from 'react'
+import { useMemo } from 'react'
 
 const ITEMS_PER_PAGE = 6
+
+const SORTS = [
+  { value: 'note-desc', label: 'Meilleures notes',  icon: 'star' },
+  { value: 'prix-asc',  label: 'Prix croissant',    icon: 'arrow_upward' },
+  { value: 'prix-desc', label: 'Prix décroissant',  icon: 'arrow_downward' },
+  { value: 'nom-asc',   label: 'Nom A → Z',         icon: 'sort_by_alpha' },
+]
+
+const StarFilter = ({ minNote, onChange }) => (
+  <div className="flex gap-1">
+    {[1, 2, 3, 4, 5].map(n => (
+      <button key={n} onClick={() => onChange(minNote === n ? 0 : n)} title={`${n} étoile${n > 1 ? 's' : ''} min.`}>
+        <span className={`material-symbols-outlined text-2xl transition-colors ${n <= minNote ? 'text-amber-400' : 'text-outline-variant hover:text-amber-300'}`}>
+          star
+        </span>
+      </button>
+    ))}
+    {minNote > 0 && (
+      <button onClick={() => onChange(0)} className="ml-1 text-xs text-secondary font-bold hover:underline self-center">Reset</button>
+    )}
+  </div>
+)
 
 function ServicesPage() {
   const [activeTab, setActiveTab] = useState('all')
@@ -16,6 +40,34 @@ function ServicesPage() {
   const { prestataires } = usePrestataires()
   const { typeServicesWithAll, typesLoading } = useTypeServices();
   const [currentPage, setCurrentPage] = useState(1)
+
+  const [search,              setSearch]              = useState('')
+  const [minNote,             setMinNote]             = useState(0)
+  const [prixMax,             setPrixMax]             = useState('')
+  const [sortBy,              setSortBy]              = useState('note-desc')
+
+  useEffect(() => { setSearch(''); setMinNote(0); setPrixMax('') }, [activeTab])
+
+  const filtered = useMemo(() => {
+    let r = prestataires.filter(p => p?.typeService?.Id === activeTab || activeTab === 'all')
+    if (search.trim()) {
+      const q = search.toLowerCase()
+      r = r.filter(p =>
+        p?.utilisateur?.Nom?.toLowerCase().includes(q) ||
+        p?.ZoneIntervention?.toLowerCase().includes(q) ||
+        p?.Bio?.toLowerCase().includes(q)
+      )
+    }
+    if (minNote > 0) r = r.filter(p => Number(p.NoteMoyenne || 0) >= minNote)
+    if (prixMax !== '') r = r.filter(p => Number(p.TarifHoraire || 0) <= Number(prixMax))
+    r.sort((a, b) => {
+      if (sortBy === 'note-desc') return Number(b.NoteMoyenne || 0) - Number(a.NoteMoyenne || 0)
+      if (sortBy === 'prix-asc')  return Number(a.TarifHoraire || 0) - Number(b.TarifHoraire || 0)
+      if (sortBy === 'prix-desc') return Number(b.TarifHoraire || 0) - Number(a.TarifHoraire || 0)
+      return (a?.utilisateur?.Nom || '').localeCompare(b?.utilisateur?.Nom || '')
+    })
+    return r
+  }, [prestataires, activeTab, search, minNote, prixMax, sortBy])
 
   // Mapping des icônes par service
   const getIconForTab = (tabNom) => {
@@ -28,7 +80,10 @@ function ServicesPage() {
   }
 
   console.log("Prestataires : ", prestataires);
-  const filtered = prestataires.filter(p => p?.typeService?.Id === activeTab || activeTab === 'all')
+  //const filtered = prestataires.filter(p => p?.typeService?.Id === activeTab || activeTab === 'all')
+  //const handleReserve = (p) => requireAuthAction(() => setSelectedPrestataire(p))
+  const activeFilterCount = [search.trim(), minNote > 0, prixMax !== ''].filter(Boolean).length
+  const resetFilters = () => { setSearch(''); setMinNote(0); setPrixMax('') }
 
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE)
   const paginatedProducts = filtered.slice(
@@ -62,9 +117,10 @@ function ServicesPage() {
           {/* Stats rapides */}
           <FadeIn delay={0.2} className="flex flex-wrap gap-6 mt-10">
             {[
-              { icon: 'verified_user', label: 'Prestataires certifiés', value: '19+' },
-              { icon: 'star', label: 'Note moyenne', value: '4.8/5' },
+              { icon: 'verified_user', label: 'Prestataires certifiés', value: prestataires.length.toString() }, // temporairement le nombre de prestataires comme nombre de certifiés  
+              { icon: 'star', label: 'Note moyenne', value: prestataires.length > 0 ? prestataires.reduce((acc, p) => acc + Number(p.NoteMoyenne || 0), 0) / prestataires.length : 'N/A' },
               { icon: 'event_available', label: 'Réservations réussies', value: '1,240+' },
+              { icon: 'event_available', label: 'Services disponibles', value: typeServicesWithAll.length.toString() },
             ].map(stat => (
               <div key={stat.label} className="flex items-center gap-3 bg-white/10 border-2 border-white/30 px-5 py-3 rounded-xl">
                 <span className="material-symbols-outlined text-[#fe9e72] text-2xl">{stat.icon}</span>
@@ -104,6 +160,70 @@ function ServicesPage() {
               </button>
             ))
           )}
+        </FadeIn>
+
+        {/* Barre de filtres */}
+        <FadeIn className="bg-surface-container-lowest border-2 border-black rounded-2xl p-4 mb-8 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+          <div className="flex flex-wrap gap-4 items-end">
+
+            {/* Recherche */}
+            <div className="flex-1 min-w-[180px]">
+              <label className="font-bold text-xs uppercase tracking-widest text-on-surface-variant mb-1.5 block">Rechercher</label>
+              <div className="relative">
+                <input
+                  value={search} onChange={e => setSearch(e.target.value)}
+                  placeholder="Nom, ville..."
+                  className="w-full border-2 border-black px-4 py-2.5 pr-9 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary rounded-xl bg-white"
+                />
+                {search ? (
+                  <button onClick={() => setSearch('')} className="absolute right-2.5 top-2.5">
+                    <span className="material-symbols-outlined text-primary text-lg">close</span>
+                  </button>
+                ) : (
+                  <span className="material-symbols-outlined absolute right-2.5 top-2.5 text-primary/50 text-lg">search</span>
+                )}
+              </div>
+            </div>
+
+            {/* Note min */}
+            <div>
+              <label className="font-bold text-xs uppercase tracking-widest text-on-surface-variant mb-1.5 block">Note min.</label>
+              <StarFilter minNote={minNote} onChange={setMinNote} />
+            </div>
+
+            {/* Prix max */}
+            <div className="min-w-[130px]">
+              <label className="font-bold text-xs uppercase tracking-widest text-on-surface-variant mb-1.5 block">Prix max (DZD/h)</label>
+              <input
+                type="number" min="0" placeholder="Ex: 5000" value={prixMax} onChange={e => setPrixMax(e.target.value)}
+                className="w-full border-2 border-black px-3 py-2.5 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary rounded-xl bg-white"
+              />
+            </div>
+
+            {/* Tri */}
+            <div>
+              <label className="font-bold text-xs uppercase tracking-widest text-on-surface-variant mb-1.5 block">Trier par</label>
+              <div className="flex flex-wrap gap-1.5">
+                {SORTS.map(s => (
+                  <button key={s.value} onClick={() => setSortBy(s.value)}
+                    className={`flex items-center gap-1 px-3 py-2 text-xs font-bold border-2 border-black rounded-xl transition-all
+                      ${sortBy === s.value ? 'bg-secondary text-white shadow-none translate-x-[1px] translate-y-[1px]' : 'bg-white text-on-surface hover:bg-secondary/5 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'}`}>
+                    <span className="material-symbols-outlined text-[15px]">{s.icon}</span>
+                    <span className="hidden sm:inline">{s.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Reset */}
+            {activeFilterCount > 0 && (
+              <button onClick={resetFilters}
+                className="flex items-center gap-1.5 px-3 py-2.5 border-2 border-black rounded-xl text-xs font-bold bg-white hover:bg-error-container transition-colors">
+                <span className="material-symbols-outlined text-[15px]">filter_list_off</span>
+                Reset ({activeFilterCount})
+              </button>
+            )}
+          </div>
         </FadeIn>
 
         {/* Grid prestataires */}

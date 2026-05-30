@@ -1,89 +1,15 @@
-import { useState } from 'react'
-import { animalApi, especeApi, raceApi } from '../lib/api'
-import { useQuery } from '@tanstack/react-query'
-import { useEspeces } from './useEspece'
-import { useRaces } from './useRace'
+// frontend/src/hooks/useFilters.js
+
+import { useState, useMemo } from 'react'
 import { useAnimals } from './useAnimal'
-//import { animaux } from '../data/mockData'
-
-
+import { useEspeces } from './useEspece'
+import { useCallback } from 'react'
 
 export const useFilters = () => {
+  const { animals, isLoading: AnimalsLoading } = useAnimals()
+  //const { especes, isLoading: EspecesLoading } = useEspeces()
 
-  const {animals, isLoading:AnimalsLoading} = useAnimals();
-  const {especes, isLoading:EspecesLoading} = useEspeces();
-
-  /*const {data:AnimauxData, isLoading:AnimauxLoading} = useQuery({
-    queryKey: ["animaux"],
-    queryFn: animalApi.getAll,
-  })
-
-  const {data:RacesData, isLoading:RacesLoading} = useQuery({
-    queryKey: ["races"],
-    queryFn: raceApi.getAll,
-  })
-
-  const {data:EspecesData, isLoading:EspecesLoading} = useQuery({
-    queryKey: ["especes"],
-    queryFn: especeApi.getAll,
-  }) 
-
-
-
-  const animalsRaw = AnimauxData ?? []
-  const races = RacesData ?? []
-  const especes = EspecesData ?? []
-
-  const raceMap = new Map(races.map(r => [r.Id, r]))
-  const especeMap = new Map(especes.map(e => [e.Id, e]))
-
-  const getTailleLabel = (cm) => {
-    if (cm <= 30) return 'Petit'
-    if (cm <= 60) return 'Moyen'
-    return 'Grand'
-  }
-
-  const animals = animalsRaw.map(a => {
-    const race = raceMap.get(a.Race)
-    const espece = race ? especeMap.get(race.Espece) : undefined
-
-    return {
-      ...a,
-      TailleLabel: getTailleLabel(a.Taille), // 👈 ICI
-      Race: race
-        ? {
-            Id: race.Id,
-            Nom: race.Nom,
-            Description: race.Description,
-            Origine: race.Origine,
-            EsperanceVie: race.EsperanceVie,
-            Maintenance: race.Maintenance,
-            TailleMoyenne: race.TailleMoyenne,
-            PoidsMoyen: race.PoidsMoyen,
-            Couleurs: race.Couleurs,
-            Classification: race.Classification,
-            Pelage: race.Pelage,
-            TaillePelageMoyen: race.TaillePelageMoyen,
-            Habitat: race.Habitat,
-            Inteligence: race.Inteligence,
-            Imunite: race.Imunite,
-            Alergies: race.Alergies,
-            Espece: espece
-              ? {
-                  Id: espece.Id,
-                  Nom: espece.Nom,
-                  Description: espece.Description
-                }
-              : null
-          }
-        : null
-    }
-  })*/
-
-  console.log("L'animal :   ", animals)
-
-
-  
+  // États des filtres
   const [espece, setEspece] = useState('Tous')
   const [race, setRace] = useState('Tous')
   const [taille, setTaille] = useState([])
@@ -91,6 +17,109 @@ export const useFilters = () => {
   const [selectedTraits, setSelectedTraits] = useState([])
   const [search, setSearch] = useState('')
 
+  // ⚡ MEMOISATION 1: Liste des espèces uniques
+  const uniqueEspeces = useMemo(() => {
+    console.log('🔄 Recalcul des espèces uniques')
+    return ['Tous', ...new Set(animals.map(a => a?.Race?.Espece?.Nom).filter(Boolean))]
+  }, [animals])
+
+  // ⚡ MEMOISATION 2: Races disponibles basées sur l'espèce sélectionnée
+  const availableRaces = useMemo(() => {
+    console.log('🔄 Recalcul des races disponibles')
+    const filteredByEspece = animals.filter(a => 
+      espece === 'Tous' || a?.Race?.Espece?.Nom === espece
+    )
+    
+    return [
+      'Tous',
+      ...new Set(
+        filteredByEspece
+          .map(a => a.Race?.Nom)
+          .filter(Boolean)
+      )
+    ]
+  }, [animals, espece])
+
+  const toBool = (val) => {
+    if (typeof val === 'boolean') return val
+    if (typeof val === 'string') {
+      return ['oui', '1', 'true'].includes(val.toLowerCase())
+    }
+    if (typeof val === 'number') return val === 1
+    return false
+  }
+
+  const getAnimalTraits = (a) => {
+    const traits = []
+
+    if (toBool(a.SociableEnfant ?? a.sociableEnfant)) {
+      traits.push('Enfants')
+    }
+
+    if (toBool(a.SociableAnimaux ?? a.sociableAnimaux)) {
+      traits.push('Animaux')
+    }
+
+    if (toBool(a.Sterilise ?? a.sterilise)) {
+      traits.push('Sterilise')
+    }
+
+    return traits
+  }
+
+  // ⚡ MEMOISATION 3: Filtrage principal des animaux
+  const filteredAnimaux = useMemo(() => {
+    console.log('🔄 Recalcul des animaux filtrés')
+    
+    return animals.filter(a => {
+      // Filtre par espèce
+      if (espece !== 'Tous' && a?.Race?.Espece?.Nom !== espece) return false
+      
+      // Filtre par race
+      if (race !== 'Tous' && a?.Race?.Nom !== race) return false
+      
+      // Filtre par taille
+      if (taille.length > 0 && !taille.includes(a.TailleLabel)) return false
+      
+      // Filtre par recherche
+      if (search && !a.Nom.toLowerCase().includes(search.toLowerCase())) return false
+
+      if (
+        caractere.length > 0 &&
+        !caractere.some(id =>
+          a?.Caracteres?.some(car => car.Id === id)
+        )
+      ) return false
+
+      if (selectedTraits.length > 0) {
+        const animalTraits = getAnimalTraits(a)
+
+        if (!selectedTraits.every(t => animalTraits.includes(t))) {
+          return false
+        }
+      }
+      
+      // ✅ Ajoute ici tes autres filtres si besoin
+      // if (caractere.length > 0 && !caractere.some(c => a.Caracteres?.includes(c))) return false
+      // if (selectedTraits.length > 0 && !selectedTraits.some(t => a.Traits?.includes(t))) return false
+      
+      return true
+    })
+  }, [animals, espece, race, taille, search, caractere, selectedTraits])
+
+  // ⚡ MEMOISATION 4: Stats pour l'affichage (optionnel)
+  const stats = useMemo(() => {
+    return {
+      total: filteredAnimaux.length,
+      parEspece: filteredAnimaux.reduce((acc, a) => {
+        const especeName = a?.Race?.Espece?.Nom || 'Inconnu'
+        acc[especeName] = (acc[especeName] || 0) + 1
+        return acc
+      }, {})
+    }
+  }, [filteredAnimaux])
+
+  // Fonctions toggle (pas besoin de useMemo, ce sont des fonctions simples)
   const toggleTaille = (t) =>
     setTaille(prev => prev.includes(t) ? prev.filter(x => x !== t) : [...prev, t])
 
@@ -100,39 +129,25 @@ export const useFilters = () => {
   const toggleTrait = (t) =>
     setSelectedTraits(prev => prev.includes(t) ? prev.filter(x => x !== t) : [...prev, t])
 
-  const reset = () => { 
+  // Reset avec useCallback pour stabilité (optionnel)
+  const reset = useCallback(() => { 
     setEspece('Tous')
     setRace('Tous')
     setTaille([])
     setCaractere([])
     setSelectedTraits([])
     setSearch('') 
-  }
+  }, [])
 
-  const filteredAnimaux = animals.filter(a => {
-    if (espece !== 'Tous' && a?.Race?.Espece?.Nom !== espece) return false
-    if (race !== 'Tous' && a?.Race?.Nom !== race) return false
-    if (taille.length > 0 && !taille.includes(a.TailleLabel)) return false
-    if (search && !a.Nom.toLowerCase().includes(search.toLowerCase())) return false
-    return true
+  console.log('📊 useFilters - render avec', {
+    totalAnimaux: animals.length,
+    filtreEspece: espece,
+    filtreRace: race,
+    resultatsFiltres: filteredAnimaux.length
   })
 
-  // Dynamically get available races based on current species
-  const availableRaces = [
-    'Tous',
-    ...new Set(
-      animals
-        .filter(a => espece === 'Tous' || a?.Race?.Espece?.Nom === espece)
-        .map(a => a.Race?.Nom)
-        .filter(Boolean)
-    )
-  ]
-  /*['Tous', ...new Set((AnimauxData ?? [])
-    .filter(a => espece === 'Tous' || a.espece === espece)
-    .map(a => a.race))]*/
-
   return { 
-    especes,
+    especes: uniqueEspeces, // ← Utilise les espèces uniques
     espece, setEspece, 
     race, setRace, 
     availableRaces,
@@ -140,7 +155,9 @@ export const useFilters = () => {
     caractere, toggleCaractere, 
     selectedTraits, toggleTrait,
     search, setSearch, 
-    reset, filteredAnimaux, 
-    isLoading: AnimalsLoading || EspecesLoading
+    reset, 
+    filteredAnimaux, 
+    stats, // ← Optionnel
+    isLoading: AnimalsLoading //|| EspecesLoading
   }
 }

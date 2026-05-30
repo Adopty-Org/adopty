@@ -383,13 +383,13 @@ function Navbar() {
                                         <p className="text-xs text-on-surface-variant">{item?.Categorie}</p>
                                         {/* ✅ Boutons + et - */}
                                         <div className="flex items-center gap-2 mt-2">
-                                            <button 
+                                            <button
                                                 onClick={() => updateQty(item?.Id, item?.Quantite - 1)}
                                                 className="w-7 h-7 flex items-center justify-center border-2 border-black rounded-lg bg-white hover:bg-gray-100 transition-colors"
                                                 disabled={item?.Quantite <= 1}
                                             >
                                                 <span className="material-symbols-outlined text-sm">remove</span>
-                                            </button>
+                                            </button> {console.log("Quantité:", item)}
                                             
                                             <span className="font-bold text-sm w-8 text-center">{item?.Quantite}</span>
                                             

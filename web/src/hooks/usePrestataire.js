@@ -31,6 +31,7 @@ export const usePrestataires = () => {
             queryKey: ["utilisateur", prestataire?.IdUtilisateur],
             queryFn: () => utilisateurApi.getSpecific(prestataire?.IdUtilisateur),
             enabled: !!prestataire?.IdUtilisateur,
+            retry: false
         }))
     })
 
@@ -141,14 +142,17 @@ export const usePrestataires = () => {
 
 // Hook séparé pour un prestataire spécifique (optionnel)
 export const usePrestataire = (id) => {
-    const { prestatairesMap, isLoading, isError, error } = usePrestataires()
-    
-    const prestataire = useMemo(() => {
-        if (!id) return null
-        return prestatairesMap.get(id)
-    }, [prestatairesMap, id])
+  const { prestatairesMap, isLoading, isError, error } = usePrestataires()
 
-    return { prestataire, isLoading, isError, error }
+  const prestataire = useMemo(() => {
+    if (!id) return null
+
+    const prestataireId = Number(id)
+
+    return prestatairesMap.get(prestataireId)
+  }, [prestatairesMap, id])
+
+  return { prestataire, isLoading, isError, error }
 }
 
 export const useCreatePrestataire = () => {

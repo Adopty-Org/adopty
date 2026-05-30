@@ -2,6 +2,7 @@ import { useQueries, useQuery } from "@tanstack/react-query"
 import { utilisateurApi } from "../lib/api"
 import { useMemo } from "react"
 import { usePaniers } from "./usePanier"
+import { useAnimal, useAnimals } from "./useAnimal"
 
 
 export const useUtilisateurs = () => {
@@ -64,6 +65,7 @@ export const useUtilisateurs = () => {
 export const useUtilisateur = (id) => {
 
     const {isLoading:utilisateurPanierLoading, panierMips, refetch: refetchPaniers} = usePaniers()
+    const {animalMapUtilisateur, isLoading} = useAnimals()
 
     const { data: UtilisateurData, isLoading: utilisateurLoanding, isError, error, refetch: refetchUtilisateur } = useQuery({
         queryKey: ["utilisateur", id],
@@ -98,14 +100,16 @@ export const useUtilisateur = (id) => {
         
         const a = UtilisateurData  // L'objet utilisateur directement
         const panier = panierMips.get(a?.Id)
-
+        const animals = animalMapUtilisateur.get(a?.Id)
+ 
         return {
             ...a,
             Panier: panier,
             Roles : UtilisateurRolesData ?? [],
-            Refuge: UtilisateurRefugesData ?? []
+            Refuge: UtilisateurRefugesData ?? [],
+            Animals: animals ?? []
         }
     }, [UtilisateurData, UtilisateurRolesData, panierMips, UtilisateurRefugesData]);
 
-    return { utilisateur, isLoading : utilisateurLoanding || utilisateurPanierLoading || UtilisateurRolesLoading || UtilisateurRefugesLoading, isError, error, refetch }
+    return { utilisateur, isLoading : utilisateurLoanding || utilisateurPanierLoading || UtilisateurRolesLoading || UtilisateurRefugesLoading || isError, isError, error, refetch }
 }

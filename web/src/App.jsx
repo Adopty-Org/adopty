@@ -14,7 +14,7 @@ import LoadingLayout from './components/Loadingpage'
 import Signalement from './pages/signalement/Signalement'
 import Encyclopedie from './pages/encyclopedie/enciclopedie'
 import Profil from './pages/profil/profil'
-import UserProfile from './pages/profil/userProfile'
+//import UserProfile from './pages/profil/userProfile'
 
 import { useEffect } from "react";
 import { setAuthTokenGetter } from "./lib/axios.js";
@@ -31,6 +31,8 @@ import ProductDetail from './pages/shop/ProductDetail.jsx'
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 import Auth from './pages/auth/Auth.jsx'
+import ProfilPrestataire from './pages/profil/ProfilPrestataire.jsx'
+import UserProfile from './pages/profil/userProfile_2.jsx'
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
@@ -71,7 +73,7 @@ function App() {
       {/*<Route path="/testConversation" element={<ConversationsList/>}/>*/}
       {/*<Route path="/testConversation2" element={<ChatRoom conversationId="1" currentUserId="1" />}/>*/}
       {/*<Route path="/testConversation3" element={<ChatPage />}/>*/}
-      {/*<Route path="/log" element={<Auth />}/>*/}
+      {<Route path="/log" element={<Auth />}/>}
       {/* pas de isSignedIn car debile */}
       <Route path="/" element={<LobbyLayout/>}>
         <Route index element={<Navigate to={"lobby"}/>}/>
@@ -88,6 +90,7 @@ function App() {
         <Route path="dashboard"element={<DashboardHub />}/>
         <Route path="refugeProfile/:id"element={<RefugeProfile/>}/>
         <Route path="/realrefuge" element={<Refuges />}/>
+        <Route path="/prestataire/:id" element={<ProfilPrestataire />} />
 
         <Route path="paiement"element={
           <Elements stripe={stripePromise}>

@@ -146,3 +146,12 @@ export const removeVaccinToAnimalByIds = async (vaccinId, animalId) => {
 
     return result.affectedRows;
 }
+
+export const getAnimalsPossession = async (id) => {
+  const [rows] = await db.query(
+    `SELECT p.IdRefuge, p.IdUtilisateur FROM possession p WHERE p.IdAnimal = ?`,
+    [id]
+  );
+  console.log("possessions : ", rows)
+  return rows;
+}

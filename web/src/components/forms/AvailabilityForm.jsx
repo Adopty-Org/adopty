@@ -13,6 +13,7 @@ const AvailabilityForm = ({ initialData = null, profilId, onClose, onSuccess }) 
     Recurrence: initialData?.recurrence || 'Journalier',
     Frequence: initialData?.frequence || 1,
     Disponibilite: initialData?.disponible !== undefined ? initialData.disponible : true,
+    RecurrenceFin: initialData?.recurrenceFin || null,
   })
 
   const createDisponibilite = useCreateDisponibilite();
@@ -97,14 +98,28 @@ const AvailabilityForm = ({ initialData = null, profilId, onClose, onSuccess }) 
         </div>
         <div className="space-y-2">
           <label className="text-xs font-bold uppercase tracking-wider text-on-surface-variant">Fréquence</label>
-          <input
+          {/*<input
             type="number"
             min="1"
             name="Frequence"
             value={formData.Frequence}
             onChange={handleChange}
             className="w-full bg-white border-2 border-black px-4 py-3 text-sm font-body focus:outline-none focus:ring-2 focus:ring-primary rounded-lg"
-          />
+          />*/}
+          <select
+            name="Frequence"
+            value={formData.Frequence}
+            onChange={handleChange}
+            className="w-full bg-white border-2 border-black px-4 py-3 text-sm font-body focus:outline-none focus:ring-2 focus:ring-primary rounded-lg"
+          >
+            <option value="dimanche">dimanche</option>
+            <option value="lundi">lundi</option>
+            <option value="mardi">mardi</option>
+            <option value="mercredi">mercredi</option>
+            <option value="jeudi">jeudi</option>
+            <option value="vendredi">vendredi</option>
+            <option value="samedi">samedi</option>
+          </select>
         </div>
       </div>
 

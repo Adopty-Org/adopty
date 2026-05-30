@@ -24,7 +24,18 @@ if (!PUBLISHABLE_KEY) {
 }
 
 // Create a client
-const queryClient = new QueryClient()
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000,
+      gcTime: 30 * 60 * 1000,
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      placeholderData: previousData => previousData,
+    },
+  },
+})
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

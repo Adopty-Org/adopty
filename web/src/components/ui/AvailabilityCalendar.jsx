@@ -7,7 +7,7 @@ import { useDisponibilites, useCreateDisponibilite, useUpdateDisponibilite } fro
 
 const localizer = momentLocalizer(moment);
 
-const AvailabilityCalendar = ({ profilId }) => {
+const AvailabilityCalendar = ({ profilId, mode="client", onReservationSelect }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -22,23 +22,26 @@ const AvailabilityCalendar = ({ profilId }) => {
   const updateDisponibilite = useUpdateDisponibilite();
 
   // ✅ Fonction utilitaire pour parser les dates correctement
-const parseDate = (dateString) => {
-  if (!dateString) return null;
-  
-  // Si c'est déjà un objet Date
-  if (dateString instanceof Date) return dateString;
-  
-  // Essayer différents formats
-  const date = new Date(dateString);
-  
-  // Vérifier si la date est valide
-  if (isNaN(date.getTime())) {
-    console.warn(`Date invalide: ${dateString}`);
-    return null;
-  }
-  
-  return date;
-};
+  const parseDate = (dateString) => {
+    if (!dateString) return null;
+    
+    // Si c'est déjà un objet Date
+    if (dateString instanceof Date) return dateString;
+    
+    // Essayer différents formats
+    const date = new Date(dateString);
+    
+    // Vérifier si la date est valide
+    if (isNaN(date.getTime())) {
+      console.warn(`Date invalide: ${dateString}`);
+      return null;
+    }
+    
+    return date;
+  };
+
+  const isProviderMode = mode === "provider"
+  const isClientMode = mode === "client"
 
   // ✅ Fonction corrigée pour générer les dates de récurrence
     /*const generateRecurringDatesForDisplay = (disponibilite) => {
@@ -782,6 +785,22 @@ const generateRecurringDatesForDisplay = (disponibilite) => {
       warningMsg = "⚠️ ATTENTION : Ce créneau contient des parties non déclarées (gris).\n\nVoulez-vous continuer ?";
     }
     
+    if (isClientMode) {
+  if (!isFullyAvailable) {
+    alert("Ce créneau n'est pas entièrement disponible.")
+    return
+  }
+
+  onReservationSelect?.({
+      IdProfil: profilId,
+      DateDebut: start.toISOString(),
+      DateFin: end.toISOString(),
+    })
+
+    return
+  }
+
+  if (isProviderMode) {
     setSelectedSlot({
       start,
       end,
@@ -791,10 +810,11 @@ const generateRecurringDatesForDisplay = (disponibilite) => {
       isFullyUnavailable,
       isPartiallyMixed,
       hasUndefinedParts
-    });
-    
-    setWarningMessage(warningMsg);
-    setShowWarningModal(true);
+    })
+
+    setWarningMessage(warningMsg)
+    setShowWarningModal(true)
+  }
   };
 
   const handleContinueToEdit = () => {
@@ -989,7 +1009,7 @@ useEffect(() => {
 // Composant Modal de récurrence
 const RecurrenceModal = ({ slot, pendingAvailability, onConfirm, onCancel }) => {
   const [recurrence, setRecurrence] = useState('aucune');
-  const [frequency, setFrequency] = useState(1);
+  const [frequency, setFrequency] = useState('');
   const [untilDate, setUntilDate] = useState('');
   const [customEnd, setCustomEnd] = useState(false);
 
@@ -1011,16 +1031,16 @@ const RecurrenceModal = ({ slot, pendingAvailability, onConfirm, onCancel }) => 
       let nextDate = new Date(start);
       switch(recurrence) {
         case 'quotidien':
-          nextDate.setDate(start.getDate() + (frequency * i));
+          nextDate.setDate(start.getDate() + (frequency?.length * i));
           break;
         case 'hebdomadaire':
-          nextDate.setDate(start.getDate() + (7 * frequency * i));
+          nextDate.setDate(start.getDate() + (7 * frequency?.length * i));
           break;
         case 'mensuelle':
-          nextDate.setMonth(start.getMonth() + (frequency * i));
+          nextDate.setMonth(start.getMonth() + (frequency?.length * i));
           break;
         case 'annuelle':
-          nextDate.setFullYear(start.getFullYear() + (frequency * i));
+          nextDate.setFullYear(start.getFullYear() + (frequency?.length * i));
           break;
       }
       previewDates.push(nextDate.toLocaleDateString('fr-FR'));
@@ -1067,7 +1087,7 @@ const RecurrenceModal = ({ slot, pendingAvailability, onConfirm, onCancel }) => 
           
           {recurrence !== 'aucune' && (
             <div>
-              <label className="block text-sm font-bold mb-2">
+              {/*<label className="block text-sm font-bold mb-2">
                 Fréquence : tous les {frequency} {getRecurrenceText()}
               </label>
               <input 
@@ -1077,7 +1097,21 @@ const RecurrenceModal = ({ slot, pendingAvailability, onConfirm, onCancel }) => 
                 value={frequency} 
                 onChange={(e) => setFrequency(parseInt(e.target.value))}
                 className="w-full"
-              />
+              />*/}
+              <select
+            name="Frequence"
+            value={frequency}
+            onChange={(e) => setFrequency(e.target.value)}
+            className="w-full bg-white border-2 border-black px-4 py-3 text-sm font-body focus:outline-none focus:ring-2 focus:ring-primary rounded-lg"
+          >
+            <option value="dimanche">dimanche</option>
+            <option value="lundi">lundi</option>
+            <option value="mardi">mardi</option>
+            <option value="mercredi">mercredi</option>
+            <option value="jeudi">jeudi</option>
+            <option value="vendredi">vendredi</option>
+            <option value="samedi">samedi</option>
+          </select>
               <div className="text-center text-sm text-gray-600 mt-1">
                 {frequency} {getRecurrenceText()}
               </div>

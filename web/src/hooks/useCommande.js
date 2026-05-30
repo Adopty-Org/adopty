@@ -79,9 +79,25 @@ export const useCommandes = () => {
         [commandes]
     )
 
+    const commandeUtilisateurMap = useMemo(() => {
+        const map = new Map() // key: IdUtilisateur, value: [Commande, ...]
+        
+        commandes.forEach(commande => {
+            const utilisateurId = commande.IdUtilisateur
+            if (!map.has(utilisateurId)) {
+                map.set(utilisateurId, [])
+            }
+            map.get(utilisateurId).push(commande)
+        })
+        
+        return map
+    }, [commandes])
+
+
     return ({
         commandes,
         commandeMap,
+        commandeUtilisateurMap,
         sousCommandesByCommande, // Utile si besoin d'accès direct
         isLoading: CommandesLoading || SousCommandesLoading,
         isError,

@@ -9,6 +9,11 @@ export const useEspeces = () => {
     const {data:EspecesData, isLoading:EspecesLoading, isError, error } = useQuery({
         queryKey: ["especes"],
         queryFn: especeApi.getAll,
+        staleTime: 5 * 60 * 1000,
+        gcTime: 30 * 60 * 1000,
+        refetchOnMount: false,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
     }) 
 
     const especes = EspecesData ?? []

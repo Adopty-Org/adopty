@@ -6,7 +6,7 @@ import { useMemo } from "react"
 
 export const useDisponibilites = (id) => {
 
-    const {data:DisponibilitesData, isLoading:DisponibilitesLoading, isError, error } = useQuery({
+    const {data:DisponibilitesData, isLoading:DisponibilitesLoading, isError, error, refetch } = useQuery({
         queryKey: ["disponibilites", id],
         queryFn: () => disponibiliteApi.getByProfilPrestataire(id),
         enabled: !!id,
@@ -25,7 +25,8 @@ export const useDisponibilites = (id) => {
         disponibiliteMap,
         DisponibilitesLoading,
         isError,
-        error
+        error,
+        refetch
     })
 }
 

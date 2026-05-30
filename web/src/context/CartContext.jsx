@@ -267,7 +267,7 @@ export const CartProvider = ({ children }) => {
             try {
               // Récupérer les détails du produit (dont le prix)
               const produit = await produitApi.getSpecific(ligne.IdProduit)
-              const photos = await produitApi.getPhotos(ligne.IdProduit)
+              const photos = await produitApi.getPhotos(ligne.IdProduit); console.log("Produit chargé pour ligne", ligne.Id, ":", produit)
               return { 
                 ...ligne, 
                 produit: produit,

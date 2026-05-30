@@ -9,6 +9,11 @@ export const useCaracteres = () => {
     const {data:CaracteresData, isLoading: CaracteresLoading, isError, error } = useQuery({
         queryKey: ["caracteres"],
         queryFn: caracteristiqueApi.getAll,
+        staleTime: 5 * 60 * 1000,
+        gcTime: 30 * 60 * 1000,
+        refetchOnMount: false,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
     })
     
     const caracteres = CaracteresData ?? []
