@@ -127,6 +127,12 @@ export const useAnimals = () => {
             const caractereData = caracteresByAnimal.get(race?.Id) ?? EMPTY_ARRAY
             const photos = stablePhotosData[index] ?? EMPTY_ARRAY
             const possessions = stablePossessionsData[index] ?? EMPTY_ARRAY
+
+            console.log(
+  a.Id,
+  stablePhotosData[index],
+  stablePossessionsData[index]
+)
             
             return {
                 ...a,
@@ -192,6 +198,39 @@ export const useAnimals = () => {
         })
         return map
     }, [animals])
+
+    console.log("AnimauxData", animals)
+console.log("photosQueries", photosQueries)
+console.log("possessionsQueries", possessionsQueries)
+
+photosQueries.forEach((q, i) => {
+  console.log(
+    "PHOTO",
+    AnimauxData?.[i]?.Id,
+    q.status,
+    q.data,
+    q.error
+  )
+})
+
+possessionsQueries.forEach((q, i) => {
+  console.log(
+    "POSSESSION",
+    AnimauxData?.[i]?.Id,
+    q.status,
+    q.data,
+    q.error
+  )
+})
+possessionsQueries.forEach((q, i) => {
+  console.log(
+    AnimauxData?.[i]?.Id,
+    q.status,
+    q.fetchStatus,
+    q.data,
+    q.error
+  )
+})
 
     // 🔍 DEBUG: Voir ce qui change
     useEffect(() => {

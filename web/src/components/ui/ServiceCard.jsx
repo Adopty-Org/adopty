@@ -48,7 +48,7 @@ const ServiceCard = ({ prestataire, delay = 0, onReserver }) => {
                 {isSelf ? '👤 Vous' : prestataire?.disponible ? 'Disponible' : 'Occupé'}
               </span>
             </div>
-            <p className="text-sm text-on-surface-variant font-bold">{prestataire?.typeService.Type} • {prestataire?.ZoneIntervention}</p>
+            <p className="text-sm text-on-surface-variant font-bold">{prestataire?.typeService?.Type} • {prestataire?.ZoneIntervention}</p>
             <div className="flex items-center gap-1.5 mt-1">
               <div className="flex">
                 {etoiles.map((filled, i) => (

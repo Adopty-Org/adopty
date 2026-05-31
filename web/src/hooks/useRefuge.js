@@ -73,7 +73,7 @@ export const useRefuges = () => {
 
 export const useRefuge = (id,utilisateurMap = null) => {
     console.log("utilisateurMap dans useRefuge", utilisateurMap)
-    const { refugeMap, RefugesLoading } = useRefuges(utilisateurMap);
+    const { refugeMap, RefugesLoading } = useRefuges();
     const { DemandeAdoptionsLoading, demandesByRefuge: DemandesAdoption } = useDemandeAdoptions(utilisateurMap)
     const { DemandeTransfertsCibleLoading, demandeTransfertCibleByRefuge: DemandesTransfert } = useDemandeTransfertsByRefugeCible(id, utilisateurMap)
     const { SousCommandesLoading, sousCommandeMips } = useSousCommandes()
