@@ -354,7 +354,7 @@ const Dashboard = () => {
                               <p className="text-xs text-on-surface-variant">{cmd?.produit}</p>
                             </div>
                             <div className="text-right flex-shrink-0">
-                              <p className="font-extrabold text-sm text-primary">{cmd?.montant.toFixed(2)} EUR</p>
+                              <p className="font-extrabold text-sm text-primary">{cmd?.montant?.toFixed(2)} EUR</p>
                               <StatutBadge statut={cmd?.statut?.Statut} />
                             </div>
                           </div>
@@ -475,7 +475,7 @@ const Dashboard = () => {
                           <td className="px-5 py-4 font-mono font-bold text-on-surface-variant">{cmd?.Id}</td>
                           <td className="px-5 py-4 font-bold">{cmd?.client}</td>
                           <td className="px-5 py-4 text-on-surface-variant">{cmd?.produit}</td>
-                          <td className="px-5 py-4 font-extrabold text-primary">{cmd?.montant.toFixed(2)} EUR</td>
+                          <td className="px-5 py-4 font-extrabold text-primary">{cmd?.montant?.toFixed(2)} EUR</td>
                           <td className="px-5 py-4"><StatutBadge statut={cmd?.statut?.Statut} /></td>
                           <td className="px-5 py-4 text-on-surface-variant">{cmd?.date}</td>
                         </tr>

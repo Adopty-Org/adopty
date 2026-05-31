@@ -288,9 +288,9 @@ export async function getCaracteristiquesOfAnimalIdControlleur(req, res) {
             return res.status(404).json({ message: "Animal non trouvé" });
         }
         const possessions = await getAnimalsPossession(id);
-        if (!possessions || possessions.length === 0) {
+        /*if (!possessions || possessions.length === 0) {
             return res.status(404).json({ message: "Aucune possession trouvée pour cet animal" });
-        }
+        }*/
         res.status(200).json(possessions ?? []);
     } catch (error) {
         console.error("Erreur lors de la récupération des possessions:", error);
