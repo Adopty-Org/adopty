@@ -10,9 +10,13 @@ import { PageTransition, FadeIn } from '../../components/Animations'
 import { useUtilisateur, useUtilisateurs } from '../../hooks/useUtilisateur'
 import { useDemandeAdoptions } from '../../hooks/useDemandeAdoption'
 import { useCommandes } from '../../hooks/useCommande'
-import { useReservations } from '../../hooks/useReservation'
-import { animalApi, utilisateurApi } from '../../lib/api'
+import { useReservations, useUpdateReservation } from '../../hooks/useReservation'
+import { animalApi, annonceApi, utilisateurApi } from '../../lib/api'
 import AnimalForm from '../../components/forms/AnimalForm'
+import AnnonceFormModal from '../../components/forms/AnnonceFormModal'
+import { useAnnoncesUtilisateur } from "../../hooks/useAnnonce"
+import Modal from '../../components/ui/Modal'
+import { usePrestataires } from '../../hooks/usePrestataire'
 
 
 
@@ -41,10 +45,12 @@ const ROLE_META = {
 
 const NAV_ITEMS = [
   { id: 'profil',      label: 'Mon Profil',        icon: 'person' },
-  { id: 'commandes',  label: 'Mes Commandes',      icon: 'receipt_long' },
-  { id: 'reservations', label: 'Mes Réservations', icon: 'event' },
   { id: 'adoptions',  label: 'Mes Adoptions',      icon: 'pets' },
   { id: 'animaux',  label: 'Mes Animaux',      icon: 'home' },
+  { id: 'annonces',  label: 'Mes Annonces',      icon: 'home' },
+  { id: 'commandes',  label: 'Mes Commandes',      icon: 'receipt_long' },
+  { id: 'reservations', label: 'Mes Réservations', icon: 'event' },
+  { id: 'favoris',  label: 'Mes Favoris',      icon: 'favorite' },
 ]
 
 const StatutBadge = ({ statut }) => {
@@ -89,6 +95,11 @@ const UserProfile = () => {
   const [isLoading,     setIsLoading]     = useState(true)
   const [showAnimalModal, setShowAnimalModal] = useState(false)
   const [editingAnimal, setEditingAnimal] = useState(null)
+  const [selectedCommande, setSelectedCommande] = useState(null)
+  const [selectedAnnonce, setSelectedAnnonce] = useState(null)
+  const [isCandidaturesModalOpen, setIsCandidaturesModalOpen] = useState(false)
+  
+  const [isAnnonceModalOpen, setIsAnnonceModalOpen] = useState(false)
 
   // Profil backend via hook (ex-mapUtilisateur)
   //const { user: backendProfile } = useCurrentUser()
@@ -97,30 +108,54 @@ const UserProfile = () => {
   const {utilisateur, isLoading: utilisateurLoading, error, refetch: refetchUtilisateur} = useUtilisateur(user?.id)
   const { demandeAdoptionUtilisateurMap, DemandeAdoptionsLoading } = useDemandeAdoptions(utilisateurMap)
   const {commandeUtilisateurMap, isLoading: commandesLoading } = useCommandes()
-  const { reservationUtilisateurMap, ReservationsLoading } = useReservations()
+  const { reservationAnnonceMap, reservationUtilisateurMap, ReservationsLoading } = useReservations()
+  const {prestatairesMap} = usePrestataires()
+  
+
+  const { annonces, AnnoncesLoading } = useAnnoncesUtilisateur()
+
+  const mesAnnonces = useMemo(() => {
+    if (!utilisateur?.Id) return []
+
+    return annonces.filter(
+      a => {return (
+          Number(a.IdUtilisateur) === Number(utilisateur.Id) &&
+          [1, 2, 6].includes(Number(a.Statut))
+        )
+      }
+    )
+  }, [annonces, utilisateur?.Id])
+
+  const updateReservation = useUpdateReservation()
 
   const isloading = utilisateursLoading || utilisateurLoading || DemandeAdoptionsLoading || commandesLoading || ReservationsLoading
 
   console.log("utilisateur", utilisateur)
 
   
-  const roles = utilisateur.Roles ?? [];
+  const roles = utilisateur?.Roles ?? [];
 
-    const hasOtherRoleThanUser = roles.some(
-    role => role.Nom !== "Utilisateur"
-    );
+  const hasOtherRoleThanUser = roles.some(
+  role => role.Nom !== "Utilisateur"
+  );
 
-    const filteredRoles = hasOtherRoleThanUser
-    ? roles.filter(role => role.Nom !== "Utilisateur")
-    : roles;
+  const filteredRoles = hasOtherRoleThanUser
+  ? roles.filter(role => role.Nom !== "Utilisateur")
+  : roles;
 
-    const rolesMeta = filteredRoles.map(role =>
-    ROLE_META[role.Nom] ?? {
-        icon: "person",
-        label: role.Nom,
-        color: "bg-gray-500 text-white",
-    }
-    );
+  const rolesMeta = filteredRoles.map(role =>
+  ROLE_META[role.Nom] ?? {
+      icon: "person",
+      label: role.Nom,
+      color: "bg-gray-500 text-white",
+  }
+  );
+
+  const candidaturesAnnonce = useMemo(() => {
+    if (!selectedAnnonce?.Id) return []
+
+    return reservationAnnonceMap.get(selectedAnnonce.Id) ?? []
+  }, [reservationAnnonceMap, selectedAnnonce?.Id])
 
   /*useEffect(() => {
     const loadProfile = async () => {
@@ -169,9 +204,15 @@ const UserProfile = () => {
     return commandeUtilisateurMap.get(utilisateur.Id) ?? []
     }, [utilisateur?.Id, commandeUtilisateurMap])
 
+    console.log("commandes", commandes)
+
     const animaux = useMemo(() => {
     return utilisateur?.Animals ?? []
     }, [utilisateur?.Id])
+
+    const favoris = useMemo(() => {
+    return utilisateur?.wishlist?.ligneWishlist ?? []
+    }, [utilisateur?.wishlist])
 
   const handleAddAnimal = () => {
       setEditingAnimal(null)
@@ -207,6 +248,28 @@ const UserProfile = () => {
       
       refetchUtilisateur()
       handleModalClose()
+    }
+
+    const handleUpdateReservationStatus = async (IdAnnonce, IdProfil, id, statut) => {
+      try {
+
+        const prestataire = prestatairesMap.get(IdProfil)
+        await updateReservation.mutateAsync({
+          prestataire: prestataire.Id,
+          id,
+          formData: { Statut: statut, IdProfil: prestataire.Id }
+        })
+
+        await annonceApi.uupdateStatut({
+          id: IdAnnonce,
+          formData: { Statut: statut }
+        })
+
+        
+      } catch (error) {
+        console.error(error)
+        alert('Erreur lors de la mise à jour du statut')
+      }
     }
 
   if (!isLoaded) return (
@@ -329,6 +392,16 @@ const UserProfile = () => {
                         {animaux.length}
                       </span>
                     )}
+                    {item.id === 'favoris' && favoris.length > 0 && (
+                      <span className={`ml-auto text-[10px] font-extrabold px-1.5 py-0.5 rounded-full border border-black ${activeSection === 'favoris' ? 'bg-white text-primary' : 'bg-primary text-white'}`}>
+                        {favoris.length}
+                      </span>
+                    )}
+                    {item.id === 'annonces' && mesAnnonces.length > 0 && (
+                      <span className={`ml-auto text-[10px] font-extrabold px-1.5 py-0.5 rounded-full border border-black ${activeSection === 'annonces' ? 'bg-white text-primary' : 'bg-primary text-white'}`}>
+                        {mesAnnonces.length}
+                      </span>
+                    )}
                   </button>
                 ))}
               </nav>
@@ -433,7 +506,12 @@ const UserProfile = () => {
                         const ref = cmd.PaymentRef ?? ''
                         const isSimulated = ref.startsWith('SIM-')
                         return (
-                          <div key={cmd.commandeId ?? `cmd-${idx}`} className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-surface-container/50 transition-colors">
+                          <button
+                              key={cmd.Id ?? cmd.commandeId ?? `cmd-${idx}`}
+                              onClick={() => setSelectedCommande(cmd)}
+                              className="w-full text-left p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-surface-container/50 transition-colors"
+                            >
+                          {/*<div key={cmd.commandeId ?? `cmd-${idx}`} className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-surface-container/50 transition-colors">*/}
                             <div className="flex items-center gap-4">
                               <div className="w-12 h-12 bg-primary-fixed rounded-full border-2 border-black flex items-center justify-center flex-shrink-0">
                                 <span className="material-symbols-outlined text-primary text-xl">shopping_bag</span>
@@ -455,7 +533,9 @@ const UserProfile = () => {
                               <StatutBadge statut={paiementLabel} />
                               <StatutBadge statut={statutLabel} />
                             </div>
-                          </div>
+
+                            
+                          </button>
                         )
                       })}
                     </div>
@@ -724,6 +804,238 @@ const UserProfile = () => {
                 
                     </FadeIn>
                 )}
+                {/* SECTION ANIMAUX */}
+                {activeSection === 'favoris' && (
+                    <FadeIn delay={0.2}>
+                        <div className="bg-surface-container-lowest border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] rounded-xl overflow-hidden">
+                        <div className="bg-surface-container border-b-4 border-black px-6 py-4 flex justify-between items-center flex-wrap gap-4">
+                            <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-primary flex items-center gap-2">
+                            <span className="material-symbols-outlined">favorite</span>
+                            Mes favoris
+                            </h2>
+                            <button
+                            
+                            className="px-4 py-2 bg-primary text-white font-bold border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all text-sm flex items-center gap-2"
+                            >
+                            <span className="material-symbols-outlined text-base">add</span>
+                            Ajouter un animal
+                            </button>
+                        </div>
+                        
+                        <div className="p-6">
+                            {utilisateurLoading && (
+                            <div className="flex justify-center py-8">
+                                <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+                            </div>
+                            )}
+                            
+                            {error && (
+                            <div className="p-4 bg-error-container text-on-error-container border-2 border-black rounded-lg font-bold text-sm">
+                                Erreur: {error}
+                            </div>
+                            )}
+                            
+                            {!utilisateurLoading && !error && utilisateur?.wishlist?.ligneWishlist?.length === 0 && (
+                            <div className="text-center py-12">
+                                <span className="material-symbols-outlined text-6xl text-on-surface-variant/30">pets</span>
+                                <p className="mt-4 text-on-surface-variant font-bold">Vous n'avez pas encore ajouté d'animaux</p>
+                                <button
+                                
+                                className="mt-4 px-6 py-3 bg-primary text-white font-bold border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all"
+                                >
+                                Ajouter mon premier animal
+                                </button>
+                            </div>
+                            )}
+                            
+                            {!utilisateurLoading && !error && utilisateur?.wishlist?.ligneWishlist?.length > 0 && (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {utilisateur?.wishlist?.ligneWishlist?.map((ligne) => (
+                                <div key={ligne.Id} className="bg-white border-2 border-black rounded-xl overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                                    {/* Image - à adapter selon ta structure AnimalCard */}
+                                    <div className="relative h-40 bg-secondary-fixed">
+                                    
+                                    <div className="absolute top-2 right-2 flex gap-2">
+                                        <button
+                                        
+                                        className="p-2 bg-white border-2 border-black rounded-lg hover:bg-primary-fixed transition-colors"
+                                        >
+                                        <span className="material-symbols-outlined text-sm">edit</span>
+                                        </button>
+                                        <button
+                                        
+                                        className="p-2 bg-white border-2 border-black rounded-lg hover:bg-error-container transition-colors"
+                                        >
+                                        <span className="material-symbols-outlined text-sm">delete</span>
+                                        </button>
+                                    </div>
+                                    </div>
+                                    <div className="p-4">
+                                    <h3 className="font-['Chewy'] text-xl text-primary">{ligne?.IdAnimal}</h3>
+                                    
+                                    {ligne?.IdProduit && (
+                                        <p className="text-sm mt-2 line-clamp-2">{ligne?.Produit}</p>
+                                    )}
+                                    </div>
+                                </div>
+                                ))}
+                            </div>
+                            )}
+                        </div>
+                        </div>
+                    
+
+                
+                    </FadeIn>
+                )}
+
+                {activeSection === "annonces" && (
+                  <FadeIn>
+                    <div className="bg-surface-container-lowest border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] rounded-xl overflow-hidden">
+
+                      <div className="bg-surface-container border-b-4 border-black px-6 py-4 flex justify-between items-center">
+                        <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-primary flex items-center gap-2">
+                          <span className="material-symbols-outlined">campaign</span>
+                          Mes annonces
+                        </h2>
+
+                        <button
+                          onClick={() => setIsAnnonceModalOpen(true)}
+                          className="px-4 py-2 bg-primary text-white font-bold border-2 border-black rounded-lg"
+                        >
+                          + Nouvelle annonce
+                        </button>
+                      </div>
+
+                      <div className="p-6">
+
+                        {AnnoncesLoading && (
+                          <div className="flex justify-center py-10">
+                            <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+                          </div>
+                        )}
+
+                        {!AnnoncesLoading && mesAnnonces.length === 0 && (
+                          <div className="text-center py-12 max-w-lg mx-auto">
+                            <span className="material-symbols-outlined text-6xl opacity-30">
+                              campaign
+                            </span>
+
+                            <h3 className="mt-4 font-extrabold text-lg text-primary">
+                              Aucune annonce publiée
+                            </h3>
+
+                            <p className="mt-3 text-sm text-on-surface-variant leading-relaxed">
+                              Les annonces vous permettent de publier vos besoins concernant vos animaux
+                              afin d'être contacté par des prestataires qualifiés.
+                            </p>
+
+                            <div className="mt-4 text-xs text-on-surface-variant bg-surface-container border-2 border-black rounded-xl p-4 text-left">
+                              <p className="font-bold mb-2">Exemples d'annonces :</p>
+
+                              <ul className="space-y-1">
+                                <li>🐾 Je cherche un promeneur pour mon chien pendant une semaine.</li>
+                                <li>🏠 Je recherche une garde à domicile pour mon chat durant mes vacances.</li>
+                                <li>🛁 Je souhaite trouver un toiletteur près de chez moi.</li>
+                                <li>🎓 Je cherche un éducateur canin pour mon chiot.</li>
+                              </ul>
+                            </div>
+
+                            <button
+                              onClick={() => setIsAnnonceModalOpen(true)}
+                              className="mt-6 px-6 py-3 bg-primary text-white font-bold border-2 border-black rounded-lg shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all"
+                            >
+                              Créer ma première annonce
+                            </button>
+                          </div>
+                        )}
+
+                        {!AnnoncesLoading && mesAnnonces.length > 0 && (
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                            {mesAnnonces.map((annonce) => (
+                              <div
+                                key={annonce.Id}
+                                className="bg-white border-2 border-black rounded-xl overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+                              >
+
+                                
+                                <div className="p-4 border-b-2 border-black bg-surface-container">
+                                  <div className="flex justify-between items-center gap-3">
+                                    <div className="flex items-center gap-2">
+                                      <span className="font-extrabold text-primary">
+                                        #{annonce.Id}
+                                      </span>
+
+                                      <span className="px-2 py-1 text-xs border border-black rounded-full bg-primary-fixed font-bold">
+                                        {annonce.TypeAnnonce}
+                                      </span>
+                                    </div>
+
+                                    <button
+                                      onClick={() => {
+                                        setSelectedAnnonce(annonce)
+                                        setIsCandidaturesModalOpen(true)
+                                      }}
+                                      className="inline-flex items-center gap-1 px-3 py-1.5 bg-secondary text-white border-2 border-black rounded-lg font-bold text-xs shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all"
+                                    >
+                                      <span className="material-symbols-outlined text-sm">
+                                        group
+                                      </span>
+                                      Candidatures
+                                    </button>
+                                  </div>
+                                </div>
+                                
+
+                                <div className="p-4 space-y-2">
+
+                                    <p className="font-bold">
+                                      Service : {annonce.typeService?.Type || annonce.TypeService}
+                                    </p>
+                                    
+
+                                  <p className="text-sm text-on-surface-variant">
+                                    {annonce.Notes || "Aucune description"}
+                                  </p>
+
+                                  <p className="text-sm">
+                                    📅 {new Date(annonce.DateDebut).toLocaleDateString("fr-FR")} to {new Date(annonce.DateFin).toLocaleDateString("fr-FR")}
+                                  </p>
+
+                                  <p className="text-sm">
+                                    💰 {Number(annonce.PrixSouhaite || 0).toLocaleString("fr-FR")} DZD
+                                  </p>
+
+                                </div>
+
+                                <div className="p-4 border-t-2 border-black flex gap-2">
+
+                                  <button
+                                    className="flex-1 py-2 bg-primary text-white border-2 border-black rounded-lg font-bold"
+                                  >
+                                    Modifier
+                                  </button>
+
+                                  <button
+                                    className="flex-1 py-2 bg-error text-white border-2 border-black rounded-lg font-bold"
+                                  >
+                                    Supprimer
+                                  </button>
+
+                                </div>
+
+                              </div>
+                            ))}
+
+                          </div>
+                        )}
+
+                      </div>
+
+                    </div>
+                  </FadeIn>
+                )}
             </main>
           </div>
         </div>
@@ -752,6 +1064,241 @@ const UserProfile = () => {
           </div>
         </div>
       )}
+
+      {selectedCommande && (
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div className="bg-surface-container-lowest border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-xl max-w-3xl w-full max-h-[90vh] overflow-hidden">
+          
+          <div className="bg-surface-container border-b-4 border-black px-6 py-4 flex justify-between items-center">
+            <h3 className="font-['Chewy'] text-2xl text-primary">
+              Commande #{String(selectedCommande.Id).padStart(6, "0")}
+            </h3>
+
+            <button
+              onClick={() => setSelectedCommande(null)}
+              className="p-2 hover:bg-black/10 rounded-lg"
+            >
+              <span className="material-symbols-outlined">close</span>
+            </button>
+          </div>
+
+          <div className="p-6 overflow-y-auto max-h-[calc(90vh-80px)] space-y-6">
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="border-2 border-black rounded-xl p-4 bg-white">
+                <p className="text-xs font-bold text-on-surface-variant uppercase">ID commande</p>
+                <p className="font-extrabold">{selectedCommande.Id}</p>
+              </div>
+
+              <div className="border-2 border-black rounded-xl p-4 bg-white">
+                <p className="text-xs font-bold text-on-surface-variant uppercase">Utilisateur</p>
+                <p className="font-extrabold">#{selectedCommande.IdUtilisateur}</p>
+              </div>
+
+              <div className="border-2 border-black rounded-xl p-4 bg-white">
+                <p className="text-xs font-bold text-on-surface-variant uppercase">Statut</p>
+                <div className="mt-2">
+                  <StatutBadge statut={selectedCommande.statut?.Statut ?? selectedCommande.Statut} />
+                </div>
+              </div>
+
+              <div className="border-2 border-black rounded-xl p-4 bg-white">
+                <p className="text-xs font-bold text-on-surface-variant uppercase">Total général</p>
+                <p className="font-extrabold text-primary">
+                  {Number(selectedCommande.totalGeneral ?? 0).toLocaleString("fr-DZ")} DZD
+                </p>
+              </div>
+            </div>
+
+            <div>
+              <h4 className="font-extrabold text-primary mb-3 flex items-center gap-2">
+                <span className="material-symbols-outlined">inventory_2</span>
+                Sous-commandes
+              </h4>
+
+              {selectedCommande.sousCommandes?.length === 0 ? (
+                <div className="border-2 border-black rounded-xl p-5 text-center text-on-surface-variant font-bold">
+                  Aucune sous-commande trouvée pour cette commande.
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {selectedCommande.sousCommandes.map((sc) => (
+                    <div
+                      key={sc.Id}
+                      className="border-2 border-black rounded-xl p-4 bg-white shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]"
+                    >
+                      <div className="flex justify-between gap-4">
+                        <div>
+                          <p className="font-extrabold">Sous-commande #{sc.Id}</p>
+                          <p className="text-xs text-on-surface-variant font-bold">
+                            Refuge #{sc.IdRefuge}
+                          </p>
+                        </div>
+
+                        <div className="text-right">
+                          <p className="font-extrabold text-primary">
+                            {Number(sc.Total_prix ?? 0).toLocaleString("fr-DZ")} DZD
+                          </p>
+                          <StatutBadge statut={sc.statut?.Statut ?? sc.Statut} />
+                        </div>
+                      </div>
+
+                      {sc.stripe_transfer_id && (
+                        <p className="text-xs mt-2 text-on-surface-variant">
+                          Transfer Stripe : {sc.stripe_transfer_id}
+                        </p>
+                      )}
+
+                      {sc.platformFee != null && (
+                        <p className="text-xs text-on-surface-variant">
+                          Frais plateforme : {Number(sc.platformFee).toLocaleString("fr-DZ")} DZD
+                        </p>
+                      )}
+
+                      <div className="mt-4 border-t-2 border-outline-variant pt-3">
+                        <p className="text-xs font-extrabold uppercase text-on-surface-variant mb-2">
+                          Produits commandés
+                        </p>
+
+                        {sc.lignesCommande?.length === 0 ? (
+                          <p className="text-xs text-on-surface-variant italic">
+                            Aucun produit trouvé pour cette sous-commande.
+                          </p>
+                        ) : (
+                          <div className="space-y-2">
+                            {(() => {
+                              const lignes = Array.isArray(sc?.lignesCommande)
+                                ? sc.lignesCommande
+                                : sc?.lignesCommande
+                                  ? [sc.lignesCommande]
+                                  : []
+
+                              return lignes.length === 0 ? (
+                                <p className="text-xs text-on-surface-variant italic">
+                                  Aucun produit trouvé pour cette sous-commande.
+                                </p>
+                              ) : (
+                                <div className="space-y-2">
+                                  {lignes.map((ligne) => (
+                                    <div
+                                      key={ligne.Id}
+                                      className="flex items-center justify-between gap-3 bg-surface-container rounded-lg border border-black px-3 py-2"
+                                    >
+                                      <div>
+                                        <p className="text-sm font-extrabold">
+                                          Produit #{ligne.IdProduit ?? "—"}
+                                        </p>
+                                        <p className="text-xs text-on-surface-variant">
+                                          Ligne #{ligne.Id}
+                                        </p>
+                                      </div>
+
+                                      <span className="px-2 py-1 rounded-full border border-black text-xs font-extrabold bg-white">
+                                        x{ligne.Quantite ?? 1}
+                                      </span>
+                                    </div>
+                                  ))}
+                                </div>
+                              )
+                            })()}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+          </div>
+        </div>
+      </div>
+    )}
+
+    <Modal
+      isOpen={isCandidaturesModalOpen}
+      onClose={() => {
+        setIsCandidaturesModalOpen(false)
+        setSelectedAnnonce(null)
+      }}
+      title={`Candidatures annonce #${selectedAnnonce?.Id ?? ""}`}
+      size="lg"
+    >
+      <div className="space-y-4">
+        {candidaturesAnnonce.length === 0 ? (
+          <div className="text-center py-10 text-on-surface-variant">
+            <span className="material-symbols-outlined text-5xl opacity-30">
+              group_off
+            </span>
+            <p className="mt-3 font-bold">
+              Aucune candidature pour cette annonce.
+            </p>
+          </div>
+        ) : (
+          candidaturesAnnonce.map((reservation) => (
+            <div
+              key={reservation.Id}
+              className="border-2 border-black rounded-xl p-4 bg-white shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]"
+            >
+              <div className="flex justify-between gap-4">
+                <div>
+                  <p className="font-extrabold text-primary">
+                    Candidature #{reservation.Id}
+                  </p>
+
+                  <p className="text-sm text-on-surface-variant">
+                    Prestataire #{reservation.IdProfil}
+                  </p>
+
+                  <p className="text-sm text-on-surface-variant">
+                    Du {new Date(reservation.DateDebut).toLocaleDateString("fr-FR")} au{" "}
+                    {new Date(reservation.DateFin).toLocaleDateString("fr-FR")}
+                  </p>
+
+                  {reservation.Notes && (
+                    <p className="text-sm italic mt-2">
+                      "{reservation.Notes}"
+                    </p>
+                  )}
+                </div>
+
+                <div className="text-right">
+                  <p className="font-extrabold text-primary">
+                    {Number(reservation.PrixFinal || 0).toLocaleString("fr-FR")} DZD
+                  </p>
+
+                  <StatutBadge statut={reservation.statut?.Statut || reservation.Statut} />
+                </div>
+              </div>
+
+              <div className="mt-4 flex justify-end gap-2 border-t-2 border-outline-variant pt-4">
+                <button
+                  onClick={() => handleUpdateReservationStatus(reservation.IdAnnonce, reservation.IdProfil, reservation.Id, 4)}
+                  className="px-4 py-2 bg-primary text-white border-2 border-black rounded-lg font-bold"
+                >
+                  Valider
+                </button>
+
+                <button
+                  onClick={() => handleUpdateReservationStatus(reservation.IdAnnonce, reservation.IdProfil, reservation.Id, 5)}
+                  className="px-4 py-2 bg-error text-white border-2 border-black rounded-lg font-bold"
+                >
+                  Refuser
+                </button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </Modal>
+
+    <AnnonceFormModal
+        isOpen={isAnnonceModalOpen}
+        onClose={() => setIsAnnonceModalOpen(false)}
+        mode="utilisateur"
+        animals = {utilisateur?.Animals || []}
+        IdUtilisateur={utilisateur?.Id}
+      />
     </PageTransition>
   )
 }

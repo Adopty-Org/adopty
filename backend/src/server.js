@@ -187,6 +187,9 @@ if (app._router && app._router.stack) {
 
 console.log("\n===================================\n");
 
+console.log("Date locale :", new Date());
+console.log("ISO :", new Date().toISOString());
+console.log("Timezone :", Intl.DateTimeFormat().resolvedOptions().timeZone);
 
 server.listen(ENV.PORT, () => {
     console.log(ENV.NODE_ENV + ENV.PORT + " Le serveur roule ma boule !");

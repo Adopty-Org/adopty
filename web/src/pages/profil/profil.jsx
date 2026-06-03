@@ -3,23 +3,27 @@ import { Link, useParams } from 'react-router'
 import { PageTransition, FadeIn } from '../../components/Animations'
 import Modal from '../../components/ui/Modal'
 import AdoptionForm from '../../components/forms/AdoptionForm'
-import { animalApi, especeApi, raceApi } from '../../lib/api'
-import { useQuery } from '@tanstack/react-query'
+import { animalApi, especeApi, ligneWishlistApi, raceApi, wishlistApi } from '../../lib/api'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useAnimals,useAnimal } from '../../hooks/useAnimal'
 import Carousel from '../../components/ui/Carousel'
 import { useRefuge } from '../../hooks/useRefuge'
-import { useUtilisateurs } from '../../hooks/useUtilisateur'
+import { useUtilisateur, useUtilisateurs, useUtilisateursNues } from '../../hooks/useUtilisateur'
+import { useUser } from '@clerk/clerk-react'
 //import { animaux } from '../data/mockData'
 
 const Profil = () => {
   const { id } = useParams()
   console.log("L'id :   ", id)
   const [adoptionOpen, setAdoptionOpen] = useState(false)
-  const [favoris, setFavoris] = useState(false)
-  const {utilisateurMap, isLoading: utilisateurLoading} = useUtilisateurs()
+  //const [favoris, setFavoris] = useState(false)
+  //const {utilisateurMap, isLoading: utilisateursLoading} = useUtilisateurs()
+  const {utilisateurMap, isLoading: utilisateursLoading} = useUtilisateursNues()
+  const { user } = useUser()
+  const {utilisateur, isLoading: utilisateurLoading, refetch} = useUtilisateur(user?.id)
 
   const {animal, isLoading: AnimalLoading, isError, error}= useAnimal(id)
-  const {refuge, isLoading: RefugeLoading} = useRefuge(animal?.possessions[0]?.IdRefuge, utilisateurMap)
+  const {refuge, RefugesLoading} = useRefuge(animal?.possessions[0]?.IdRefuge, utilisateurMap)
 
   const [showCarousel, setShowCarousel] = useState(false);
   const [carouselStartIndex, setCarouselStartIndex] = useState(0);
@@ -28,6 +32,14 @@ const Profil = () => {
     setCarouselStartIndex(startIndex);
     setShowCarousel(true);
   };
+
+  const queryClient = useQueryClient()
+
+  const isFavorite = utilisateur?.wishlist?.ligneWishlist?.some(
+    l => l.IdAnimal === animal?.Id
+  )
+
+  const favoris = isFavorite
   
   const { data: photos = [] } = useQuery({
     queryKey: ["photos", id],
@@ -37,7 +49,8 @@ const Profil = () => {
 
   console.log("L'animal :   ", animal)
   console.log("Le refuge :   ", refuge)
-  if (AnimalLoading || !animal || RefugeLoading || utilisateurLoading) {
+  if (AnimalLoading || !animal || RefugesLoading || utilisateurLoading || utilisateursLoading) {
+    console.log("Loading... ", {AnimalLoading, RefugesLoading, utilisateurLoading, utilisateursLoading})
     return <PageTransition><div className="p-12 text-center">Chargement…</div></PageTransition>
   }
 
@@ -86,6 +99,42 @@ const Profil = () => {
         </div>
       </div>
     )
+  }
+
+  const handleWishlist = async () => {
+    console.log("Wishlist avant : ", utilisateur?.wishlist, animal?.Id)
+    if(!utilisateur?.wishlist?.Id ){
+      await wishlistApi.create({ IdUtilisateur: utilisateur.Id })
+      refetch() // Recharger les données de l'utilisateur pour obtenir la wishlist créée
+    }
+    if (!utilisateur?.wishlist?.Id || !animal?.Id) return
+
+    if (favoris) {
+      // supprimer de la wishlist
+      await ligneWishlistApi.delete(utilisateur.wishlist.ligneWishlist.find(l => l.IdAnimal === animal.Id)?.Id)
+      console.log("Retirer de la wishlist")
+      queryClient.invalidateQueries({
+        queryKey: ["wishlists"]
+      })
+      await queryClient.invalidateQueries({ queryKey: ["ligneWishlist", utilisateur.wishlist.Id] })
+    } else {
+      // ajouter à la wishlist
+      await ligneWishlistApi.create({
+        IdWishlist: utilisateur.wishlist.Id,
+        IdAnimal: animal.Id,
+        IdProduit: null,
+        Quantite: 1
+      })
+
+      queryClient.invalidateQueries({
+        queryKey: ["wishlists"]
+      })
+      await queryClient.invalidateQueries({ queryKey: ["ligneWishlist", utilisateur.wishlist.Id] })
+      console.log("Ajouter à la wishlist", {
+        IdWishlist: utilisateur.wishlist.Id,
+        IdAnimal: animal.Id
+      })
+    }
   }
 
   return (
@@ -251,7 +300,7 @@ const Profil = () => {
                   </p>
                 </div>
                 <button
-                  onClick={() => setFavoris(v => !v)}
+                  onClick={() => /*setFavoris(v => !v)*/handleWishlist()}
                   className="w-12 h-12 bg-white rounded-full border-2 border-black hover:bg-red-50 transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center"
                 >
                   <span className="material-symbols-outlined text-red-500 text-2xl" style={{ fontVariationSettings: favoris ? "'FILL' 1" : "'FILL' 0" }}>favorite</span>
@@ -293,9 +342,9 @@ const Profil = () => {
 
             {/* Traits */}
             <FadeIn delay={0.2} className="flex flex-wrap gap-2">
-              {animal?.Caractere?.map(c => (
-                <span key={c} className="bg-secondary-fixed text-on-secondary-container px-4 py-2 rounded-full border-2 border-black flex items-center gap-1.5 font-bold text-sm shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-                  <span className="material-symbols-outlined text-sm">pets</span> {c}
+              {animal?.Caracteres?.map(c => (
+                <span key={c?.Id} className="bg-secondary-fixed text-on-secondary-container px-4 py-2 rounded-full border-2 border-black flex items-center gap-1.5 font-bold text-sm shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                  <span className="material-symbols-outlined text-sm">pets</span> {c?.Nom}
                 </span>
               ))}
             </FadeIn>

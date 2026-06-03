@@ -7,6 +7,7 @@ const router = Router()
 // Routes spéciales de lecture protégées
 router.get("/produit/:Produit", protectRoute, ligne_wishlist.getProduitOfLigneWishlistControlleur);
 router.get("/wishlist/:Wishlist", protectRoute, ligne_wishlist.getWishlistOfLigneWishlistControlleur);
+router.get("/wishlists/:Wishlist", protectRoute, ligne_wishlist.getLigneWishlistByWishlistControlleur);
 
 // Routes protégées - création, modification, suppression (utilisateurs authentifiés)
 router.post("/", protectRoute, ligne_wishlist.createLigneWishlistControlleur);

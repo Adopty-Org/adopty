@@ -8,9 +8,22 @@ import { NewLoadingLayout } from '../../components/Loadingpage'
 import { useUtilisateur, useUtilisateurs } from '../../hooks/useUtilisateur'
 import { useUser } from '@clerk/clerk-react'
 import DemandeDetailModal from '../../components/ui/DemandeDetailModal'
-import { animalApi, demandeAdoptionApi, demandeTransfertApi, produitApi, refugeApi, sousCommandeApi, utilisateurApi } from '../../lib/api'
+import { animalApi, demandeAdoptionApi, demandeTransfertApi, produitApi, refugeApi, sousCommandeApi, utilisateurApi, stripeApi } from '../../lib/api'
 import TransfertModal from '../../components/ui/TransfertModal'
 import UpdateStatusModal from '../../components/ui/UpdateStatusModal'
+
+const StatutBadge = ({ statut }) => {
+  const s = String(statut ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+  let cls = 'bg-surface-container text-on-surface'
+  if (s.includes('accept') || s.includes('valide') || s.includes('livre')) cls = 'bg-primary-fixed text-on-primary-fixed-variant'
+  if (s.includes('attente') || s.includes('cours')) cls = 'bg-secondary-fixed text-on-secondary-fixed'
+  if (s.includes('refuse') || s.includes('annul')) cls = 'bg-error-container text-on-error-container'
+  return (
+    <span className={`px-2.5 py-0.5 rounded-full text-xs font-extrabold border border-black ${cls}`}>
+      {statut || 'En attente'}
+    </span>
+  )
+}
 
 const RefugeDashboard = () => {
   //const { backendUserId } = useRoleAccess()
@@ -22,6 +35,7 @@ const RefugeDashboard = () => {
   const [myAdoptions, setMyAdoptions] = useState([])
   const [myTransferts, setMyTransferts] = useState([])
   const [myOrders, setMyOrders] = useState([])
+  const [selectedCommande, setSelectedCommande] = useState(null)
   
   // États pour le CRUD Animaux
   const [isAnimalModalOpen, setIsAnimalModalOpen] = useState(false)
@@ -50,6 +64,8 @@ const RefugeDashboard = () => {
 
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false)
   const [selectedOrder, setSelectedOrder] = useState(null)
+  const [isAdminAprooved, setIsAdminAprooved] = useState(false)
+  const [isStripeAprooved, setIsStripeAprooved] = useState(false)
   
   console.log("Refuges dans le dashboard :", refuge)
 
@@ -70,6 +86,8 @@ const RefugeDashboard = () => {
       if(!RefugesLoading && !UtilisateurLoading){
         console.log("le refuge avant d'assiger le truc")
         setMyRefuges(refuge)
+        setIsAdminAprooved(refuge?.Statut === 4) // Exemple: statut 3 = approuvé
+        setIsStripeAprooved(refuge?.stripeAccountStatus === 'verified')
       }
 
       if(!refugesLoading){
@@ -355,6 +373,32 @@ const handleRefuseTransfert = async (demandeId, commentaire) => {
     handleModalClose()
   }
 
+  const handleStripeOnboarding = async () => {
+    try {
+      let data
+
+      const accountId = refuge?.StripeAccountId || refuge?.stripeAccountId
+
+      if (!accountId) {
+        data = await stripeApi.createRefugeAccount(refuge?.Id, {
+          email: utilisateur?.AddresseEmail,
+          name: refuge?.Nom
+        })
+
+        window.open(data.onboardingUrl, "_blank", "noopener,noreferrer")
+        return
+      }
+
+      data = await stripeApi.getRefugeLink(refuge?.Id)
+
+      window.open(data.onboardingUrl, "_blank", "noopener,noreferrer")
+    } catch (error) {
+      console.error("Erreur Stripe onboarding :", error)
+      console.log("Réponse backend :", error.response?.data)
+      alert(error.response?.data?.message || error.response?.data?.error || "Erreur Stripe")
+    }
+  }
+
 
   return (
     <PageTransition>
@@ -416,6 +460,15 @@ const handleRefuseTransfert = async (demandeId, commentaire) => {
                   <p className="text-sm text-on-surface-variant">{myRefuges?.AddresseGPS}, {myRefuges?.ville}</p>
                   <p className="text-sm font-bold mt-2">{myRefuges?.Telephone}</p>
                   <p className="text-xs text-on-surface-variant mt-1">{myRefuges?.Addresse}</p>
+                  {isAdminAprooved && !isStripeAprooved && (
+                    <button
+                      onClick={handleStripeOnboarding}
+                      className="mt-4 flex items-center gap-2 px-4 py-2 bg-primary text-white border-2 border-black font-bold text-sm shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all"
+                    >
+                      <span className="material-symbols-outlined text-base">payments</span>
+                      Finaliser Stripe
+                    </button>
+                  )}
                 </div>
             )}
           </div>
@@ -572,7 +625,9 @@ const handleRefuseTransfert = async (demandeId, commentaire) => {
                 <tr><td colSpan={5} className="px-5 py-10 text-center text-on-surface-variant font-bold text-sm">Aucune commande pour le moment.</td></tr>
               ) : (
                 myOrders?.map((order) => (
-                  <tr key={order.Id} className="hover:bg-surface-container transition-colors" onClick={() => openStatusModal(order)}>
+
+                  <tr key={order.Id} className="hover:bg-surface-container transition-colors" onClick={() => setSelectedCommande(order)}>
+                    
                     <td className="px-5 py-4 font-mono text-xs">#{order.Id}</td>
                     <td className="px-5 py-4">
                       <div className="space-y-1">
@@ -610,11 +665,13 @@ const handleRefuseTransfert = async (demandeId, commentaire) => {
               <span className="material-symbols-outlined">pets</span>
               Animaux ({myAnimals.length})
             </h2>
-            <button onClick={openAddAnimal}
-              className="flex items-center gap-2 px-4 py-2 bg-primary text-white border-2 border-black font-bold text-sm shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all">
-              <span className="material-symbols-outlined text-base">add</span>
-              Ajouter
-            </button>
+            {isAdminAprooved && (
+              <button onClick={openAddAnimal}
+                className="flex items-center gap-2 px-4 py-2 bg-primary text-white border-2 border-black font-bold text-sm shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all">
+                <span className="material-symbols-outlined text-base">add</span>
+                Ajouter
+              </button>
+            )}
           </div>
           <table className="w-full text-sm">
             <thead className="bg-surface-container border-b-2 border-black">
@@ -625,7 +682,15 @@ const handleRefuseTransfert = async (demandeId, commentaire) => {
               </tr>
             </thead>
             <tbody className="divide-y divide-outline-variant">
-              {myAnimals.length === 0 ? (
+              {!isAdminAprooved ? (
+                <tr>
+                  <td colSpan={5} className="px-5 py-10 text-center text-on-surface-variant">
+                    <span className="material-symbols-outlined text-4xl mb-2 block opacity-30">pets</span>
+                    <p className="font-bold text-sm">Votre refuge n'est pas encore apprové par l'administration.</p>
+                    
+                  </td>
+                </tr>
+              ) : (myAnimals.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="px-5 py-10 text-center text-on-surface-variant">
                     <span className="material-symbols-outlined text-4xl mb-2 block opacity-30">pets</span>
@@ -665,7 +730,7 @@ const handleRefuseTransfert = async (demandeId, commentaire) => {
                     </td>
                   </tr>
                 ))
-              )}
+              ))}
             </tbody>
           </table>
         </FadeIn>
@@ -677,11 +742,13 @@ const handleRefuseTransfert = async (demandeId, commentaire) => {
               <span className="material-symbols-outlined">inventory_2</span>
               Produits en stock ({myProducts.length})
             </h2>
-            <button onClick={openAddProduit}
-              className="flex items-center gap-2 px-4 py-2 bg-primary text-white border-2 border-black font-bold text-sm shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all">
-              <span className="material-symbols-outlined text-base">add</span>
-              Ajouter
-            </button>
+            {isAdminAprooved && isStripeAprooved && (
+              <button onClick={openAddProduit}
+                className="flex items-center gap-2 px-4 py-2 bg-primary text-white border-2 border-black font-bold text-sm shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all">
+                <span className="material-symbols-outlined text-base">add</span>
+                Ajouter
+              </button>
+            )}
           </div>
           <table className="w-full text-sm">
             <thead className="bg-surface-container border-b-2 border-black">
@@ -692,17 +759,60 @@ const handleRefuseTransfert = async (demandeId, commentaire) => {
               </tr>
             </thead>
             <tbody className="divide-y divide-outline-variant">
-              {myProducts.length === 0 ? (
+              {!isAdminAprooved && !isStripeAprooved ? (
                 <tr>
                   <td colSpan={5} className="px-5 py-10 text-center text-on-surface-variant">
-                    <span className="material-symbols-outlined text-4xl mb-2 block opacity-30">inventory_2</span>
-                    <p className="font-bold text-sm">Aucun produit enregistré.</p>
-                    <button onClick={openAddProduit} className="mt-3 px-4 py-2 bg-primary text-white border-2 border-black font-bold text-sm">
-                      + Ajouter le premier produit
-                    </button>
+                    <span className="material-symbols-outlined text-4xl mb-2 block opacity-30">
+                      pending_actions
+                    </span>
+                    <p className="font-bold text-sm">
+                      Votre refuge est en attente de validation par l'administration et Stripe.
+                    </p>
                   </td>
                 </tr>
-              ) : (
+                ) : !isAdminAprooved ? (
+                  <tr>
+                    <td colSpan={5} className="px-5 py-10 text-center text-on-surface-variant">
+                      <span className="material-symbols-outlined text-4xl mb-2 block opacity-30">
+                        admin_panel_settings
+                      </span>
+                      <p className="font-bold text-sm">
+                        Votre refuge est en attente de validation par l'administration.
+                      </p>
+                    </td>
+                  </tr>
+                ) : !isStripeAprooved ? (
+                  <tr>
+                    <td colSpan={5} className="px-5 py-10 text-center text-on-surface-variant">
+                      <span className="material-symbols-outlined text-4xl mb-2 block opacity-30">
+                        account_balance
+                      </span>
+                      <p className="font-bold text-sm">
+                        Votre compte Stripe n'est pas encore vérifié.
+                      </p>
+                      <p className="text-xs mt-2">
+                        Vous pourrez vendre des produits dès que Stripe aura validé votre compte.
+                      </p>
+                    </td>
+                  </tr>
+                ) : myProducts.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="px-5 py-10 text-center text-on-surface-variant">
+                      <span className="material-symbols-outlined text-4xl mb-2 block opacity-30">
+                        inventory_2
+                      </span>
+                      <p className="font-bold text-sm">
+                        Aucun produit enregistré.
+                      </p>
+                      <button
+                        onClick={openAddProduit}
+                        className="mt-3 px-4 py-2 bg-primary text-white border-2 border-black font-bold text-sm"
+                      >
+                        + Ajouter le premier produit
+                      </button>
+                    </td>
+                  </tr>
+                ) : (
                 myProducts.map((product) => {
                   const stock = Number(product?.Stock ?? product?.Stock ?? 0)
                   return (
@@ -738,14 +848,14 @@ const handleRefuseTransfert = async (demandeId, commentaire) => {
         {/* Modal Animaux */}
         <Modal isOpen={isAnimalModalOpen} onClose={() => setIsAnimalModalOpen(false)}
           title={editingAnimal ? `Modifier ${editingAnimal.nom}` : 'Ajouter un animal'} size="lg">
-          <AnimalForm initialData={editingAnimal} refugeId={myRefuges[0]?.id}
+          <AnimalForm initialData={editingAnimal} refugeId={myRefuges?.Id}
             onClose={() => setIsAnimalModalOpen(false)} onSuccess={ (id,isEdit) => { loadDashboardData(), handleAnimalSuccess(id, isEdit)}} />
         </Modal>
 
         {/* Modal Produits */}
         <Modal isOpen={isProductModalOpen} onClose={() => setIsProductModalOpen(false)}
           title={editingProduct ? `Modifier ${editingProduct.nom}` : 'Ajouter un produit'} size="lg">
-          <ProductForm initialData={editingProduct} refugeId={myRefuges[0]?.id}
+          <ProductForm initialData={editingProduct} refugeId={myRefuges?.Id}
             onClose={() => setIsProductModalOpen(false)} onSuccess={loadDashboardData} />
         </Modal>
       </div>
@@ -787,6 +897,168 @@ const handleRefuseTransfert = async (demandeId, commentaire) => {
         order={selectedOrder}
         onUpdate={handleUpdateOrderStatus}
       />
+
+      {selectedCommande && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-surface-container-lowest border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-xl max-w-3xl w-full max-h-[90vh] overflow-hidden">
+
+            <div className="bg-surface-container border-b-4 border-black px-6 py-4 flex justify-between items-center">
+              <h3 className="font-['Chewy'] text-2xl text-primary">
+                Sous-commande #{selectedCommande.Id}
+              </h3>
+
+              <button
+                onClick={() => setSelectedCommande(null)}
+                className="p-2 hover:bg-black/10 rounded-lg"
+              >
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+
+            <div className="p-6 overflow-y-auto max-h-[calc(90vh-80px)] space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="border-2 border-black rounded-xl p-4 bg-white">
+                  <p className="text-xs font-bold text-on-surface-variant uppercase">ID sous-commande</p>
+                  <p className="font-extrabold">#{selectedCommande.Id}</p>
+                </div>
+
+                <div className="border-2 border-black rounded-xl p-4 bg-white">
+                  <p className="text-xs font-bold text-on-surface-variant uppercase">ID refuge</p>
+                  <p className="font-extrabold">#{selectedCommande.IdRefuge}</p>
+                </div>
+
+                <div className="border-2 border-black rounded-xl p-4 bg-white">
+                  <p className="text-xs font-bold text-on-surface-variant uppercase">Statut</p>
+                  <div className="mt-2">
+                    <StatutBadge statut={selectedCommande.statut?.Statut ?? selectedCommande.Statut} />
+                  </div>
+                </div>
+
+                <div className="border-2 border-black rounded-xl p-4 bg-white">
+                  <p className="text-xs font-bold text-on-surface-variant uppercase">Total</p>
+                  <p className="font-extrabold text-primary">
+                    {Number(selectedCommande.Total_prix ?? 0).toLocaleString("fr-DZ")} DZD
+                  </p>
+                </div>
+              </div>
+
+              {selectedCommande.platformFee != null && (
+                <div className="border-2 border-black rounded-xl p-4 bg-white">
+                  <p className="text-xs font-bold text-on-surface-variant uppercase">Frais plateforme</p>
+                  <p className="font-extrabold">
+                    {Number(selectedCommande.platformFee).toLocaleString("fr-DZ")} DZD
+                  </p>
+                </div>
+              )}
+
+              {selectedCommande.stripe_transfer_id && (
+                <div className="border-2 border-black rounded-xl p-4 bg-white">
+                  <p className="text-xs font-bold text-on-surface-variant uppercase">Transfer Stripe</p>
+                  <p className="font-mono text-xs break-all">
+                    {selectedCommande.stripe_transfer_id}
+                  </p>
+                </div>
+              )}
+
+              <div>
+                <h4 className="font-extrabold text-primary mb-3 flex items-center gap-2">
+                  <span className="material-symbols-outlined">inventory_2</span>
+                  Produits commandés
+                </h4>
+
+                {(() => {
+                  const lignes = Array.isArray(selectedCommande.lignesCommande)
+                    ? selectedCommande.lignesCommande
+                    : selectedCommande.lignesCommande
+                      ? [selectedCommande.lignesCommande]
+                      : []
+
+                  return !lignes.length ? (
+                    <div className="border-2 border-black rounded-xl p-5 text-center text-on-surface-variant font-bold">
+                      Aucun produit trouvé pour cette sous-commande.
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {lignes.map((ligne) => (
+                        <div
+                          key={ligne.Id}
+                          className="flex items-center justify-between gap-3 bg-surface-container rounded-lg border-2 border-black px-4 py-3"
+                        >
+                          <div>
+                            <p className="text-sm font-extrabold">
+                              Produit #{ligne.IdProduit ?? "—"}
+                            </p>
+
+                            <p className="text-xs text-on-surface-variant">
+                              Ligne #{ligne.Id}
+                            </p>
+
+                            {ligne.produit?.Nom && (
+                              <p className="text-xs font-bold text-primary mt-1">
+                                {ligne.produit.Nom}
+                              </p>
+                            )}
+                          </div>
+
+                          <div className="text-right">
+                            <span className="inline-block px-2 py-1 rounded-full border border-black text-xs font-extrabold bg-white">
+                              x{ligne.Quantite ?? 1}
+                            </span>
+
+                            {ligne.Prix_unitaire != null && (
+                              <p className="text-xs font-bold mt-2">
+                                {Number(ligne.Prix_unitaire).toLocaleString("fr-DZ")} DZD
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )
+                })()}
+              </div>
+
+            </div>
+            <div className="border-t-4 border-black p-4 bg-surface-container flex items-center justify-between">
+              <div>
+                <p className="text-xs font-bold uppercase text-on-surface-variant">
+                  Statut actuel
+                </p>
+
+                <div className="mt-1">
+                  <StatutBadge
+                    statut={selectedCommande.statut?.Statut ?? selectedCommande.Statut}
+                  />
+                </div>
+              </div>
+
+              <button
+                onClick={() => {openStatusModal(selectedCommande);setSelectedCommande(false)} }
+                className="
+                  flex items-center gap-2
+                  px-6 py-3
+                  bg-primary
+                  text-white
+                  border-2 border-black
+                  rounded-lg
+                  font-extrabold
+                  shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]
+                  hover:translate-x-[2px]
+                  hover:translate-y-[2px]
+                  hover:shadow-none
+                  transition-all
+                "
+              >
+                <span className="material-symbols-outlined">
+                  sync_alt
+                </span>
+
+                Changer le statut
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       
     </PageTransition>
   )

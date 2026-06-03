@@ -94,6 +94,8 @@ const AnimalCard = ({ animal, delay = 0 }) => {
           <span className="text-xs font-bold uppercase tracking-tight bg-surface-variant px-2 py-0.5 border border-black/20 rounded-sm">{animal?.Taille}</span>
         </div>
 
+        <p className="text-on-surface-variant text-sm line-clamp-2 font-body flex-grow">{animal.Description}</p>
+
         {/* Compatibilités + Santé */}
         <div className="flex flex-wrap gap-1.5 pt-1 border-t border-outline-variant">
           {/* État de santé */}

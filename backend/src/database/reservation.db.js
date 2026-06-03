@@ -3,8 +3,8 @@ import { Reservation } from "../modeles/reservation.model.js";
 
 export const createReservation = async (reservation) => {
     const [result] = await db.query(
-        `INSERT INTO reservation (IdUtilisateur, IdProfil, IdAnimal, IdAnnonce, TypeService, DateDebut, DateFin, Statut, PrixFinal, Notes) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO reservation (IdUtilisateur, IdProfil, IdAnimal, IdAnnonce, TypeService, DateDebut, DateFin, Statut, PrixFinal, Notes, TypeReservation) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
             reservation.IdUtilisateur,
             reservation.IdProfil,
@@ -15,7 +15,9 @@ export const createReservation = async (reservation) => {
             reservation.DateFin,
             reservation.Statut,
             reservation.PrixFinal,
-            reservation.Notes
+            reservation.Notes,
+            reservation.TypeReservation
+
         ]
     );
 
@@ -63,6 +65,20 @@ export const updateReservation = async (id, reservation) => {
       reservation.Statut,
       reservation.PrixFinal,
       reservation.Notes,
+      id
+    ]
+  );
+
+  return result.affectedRows;
+};
+
+export const updateReservationStatut = async (id, reservation) => {
+  const [result] = await db.query(
+    `UPDATE reservation SET 
+      Statut = ?
+     WHERE Id = ?`,
+    [
+      reservation.Statut,
       id
     ]
   );

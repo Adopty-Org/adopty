@@ -73,8 +73,9 @@ const ProfilPrestataire = () => {
     {
       alert("Veuillez sélectionner un créneau de disponibilité avant de réserver.")
       return;
-    } setReservationOpen(true)}//)
+    } setReservationOpen(true)};//)
 
+  
   // Anti-réflexivité : ce prestataire EST l'utilisateur connecté ?
   // On compare via idUtilisateur (clé DB du prestataire) et backendUserId
   const isSelf = false/*isSignedIn
@@ -364,8 +365,11 @@ const ProfilPrestataire = () => {
           prestataire={prestataire}
           initialSlot={selectedSlot}
           onClose={() => setReservationOpen(false)}
+          TypeReservation="reservation"
         />
       </Modal>
+
+      
     </PageTransition>
   )
 }

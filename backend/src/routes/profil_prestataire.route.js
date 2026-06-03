@@ -1,6 +1,6 @@
 import { Router } from "express";
 import * as profil_prestataire from "../controlleurs/profil_prestataire.controlleur.js"
-import { protectRoute, prestataireOnly, isOwnerOrAdmin } from "../midleware/auth.midleware.js";
+import { protectRoute, prestataireOnly, isOwnerOrAdmin, isPrestataireOwnerOrAdmin } from "../midleware/auth.midleware.js";
 
 const router = Router()
 
@@ -10,11 +10,11 @@ router.get("/type_service/:TypeService", profil_prestataire.getTypeServiceOfProf
 router.get("/utilisateur/:Utilisateur", profil_prestataire.getUtilisateurOfProfilPrestataireControlleur);
 
 // Routes protégées - réservées aux prestataires (création)
-router.post("/", protectRoute, prestataireOnly, profil_prestataire.createProfilPrestataireControlleur);
+router.post("/", protectRoute, profil_prestataire.createProfilPrestataireControlleur);
 
 // Routes protégées - modification/suppression (propriétaire ou admin)
-router.put("/:id", protectRoute, prestataireOnly, isOwnerOrAdmin, profil_prestataire.updateProfilPrestataireControlleur);
-router.delete("/:id", protectRoute, prestataireOnly, isOwnerOrAdmin, profil_prestataire.deleteProfilPrestataireControlleur);
+router.put("/:id/:Prestataire", protectRoute, isPrestataireOwnerOrAdmin, profil_prestataire.updateProfilPrestataireControlleur);
+router.delete("/:id/:Prestataire", protectRoute, isPrestataireOwnerOrAdmin, profil_prestataire.deleteProfilPrestataireControlleur);
 
 // Routes de lecture publiques
 router.get("/:id", profil_prestataire.getProfilPrestataireControlleur);

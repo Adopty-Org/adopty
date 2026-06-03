@@ -9,6 +9,10 @@ import { useCart } from '../../context/CartContext'
 import Badge from '../../components/ui/Badge'
 import { useProduit } from '../../hooks/useProduit'
 import { useRefuge } from '../../hooks/useRefuge'
+import { useUtilisateur } from '../../hooks/useUtilisateur'
+import { useUser } from '@clerk/clerk-react'
+import { ligneWishlistApi, wishlistApi } from '../../lib/api'
+import { useQueryClient } from '@tanstack/react-query'
 
 const ProductDetail = () => {
   const { id } = useParams()
@@ -18,9 +22,13 @@ const ProductDetail = () => {
   const [refugeData, setRefugeData] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const { addToCart } = useCart()
+  const {user} = useUser()
+  const {utilisateur} = useUtilisateur(user?.id)
   //const { requireAuthAction } = useRequireAuthAction()
 
   const [hasLoaded, setHasLoaded] = useState(false) // ✅ Flag pour éviter les rechargements
+
+  const queryClient = useQueryClient()
 
   const {produit:Produit, ProduitsLoading} = useProduit(id)
   console.log("produit : ", Produit)
@@ -102,7 +110,49 @@ const ProductDetail = () => {
   }
 
   const produit = produitData
+
+  const isFavorite = utilisateur?.wishlist?.ligneWishlist?.some(
+    l => l.IdProduit === produit?.Id
+  )
+
+  const favoris = isFavorite
   const handleAddToCart = () => /*requireAuthAction(() =>*/ addToCart(produit)/*)*/
+
+  const handleWishlist = async () => {
+    console.log("Wishlist avant : ", utilisateur?.wishlist, utilisateur?.Id)
+    if(!utilisateur?.wishlist?.Id ){
+      await wishlistApi.create({ IdUtilisateur: utilisateur.Id })
+      refetch() // Recharger les données de l'utilisateur pour obtenir la wishlist créée
+    }
+    if (!utilisateur?.wishlist?.Id || !produit?.Id) return
+
+    if (favoris) {
+      // supprimer de la wishlist
+      await ligneWishlistApi.delete(utilisateur.wishlist.ligneWishlist.find(l => l.IdProduit === produit.Id)?.Id)
+      console.log("Retirer de la wishlist")
+      queryClient.invalidateQueries({
+        queryKey: ["wishlists"]
+      })
+      await queryClient.invalidateQueries({ queryKey: ["ligneWishlist", utilisateur.wishlist.Id] })
+    } else {
+      // ajouter à la wishlist
+      await ligneWishlistApi.create({
+        IdWishlist: utilisateur.wishlist.Id,
+        IdAnimal: null,
+        IdProduit: produit.Id,
+        Quantite: 1
+      })
+
+      queryClient.invalidateQueries({
+        queryKey: ["wishlists"]
+      })
+      await queryClient.invalidateQueries({ queryKey: ["ligneWishlist", utilisateur.wishlist.Id] })
+      console.log("Ajouter à la wishlist", {
+        IdWishlist: utilisateur.wishlist.Id,
+        IdProduit: produit.Id
+      })
+    }
+  }
 
   return (
     <PageTransition>
@@ -141,6 +191,12 @@ const ProductDetail = () => {
               <span className="text-xs font-bold text-secondary uppercase tracking-widest mb-2 block">{produit.Categorie}</span>
               <h1 className="text-4xl md:text-5xl font-['Plus_Jakarta_Sans'] font-extrabold text-primary mb-4 leading-tight">{produit.Nom}</h1>
               
+              <button
+                onClick={() => /*setFavoris(v => !v)*/handleWishlist()}
+                className="w-12 h-12 bg-white rounded-full border-2 border-black hover:bg-red-50 transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center"
+              >
+                <span className="material-symbols-outlined text-red-500 text-2xl" style={{ fontVariationSettings: favoris ? "'FILL' 1" : "'FILL' 0" }}>favorite</span>
+              </button>
               <div className="flex items-center gap-4 mb-6">
                 <span className="text-4xl font-['Plus_Jakarta_Sans'] font-extrabold text-primary">
                   {produit?.Prix.toFixed(2)}€

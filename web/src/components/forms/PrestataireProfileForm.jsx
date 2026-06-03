@@ -36,7 +36,7 @@ const PrestataireProfileForm = ({ initialData = null, onClose, onSuccess }) => {
     try {
       
       if (profileId) {
-        await updatePrestataire.mutateAsync({ id: profileId, data:formData })
+        await updatePrestataire.mutateAsync({ prestataire: prestataire.Id, id: profileId, data:formData })
       } else {
         await createPrestataire.mutateAsync(formData)
       }

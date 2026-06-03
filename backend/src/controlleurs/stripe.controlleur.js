@@ -335,3 +335,44 @@ export const refreshOnboardingLink = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+export const createRefugeOnboardingLink = async (req, res) => {
+  try {
+    const { refugeId } = req.params;
+
+    const [rows] = await db.query(
+      "SELECT StripeAccountId FROM refuge WHERE Id = ?",
+      [refugeId]
+    );
+
+    if (!rows[0]) {
+      return res.status(404).json({ message: "Refuge introuvable" });
+    }
+
+    const accountId = rows[0].StripeAccountId;
+
+    if (!accountId) {
+      return res.status(400).json({
+        message: "Aucun compte Stripe lié à ce refuge"
+      });
+    }
+
+    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+
+    const accountLink = await stripe.accountLinks.create({
+      account: accountId,
+      refresh_url: `${frontendUrl}/refuge/${refugeId}/onboarding/refresh`,
+      return_url: `${frontendUrl}/refuge/${refugeId}/onboarding/success`,
+      type: "account_onboarding",
+    });
+
+    res.json({
+      success: true,
+      onboardingUrl: accountLink.url
+    });
+
+  } catch (error) {
+    console.error("❌ Create refuge onboarding link error:", error);
+    res.status(500).json({ error: error.message });
+  }
+};

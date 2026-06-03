@@ -4,6 +4,7 @@ import { PageTransition, FadeIn } from '../../components/Animations'
 import Pagination from '../../components/ui/Pagination'
 
 import { useRefuges } from '../../hooks/useRefuge'
+import { useAnimals } from '../../hooks/useAnimal'
 
 //import { getAnimaux, getRefuges } from '../services/publicApi'
 //import { mapAnimals } from '../mappers/animalMapper'
@@ -12,12 +13,13 @@ import { useRefuges } from '../../hooks/useRefuge'
 
 // Mini animal card for refuge pages
 const MiniAnimalCard = ({ animal }) => (
+  
   <Link
     to={`/profil_animal/${animal?.Id}`}
     className="flex items-center gap-3 p-3 bg-white border-2 border-black rounded-xl hover:bg-primary-fixed/30 hover:translate-x-0.5 hover:translate-y-0.5 transition-all shadow-[3px_3px_0px_0px_rgba(21,66,18,1)] hover:shadow-none group"
-  >
+  >{console.log("animal mini card", animal)}
     <div className="w-12 h-12 rounded-lg bg-surface-container border-2 border-black shrink-0 overflow-hidden">
-      {/*<img src={animal?.photo} alt={animal?.Nom} className="w-full h-full object-cover" />*/}
+      <img src={animal?.photos?.[0]?.Url} alt={animal?.Nom} className="w-full h-full object-cover" />
     </div>
     <div className="grow min-w-0">
       <p className="font-['Plus_Jakarta_Sans'] font-extrabold text-sm text-primary truncate">{animal?.Nom}</p>
@@ -44,7 +46,7 @@ const StatChip = ({ icon, label, value }) => (
 )
 
 // Full refuge card with anchor id
-const RefugeCard = ({ refuge, allAnimals }) => {
+const RefugeCard = ({ refuge, allAnimals, animalMap }) => {
   const animauxRefuge = allAnimals.filter(a => {
     if (a?.IdRefuge != null && refuge?.Id) return String(a?.IdRefuge) === String(refuge?.Id)
     return a?.lieu === refuge?.lieu || a?.lieu === refuge?.Nom
@@ -58,6 +60,7 @@ const RefugeCard = ({ refuge, allAnimals }) => {
     (currentAnimauxPage - 1) * ITEMS_PER_ANIMAUX_PAGE,
     currentAnimauxPage * ITEMS_PER_ANIMAUX_PAGE
   )
+  
 
   return (
     <section
@@ -103,10 +106,10 @@ const RefugeCard = ({ refuge, allAnimals }) => {
 
           {/* Stats */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <StatChip icon="pets" label="Animaux" value={refuge?.animauxTotal} />
-            <StatChip icon="people" label="Bénévoles" value={refuge?.bénévoles} />
-            <StatChip icon="home" label="Capacité" value={refuge?.capacite} />
-            <StatChip icon="straighten" label="Surface" value={refuge?.surface} />
+            <StatChip icon="pets" label="Animaux" value={refuge?.animauxTotal ?? refuge?.animals?.length} />
+            <StatChip icon="people" label="Bénévoles" value={refuge?.bénévoles ?? 0} />
+            <StatChip icon="home" label="Capacité" value={refuge?.capacite ?? 0} />
+            <StatChip icon="straighten" label="Surface" value={refuge?.surface ?? "N/A"} />
           </div>
 
           {/* Specialites */}
@@ -135,10 +138,10 @@ const RefugeCard = ({ refuge, allAnimals }) => {
               <span className="material-symbols-outlined text-lg">contact_phone</span> Contact
             </h3>
             {[
-              { icon: 'location_on', text: refuge?.adresse },
-              { icon: 'schedule', text: refuge?.horaires },
+              { icon: 'location_on', text: refuge?.Addresse },
+              { icon: 'schedule', text: refuge?.horaires ?? "Horaires non renseignés" },
               { icon: 'phone', text: refuge?.Telephone },
-              { icon: 'email', text: refuge?.email },
+              { icon: 'email', text: refuge?.email ?? "Email non renseigné" },
             ]?.map(({ icon, text }) => (
               <div key={icon} className="flex items-start gap-3">
                 <span className="material-symbols-outlined text-primary text-lg mt-0.5 shrink-0">{icon}</span>
@@ -156,9 +159,17 @@ const RefugeCard = ({ refuge, allAnimals }) => {
             {animauxRefuge.length > 0 ? (
               <>
                 <div className="space-y-2">
-                  {paginatedAnimaux.map(a => (
-                    <MiniAnimalCard key={a?.Id} animal={a} />
-                  ))}
+                  {paginatedAnimaux.map(a => {
+                    const found = animalMap.get(a?.Id)
+                    const animalComplet = Array.isArray(found) ? found[0] : found
+
+                    return (
+                      <MiniAnimalCard
+                        key={a?.Id}
+                        animal={animalComplet || a}
+                      />
+                    )
+                  })}
                 </div>
                 {totalAnimauxPages > 1 && (
                   <div className="mt-3 flex justify-center gap-2">
@@ -203,25 +214,33 @@ const Refuges = () => {
   const [refugesData, setRefugesData] = useState([])
   const [animauxData, setAnimauxData] = useState([])
   const [currentPage, setCurrentPage] = useState(1)
-  const { RefugesData, RefugesLoading, isError, error, refugeMap, refuges } = useRefuges()
+  const { RefugesData, RefugesLoading, isError, error, refugeMap, refuges, refugesNonValides, refugesValides } = useRefuges()
+  const {animalMap, isLoading:AnimalLoading} = useAnimals()
 
   useEffect(() => {
     const loadData = async () => {
-      if(RefugesLoading) return 
+      if(RefugesLoading || AnimalLoading) return 
       try {
         //const [refugesResponse, animauxResponse] = await Promise.all([getRefuges(), getAnimaux()])
         //const mappedRefuges = Array.isArray(refugesResponse) ? mapRefuges(refugesResponse) : []
         //const mappedAnimaux = Array.isArray(animauxResponse) ? mapAnimals(animauxResponse) : []
         
         if(!RefugesLoading) {
-          setRefugesData(refuges)//(mappedRefuges)
+          setRefugesData(refugesValides)//(mappedRefuges)
           console.log("refugeData", refugesData)
           }else{
             return 
           }
         
         //setAnimauxData(mappedAnimaux)
-        setAnimauxData(refuges[0]?.animals)
+        const animaux = refugesValides.flatMap(refuge =>
+          (refuge.animals || []).map(animal => ({
+            ...animal,
+            IdRefuge: refuge.Id
+          }))
+        )
+
+        setAnimauxData(animaux)
       } catch (error) {
         console.error("Erreur lors du chargement des données:", error)
         setRefugesData([])
@@ -230,7 +249,7 @@ const Refuges = () => {
     }
 
     loadData()
-  }, [RefugesLoading, RefugesData, animauxData])
+  }, [RefugesLoading, RefugesData])
 
   useEffect(() => {
     if (initialScrollDone.current) return
@@ -334,13 +353,14 @@ const Refuges = () => {
         </FadeIn>
 
         {/* Refuge cards */}
+        {!AnimalLoading&& (
         <div className="space-y-14">
           {paginatedRefuges.map((refuge, i) => (
             <FadeIn key={refuge?.Id} delay={i * 0.1}>
-              <RefugeCard refuge={refuge} allAnimals={animauxData} />
+              <RefugeCard refuge={refuge} allAnimals={animauxData} animalMap={animalMap} />
             </FadeIn>
           ))}
-        </div>
+        </div>)}
 
         <Pagination 
           currentPage={currentPage}

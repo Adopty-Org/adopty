@@ -3,7 +3,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import { useDisponibilites, useCreateDisponibilite, useUpdateDisponibilite } from '../../hooks/useDisponibilite';
+import { useDisponibilites, useCreateDisponibilite, useUpdateDisponibilite, useDeleteDisponibilite } from '../../hooks/useDisponibilite';
 
 const localizer = momentLocalizer(moment);
 
@@ -20,6 +20,7 @@ const AvailabilityCalendar = ({ profilId, mode="client", onReservationSelect }) 
   const { disponibilites, isLoading, refetch } = useDisponibilites(profilId);
   const createDisponibilite = useCreateDisponibilite();
   const updateDisponibilite = useUpdateDisponibilite();
+  const deleteDisponibilite = useDeleteDisponibilite();
 
   // ✅ Fonction utilitaire pour parser les dates correctement
   const parseDate = (dateString) => {
@@ -43,6 +44,7 @@ const AvailabilityCalendar = ({ profilId, mode="client", onReservationSelect }) 
   const isProviderMode = mode === "provider"
   const isClientMode = mode === "client"
 
+  const bolls = () => {
   // ✅ Fonction corrigée pour générer les dates de récurrence
     /*const generateRecurringDatesForDisplay = (disponibilite) => {
     // Parser les dates de début et fin
@@ -269,7 +271,43 @@ const AvailabilityCalendar = ({ profilId, mode="client", onReservationSelect }) 
     });
     
     return cutEvents;
-  };*/
+  };*/}
+
+  const mergeOverlappingEvents = (events) => {
+    if (!events || events.length === 0) return []
+
+    const sorted = [...events]
+      .filter(event => event.start && event.end)
+      .sort((a, b) => a.start.getTime() - b.start.getTime())
+
+    const merged = []
+
+    sorted.forEach(event => {
+      const last = merged[merged.length - 1]
+
+      if (!last) {
+        merged.push({ ...event })
+        return
+      }
+
+      const lastEnd = last.end.getTime()
+      const eventStart = event.start.getTime()
+      const eventEnd = event.end.getTime()
+
+      if (eventStart <= lastEnd) {
+        last.end = new Date(Math.max(lastEnd, eventEnd))
+        last.id = `${last.id}-merged-${event.id}`
+        last.parentIds = [
+          ...(last.parentIds || [last.parentId || last.id]),
+          event.parentId || event.id
+        ]
+      } else {
+        merged.push({ ...event })
+      }
+    })
+
+    return merged
+  }
 
   // ✅ Fonction corrigée pour découper les disponibilités avec les indisponibilités
 const processEventsWithCutting = (disponibilites) => {
@@ -314,8 +352,14 @@ console.log(`📊 TOTAL brut avant dédoublonnage: ${allEvents.length}`);
   if (allEvents.length === 0) return [];
   
   // Séparer les disponibilités et indisponibilités
-  const disponibles = allEvents.filter(e => e.disponible === 1);
-  const indisponibles = allEvents.filter(e => e.disponible === 0);
+  //const disponibles = allEvents.filter(e => e.disponible === 1);
+  //const indisponibles = allEvents.filter(e => e.disponible === 0);
+
+  const disponiblesRaw = allEvents.filter(e => e.disponible === 1)
+  const indisponiblesRaw = allEvents.filter(e => e.disponible === 0)
+
+  const disponibles = mergeOverlappingEvents(disponiblesRaw)
+  const indisponibles = mergeOverlappingEvents(indisponiblesRaw)
   
   console.log(`Disponibles: ${disponibles.length}, Indisponibles: ${indisponibles.length}`);
   
@@ -606,11 +650,13 @@ const generateRecurringDatesForDisplay = (disponibilite) => {
     };
     
     try {
-      if (selectedSlot.existingId && selectedSlot.currentStatus !== undefined) {
+      /*if (selectedSlot.existingId && selectedSlot.currentStatus !== undefined) {
         await updateDisponibilite.mutateAsync({ id: selectedSlot.existingId, data });
       } else {
         await createDisponibilite.mutateAsync(data);
-      }
+      }*/
+
+      await createDisponibilite.mutateAsync(data);
       
       await refetch();
       setShowRecurrenceModal(false);
@@ -832,6 +878,24 @@ const generateRecurringDatesForDisplay = (disponibilite) => {
     setShowRecurrenceModal(true);
   };
 
+  const handleDoubleClickEvent = async (event) => {
+    if (!isProviderMode) return;
+
+    const confirmDelete = window.confirm(
+      `Voulez-vous supprimer cette ${event.disponible === 1 ? "disponibilité" : "indisponibilité"} ?`
+    );
+
+    if (!confirmDelete) return;
+
+    try {
+      await deleteDisponibilite.mutateAsync(event.parentId || event.id);
+      await refetch();
+    } catch (error) {
+      console.error("Erreur suppression disponibilité:", error);
+      alert("Erreur lors de la suppression.");
+    }
+  };
+
   // Ajoute ce useEffect pour voir ce qui est réellement passé au calendrier
 useEffect(() => {
   console.log("=== DÉBOGAGE DES ÉVÉNEMENTS ===");
@@ -904,6 +968,7 @@ useEffect(() => {
           selectable
           onSelectSlot={handleSelectSlot}
           eventPropGetter={eventStyleGetter}
+          onDoubleClickEvent={handleDoubleClickEvent}
           slotPropGetter={slotStyleGetter}
           min={new Date(1970, 1, 1, 8, 0, 0)}
           max={new Date(1970, 1, 1, 20, 0, 0)}
@@ -1183,3 +1248,10 @@ const RecurrenceModal = ({ slot, pendingAvailability, onConfirm, onCancel }) => 
 };
 
 export default AvailabilityCalendar;
+
+/*dit , [] ca marche . mais une question tres serieuse , comment gerer le cas de couper une disponibilite en deux ? car la il le fait dans l'affichage et c'est cool et tout , mais maintenant le faire dans l'autre sens . exp une grosse dispo ou undispo (un gros element ) on prend une partie de cette element et on le rend indisponible comment faire ? [on le coupe dans la bdd ? en deux dispos ?] mais si on fait ca comment faire pour gerer les cas ou une dispo est avec recurnce mais l'indispo qu'on veux faire est pas ce qu'on cherche ? ..... sinon ! je sais !! on fait rien et on change l'affichage dans l'ecrant seulement !! (car la lsertaines disponibilites ce chevauchent ) tu en pence quoi ? (maintenant pas de code on essaie d'avoir l'idee puis on execute okay ?) du genre on met en place les dispos , puis si des dispos ce chevauchent on les "fusionnent"(car c'est pas logique de dire que je suis dispo de 20:h a 2:h puis de 1:h a 12:h) tu vois ? puis le systeme de decoupage auto avec les indisponibilites (et meme la on enleve le chevauchememt des indisponibilites ) tu en pences quoi ?
+
+A. fusionner les disponibilités qui se chevauchent
+B. fusionner les indisponibilités qui se chevauchent
+C. retirer les indisponibilités des disponibilités
+D. afficher le résultat propre*/

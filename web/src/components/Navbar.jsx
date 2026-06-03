@@ -14,7 +14,8 @@ import { DemandeAdoptionWatcher } from './DemandeAdoptionWatcher'
 
 export const NAVIGATION = [
   {name: "Lobby", path: "/lobby", icon: <HomeIcon className="size-5"/> },
-  {name: "Refuges & Animals", path: "/refanimal", icon: <MapPinHouseIcon className="size-5"/> },
+  {name: "Animaux", path: "/refanimal", icon: <MapPinHouseIcon className="size-5"/> },
+  {name: "Refuges", path: "/realrefuge", icon: <PawPrintIcon className="size-5"/> },
   {name: "Encyclopedie", path: "/encyclopedie", icon: <HomeIcon className="size-5"/> },
   {name: "Shop", path: "/shop", icon: <ShoppingBagIcon className="size-5"/> },
   {name: "Services", path: "/services", icon: <PawPrintIcon className="size-5"/> },

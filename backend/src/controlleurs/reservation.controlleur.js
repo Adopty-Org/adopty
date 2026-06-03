@@ -1,14 +1,16 @@
+import { db } from "../config/db.js";
 import { getAnimalById } from "../database/animal.db.js";
 import { getAnnonceById } from "../database/annonce.db.js";
+import { createDisponibilite } from "../database/disponibilite.db.js";
 import { getProfilPrestataireById } from "../database/profil_prestataire.db.js";
-import { createReservation, deleteReservation, getAllReservations, getReservationById, updateReservation } from "../database/reservation.db.js";
+import { createReservation, deleteReservation, getAllReservations, getReservationById, updateReservation, updateReservationStatut } from "../database/reservation.db.js";
 import { getStatutById } from "../database/statut.db.js";
 import { getTypeServiceById } from "../database/type_service.db.js";
 import { getUtilisateurById } from "../database/utilisateur.db.js";
 
 export async function createReservationControlleur(req,res) {
     try {
-        const { IdUtilisateur,IdProfil,IdAnimal,IdAnnonce,TypeService,DateDebut,DateFin,Statut,PrixFinal,Notes } = req.body;
+        const { IdUtilisateur,IdProfil,IdAnimal,IdAnnonce,TypeService,DateDebut,DateFin,Statut,PrixFinal,Notes,TypeReservation } = req.body;
 
         if(!IdUtilisateur || !IdAnimal && !IdAnnonce || !TypeService){
             return res.status(400).json({ message: "Le strict minimun en information est requis! "})
@@ -24,7 +26,8 @@ export async function createReservationControlleur(req,res) {
             DateFin, 
             Statut, 
             PrixFinal,
-            Notes
+            Notes, 
+            TypeReservation
         })
 
         res.status(201).json({ message: "Reservation crée avec succès", id: requete });
@@ -195,4 +198,62 @@ export async function getUtilisateurOfReservationControlleur(req,res) {
         console.error("Erreur lors de l'obtention de l'animal de l'annonce:", error);
         res.status(500).json({ message: "Erreur interne du serveur" });
     }
+}
+
+export async function updateStatutOfReservationControlleur(req,res) {
+  const connection = await db.getConnection()
+
+  try {
+    const { id } = req.params
+    const { Statut, IdProfil } = req.body
+
+    const reservation = await getReservationById(id)
+
+    if (!reservation) {
+      connection.release()
+      return res.status(404).json({
+        message: "Reservation non trouvée"
+      })
+    }
+
+    await connection.beginTransaction()
+
+    await updateReservationStatut(id,{
+      Statut
+    })
+    console.log("Statut de la reservation modifié avec succès")
+
+    if(Number(Statut) === 4){
+      await createDisponibilite({
+        IdProfil,
+        DateDebut: reservation.DateDebut,
+        DateFin: reservation.DateFin,
+        Recurrence: "Aucune",
+        Frequence: 1,
+        Disponibilite: 0,
+        RecurrenceFin: null
+      })
+    }
+
+    console.log("Disponibilité créée avec succès")
+
+    await connection.commit()
+
+    res.status(200).json({
+      message: "Statut de la reservation modifiée avec succès"
+    })
+
+  } catch (error) {
+
+    await connection.rollback()
+
+    console.error(error)
+
+    res.status(500).json({
+      message: "Erreur interne du serveur"
+    })
+
+  } finally {
+    connection.release()
+  }
 }

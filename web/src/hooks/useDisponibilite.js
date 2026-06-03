@@ -95,3 +95,14 @@ export const useUpdateDisponibilite = () => {
 
     return mutation
 }
+
+export const useDeleteDisponibilite = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: disponibiliteApi.delete,
+    onSuccess: () => {
+      queryClient.invalidateQueries(["disponibilites"])
+    }
+  })
+}

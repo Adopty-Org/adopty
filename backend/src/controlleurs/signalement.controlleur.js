@@ -7,7 +7,8 @@ export async function createSignalementControlleur(req,res) {// pas utilisable j
     try {
         const { IdUtilisateur, TypeCible,IdCible,Statut,Raison,DateSignalement } = req.body;
 
-        if(!IdUtilisateur || !TypeCible || !IdCible || !Statut ){
+        if(/*IdUtilisateur == null || */TypeCible == null || IdCible == null || Statut == null){
+            console.warn("Tentative de création de signalement avec des données manquantes:", IdUtilisateur, TypeCible, IdCible, Statut );
             return res.status(400).json({ message: "Le strict minimun en information est requis! "})
         }
 

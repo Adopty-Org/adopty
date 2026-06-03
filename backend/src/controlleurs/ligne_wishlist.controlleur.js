@@ -1,18 +1,19 @@
-import { createLigneWishlist, deleteLigneWishlist, getAllLigneWishlists, getLigneWishlistById, updateLigneWishlist } from "../database/ligne_wishlist.db.js";
+import { createLigneWishlist, deleteLigneWishlist, getAllLigneWishlists, getLigneWishlistById, getLigneWishlistsByWishlist, updateLigneWishlist } from "../database/ligne_wishlist.db.js";
 import { getProduitById } from "../database/produit.db.js";
 import { getWishlistById } from "../database/wishlist.db.js";
 
 export async function createLigneWishlistControlleur(req,res) {// pas utilisable je crois
     try {
-        const { IdWishlist, IdProduit,Quantite } = req.body;
+        const { IdWishlist, IdProduit, IdAnimal, Quantite } = req.body;
 
-        if(!IdWishlist || !IdProduit || !Quantite ){
+        if(!IdWishlist || (!IdProduit && !IdAnimal) || !Quantite ){
             return res.status(400).json({ message: "Le strict minimun en information est requis! "})
         }
 
         const requete = await createLigneWishlist({
             IdWishlist, 
             IdProduit,
+            IdAnimal,
             Quantite
         })
 
@@ -27,7 +28,7 @@ export async function createLigneWishlistControlleur(req,res) {// pas utilisable
 export async function updateLigneWishlistControlleur(req,res) {// just la au cas ou 
     try {
         const { id } = req.params;
-        const { IdWishlist, IdProduit, Quantite } = req.body;
+        const { IdWishlist, IdProduit, IdAnimal, Quantite } = req.body;
         const ligne_wishlist = await getLigneWishlistById(id);
         if (!ligne_wishlist) {
             return res.status(404).json({ message: "LigneWishlist non trouvé" });
@@ -35,6 +36,7 @@ export async function updateLigneWishlistControlleur(req,res) {// just la au cas
         await updateLigneWishlist( id ,{
             IdWishlist, 
             IdProduit,
+            IdAnimal,
             Quantite
         })
         
@@ -113,6 +115,21 @@ export async function getProduitOfLigneWishlistControlleur(req,res) {
             return res.status(404).json({ message: "LigneWishlist a un produit inexistant !(non trouvé)" });
         }
         res.status(200).json(produit);
+        
+    } catch (error) {
+        console.error("Erreur lors de l'obtention de l'animal de l'annonce:", error);
+        res.status(500).json({ message: "Erreur interne du serveur" });
+    }
+}
+
+export async function getLigneWishlistByWishlistControlleur(req,res) {
+    try {
+        const { Wishlist } = req.params;
+        const wishlist = await getLigneWishlistsByWishlist(Wishlist);
+        if (!wishlist) {
+            return res.status(404).json({ message: "LigneWishlist a un wishlist inexistant !(non trouvé)" });
+        }
+        res.status(200).json(wishlist);
         
     } catch (error) {
         console.error("Erreur lors de l'obtention de l'animal de l'annonce:", error);

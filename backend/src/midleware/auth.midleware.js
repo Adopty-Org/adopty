@@ -194,6 +194,44 @@ export const hasAnyRole = (requiredRoles) => {
     };
 }
 
+export const isPrestataireOwnerOrAdmin = async (req, res, next) => {
+  try {
+    const prestataireId = req.params.Prestataire;
+
+    if (!req.user) {
+      return res.status(401).json({ message: "Non autorisé" });
+    }
+
+    const isAdmin = ENV.ADMIN_EMAIL
+      ?.split(",")
+      .map(e => e.trim())
+      .includes(req.user.AddresseEmail);
+
+    if (isAdmin) {
+      return next();
+    }
+
+    const prestataire = await getProfilPrestataireById(prestataireId);
+
+    if (!prestataire) {
+      return res.status(404).json({ message: "Prestataire introuvable" });
+    }
+
+    const isOwner = prestataire.IdUtilisateur?.toString() === req.user.Id?.toString();
+
+    if (!isOwner) {
+      return res.status(403).json({
+        message: "Vous ne pouvez modifier que votre propre profil prestataire"
+      });
+    }
+
+    next();
+  } catch (error) {
+    console.error("Erreur isPrestataireOwnerOrAdmin :", error);
+    res.status(500).json({ message: "Erreur interne du serveur" });
+  }
+};
+
 export const isOwnerOrAdmin = (req, res, next) => {
     const resourceUserId = req.params.id;
 
@@ -220,6 +258,7 @@ export const isOwnerOrAdmin = (req, res, next) => {
 
 
 import { verifyToken } from "@clerk/backend";
+import { getProfilPrestataireById } from "../database/profil_prestataire.db.js";
 //import { getUtilisateurByClerkId } from "../database/utilisateur.db.js";
 
 export const socketAuth = async (socket, next) => {
