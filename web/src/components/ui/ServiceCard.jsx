@@ -1,7 +1,10 @@
 import { Link } from 'react-router-dom'
 import { FadeIn } from '../Animations'
+import { conversationApi, conversationParticipantApi } from '../../lib/api';
 //import { useStartConversation } from '../../hooks/useStartConversation'
 //import { useRoleAccess } from '../../hooks/useRoleAccess'
+import {useUser} from '@clerk/clerk-react'
+import { useUtilisateur } from '../../hooks/useUtilisateur';
 
 /**
  * ServiceCard
@@ -17,13 +20,48 @@ const ServiceCard = ({ prestataire, delay = 0, onReserver }) => {
   //const { startConversation, isLoading: isStarting } = useStartConversation()
   let isStarting = false; // temporaire, à remplacer par le vrai hook useStartConversation
   //const { backendUserId, isSignedIn } = useRoleAccess()
+  const {user} = useUser()
+
+  const {utilisateur} = useUtilisateur(user?.id)
 
   // Vrai si le visiteur connecté EST ce prestataire
   const isSelf = false/*isSignedIn
     && backendUserId
     && String(backendUserId) === String(prestataire.IdUtilisateur)*/
 
-  const handleContact = () => {return;}//startConversation(prestataire.IdUtilisateur, prestataire?.utilisateur?.Nom)
+  /*const handleContact = async () => {
+    const conversation = await conversationApi.create({Type: "direct"});
+    const d = await conversationParticipantApi.create{{IdConversation: conversation,  IdUtilisateur: utilisateur?.Id, Statut : 2, Role : "owner"}}
+
+    const k = await conversationParticipantApi.create{{IdConversation: conversation,  IdUtilisateur: prestataire.IdUtilisateur, Statut : 2, Role : "member"}}
+  }*/;//startConversation(prestataire.IdUtilisateur, prestataire?.utilisateur?.Nom)
+
+  const handleContact = async () => {
+    try {
+      const conversation = await conversationApi.create({
+        Type: "direct",
+      })
+
+      await conversationParticipantApi.create({
+        IdConversation: conversation.id,
+        IdUtilisateur: utilisateur.Id,
+        Statut: 2,
+        Role: "owner",
+      })
+
+      await conversationParticipantApi.create({
+        IdConversation: conversation.id,
+        IdUtilisateur: prestataire.IdUtilisateur,
+        Statut: 2,
+        Role: "member",
+      })
+
+      console.log("Conversation créée :", conversation)
+
+    } catch (error) {
+      console.error("Erreur création conversation :", error)
+    }
+  }
 
   return (
     <FadeIn delay={delay} className="bg-surface-container-lowest border-4 border-black rounded-xl overflow-hidden shadow-[8px_8px_0px_0px_rgba(21,66,18,1)] group hover:-translate-x-1 hover:-translate-y-1 hover:shadow-[12px_12px_0px_0px_rgba(21,66,18,1)] transition-all duration-200">
@@ -48,7 +86,7 @@ const ServiceCard = ({ prestataire, delay = 0, onReserver }) => {
                 {isSelf ? '👤 Vous' : prestataire?.disponible ? 'Disponible' : 'Occupé'}
               </span>
             </div>
-            <p className="text-sm text-on-surface-variant font-bold">{prestataire?.typeService.Type} • {prestataire?.ZoneIntervention}</p>
+            <p className="text-sm text-on-surface-variant font-bold">{prestataire?.typeService?.Type} • {prestataire?.ZoneIntervention}</p>
             <div className="flex items-center gap-1.5 mt-1">
               <div className="flex">
                 {etoiles.map((filled, i) => (

@@ -4,8 +4,8 @@ import { Refuge } from "../modeles/refuge.model.js";
 
 export const CreateRefuge = async (refuge) => {
     const [result] = await db.query(
-        `INSERT INTO refuge (Nom,Description,Addresse,AddresseGPS,Date_inscription,Telephone,stripeAccountId,stripeAccountStatus)
-        VALUES(?,?,?,?,NOW(),?,?,?)`,
+        `INSERT INTO refuge (Nom,Description,Addresse,AddresseGPS,Date_inscription,Telephone,stripeAccountId,stripeAccountStatus,Statut)
+        VALUES(?,?,?,?,NOW(),?,?,?,2)`,
         [
             refuge.Nom,
             refuge.Description,
@@ -47,7 +47,8 @@ export const updateRefuge = async (id, refuge) => {
       
       Telephone = ?,
       stripeAccountId = ?,
-      stripeAccountStatus = ?
+      stripeAccountStatus = ?,
+      Statut = ?
      WHERE Id = ?`,
     [
       refuge.Nom,
@@ -58,6 +59,7 @@ export const updateRefuge = async (id, refuge) => {
       refuge.Telephone,
       refuge.stripeAccountId,
       refuge.stripeAccountStatus,
+      refuge.Statut,
       id
     ]
   );
@@ -279,4 +281,18 @@ export const transferBetweenRefuges = async (animalId, fromRefugeId, toRefugeId)
     } finally {
         connection.release();
     }
+};
+
+export const updateRefugeStatut = async (id, refuge) => {
+  const [result] = await db.query(
+    `UPDATE refuge SET 
+      Statut = ?
+     WHERE Id = ?`,
+    [
+      refuge.Statut,
+      id
+    ]
+  );
+
+  return result.affectedRows;
 };

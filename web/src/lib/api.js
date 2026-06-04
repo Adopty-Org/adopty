@@ -407,6 +407,10 @@ export const refugeApi = {
         const { data } = await axiosInstance.post(`/refuges/transfer_animal_between_refuges/${animalId}/${fromRefugeId}/${toRefugeId}`);
         return data;
     },
+    updateStatutOfRefuge: async ({ refuge, id, formData }) => {
+        const { data } = await axiosInstance.put(`/refuges/statut/${id}/${refuge}`, formData);
+        return data;
+    },
 };
 
 /*
@@ -503,6 +507,21 @@ export const annonceApi = {
 
     getByStatut: async (statut) => {
         const { data } = await axiosInstance.get(`/annonces/statut/${statut}`);
+        return data;
+    },
+
+    getAllAnnoncesPrestataire: async () => {
+        const { data } = await axiosInstance.get("/annonces/type_annonce/prestataire");
+        return data;
+    },
+
+    getAllAnnoncesUtilisateur: async () => {
+        const { data } = await axiosInstance.get("/annonces/type_annonce/utilisateur");
+        return data;
+    },
+
+    updateStatut: async ({ id, formData }) => {
+        const { data } = await axiosInstance.patch(`/annonces/statut/${id}`, formData);
         return data;
     },
 };
@@ -867,8 +886,8 @@ export const demandeAdoptionApi = {
     // 🔹 CRUD (protégé - refuge seulement)
     // =========================
 
-    create: async (refugeId, formData) => {
-        const { data } = await axiosInstance.post(`/demande_adoptions/${refugeId}`, formData);
+    create: async ( formData) => {
+        const { data } = await axiosInstance.post(`/demande_adoptions/`, formData);
         return data;
     },
 
@@ -1195,6 +1214,13 @@ export const ligneWishlistApi = {
         );
         return data;
     },
+
+    getLignesByWishlist: async (wishlistId) => {
+        const { data } = await axiosInstance.get(
+            `/ligne_wishlists/wishlists/${wishlistId}`
+        );
+        return data;
+    }
 };
 
 /*
@@ -1717,13 +1743,13 @@ export const profilPrestataireApi = {
         return data;
     },
 
-    update: async ({ id, formData }) => {
-        const { data } = await axiosInstance.put(`/profil_prestataires/${id}`, formData);
+    update: async ({ prestataire ,id, formData }) => {
+        const { data } = await axiosInstance.put(`/profil_prestataires/${id}/${prestataire}`, formData);
         return data;
     },
 
-    delete: async (id) => {
-        const { data } = await axiosInstance.delete(`/profil_prestataires/${id}`);
+    delete: async (prestataire, id) => {
+        const { data } = await axiosInstance.delete(`/profil_prestataires/${id}/${prestataire}`);
         return data;
     },
 
@@ -1783,13 +1809,13 @@ export const reservationApi = {
         return data;
     },
 
-    update: async ({ id, formData }) => {
-        const { data } = await axiosInstance.put(`/reservations/${id}`, formData);
+    update: async ({ prestataire, id, formData }) => {
+        const { data } = await axiosInstance.put(`/reservations/${id}/${prestataire}`, formData);
         return data;
     },
 
-    delete: async (id) => {
-        const { data } = await axiosInstance.delete(`/reservations/${id}`);
+    delete: async (prestataire, id) => {
+        const { data } = await axiosInstance.delete(`/reservations/${id}/${prestataire}`);
         return data;
     },
 
@@ -1852,6 +1878,25 @@ export const reservationApi = {
         );
         return data;
     },
+
+    updateStatutOfReservation: async ({ prestataire, id, formData }) => {
+        const { data } = await axiosInstance.put(`/reservations/statut/${id}/${prestataire}`, formData);
+        return data;
+    },
+
+    getReservationByUtilisateur: async (animal) => {
+        const { data } = await axiosInstance.get(
+            `/reservations/utilisateur/reserve/${animal}`
+        );
+        return data;
+    },
+
+    getReservationByPrestataire: async (animal) => {
+        const { data } = await axiosInstance.get(
+            `/reservations/prestataire/reserve/${animal}`
+        );
+        return data;
+    },
 };
 
 /*
@@ -1908,6 +1953,13 @@ export const signalementApi = {
     getByStatut: async (statut) => {
         const { data } = await axiosInstance.get(
             `/signalements/statut/${statut}`
+        );
+        return data;
+    },
+
+    getSignalementByUtilisateur: async (utilisateur) => {
+        const { data } = await axiosInstance.get(
+            `/signalements/utilisateurs/${utilisateur}`
         );
         return data;
     },
@@ -2202,6 +2254,13 @@ export const stripeApi = {
         );
         return data;
     },
+
+    getRefugeLink: async (refugeId) => {
+        const { data } = await axiosInstance.get(
+            `/stripe/refuge/${refugeId}/onboarding-link`
+        );
+        return data;
+    }
 };
 
 /*

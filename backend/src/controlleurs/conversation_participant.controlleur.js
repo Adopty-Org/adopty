@@ -11,9 +11,10 @@ export async function createConversationParticipantControlleur(req,res) {
             IdConversation == null ||
             IdUtilisateur == null ||
             Statut == null ||
-            !Number.isInteger(Role) ||
+            //!Number.isInteger(Role) ||
             Role <= 0
         ) {
+            console.log("les info pour creer un participant de conversation" ,IdConversation, IdUtilisateur, Statut, Role)
             return res.status(400).json({ message: "Informations requises manquantes!" })
         }
 

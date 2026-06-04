@@ -1,4 +1,4 @@
-import { createSignalement, deleteSignalement, getAllSignalements, getSignalementById, updateSignalement } from "../database/signalement.db.js";
+import { createSignalement, deleteSignalement, getAllSignalements, getAllSignalementsByUtilisateur, getSignalementById, updateSignalement } from "../database/signalement.db.js";
 import { getReservationById } from "../database/reservation.db.js";
 import { getStatutById } from "../database/statut.db.js";
 import { getUtilisateurById } from "../database/utilisateur.db.js";
@@ -7,7 +7,8 @@ export async function createSignalementControlleur(req,res) {// pas utilisable j
     try {
         const { IdUtilisateur, TypeCible,IdCible,Statut,Raison,DateSignalement } = req.body;
 
-        if(!IdUtilisateur || !TypeCible || !IdCible || !Statut ){
+        if(/*IdUtilisateur == null || */TypeCible == null || IdCible == null || Statut == null){
+            console.warn("Tentative de création de signalement avec des données manquantes:", IdUtilisateur, TypeCible, IdCible, Statut );
             return res.status(400).json({ message: "Le strict minimun en information est requis! "})
         }
 
@@ -128,3 +129,19 @@ export async function getUtilisateurOfSignalementControlleur(req,res) {
 }
 
 // todo: ajouter les controlleurs , requetes et... pour le Statut  (ne foirez pas ca)
+
+export async function getAllSignalementsByUtilisateurControlleur(req,res) {
+    try {
+        const { Utilisateur } = req.params;
+        const utilisateur = await getAllSignalementsByUtilisateur(Utilisateur);
+        //console.log("les signalements  : ", utilisateur)
+        if (!utilisateur) {
+            return res.status(404).json({ message: "Signalement a un utilisateur inexistant !(non trouvé)" });
+        }
+        res.status(200).json(utilisateur);
+        
+    } catch (error) {
+        console.error("Erreur lors de l'obtention de l'animal de l'annonce:", error);
+        res.status(500).json({ message: "Erreur interne du serveur" });
+    }
+}

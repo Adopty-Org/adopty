@@ -3,6 +3,7 @@ export class LigneWishlist {
         this.Id = data.Id;
         this.IdWishlist = data.IdWishlist;
         this.IdProduit = data.IdProduit;
+        this.IdAnimal = data.IdAnimal;
         this.Quantite = data.Quantite;
     }
 }

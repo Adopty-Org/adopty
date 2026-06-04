@@ -6,9 +6,15 @@ import { PageTransition, FadeIn } from '../../components/Animations'
 import Modal from '../../components/ui/Modal'
 import PrestataireProfileForm from '../../components/forms/PrestataireProfileForm'
 import AvailabilityForm from '../../components/forms/AvailabilityForm'
-import { usePrestataire } from '../../hooks/usePrestataire'
+import { usePrestataire, usePrestataires } from '../../hooks/usePrestataire'
 import AvailabilityCalendar from '../../components/ui/AvailabilityCalendar'
 import { useDisponibilites } from '../../hooks/useDisponibilite'
+import { useDeleteReservation, useReservations, useUpdateReservation } from '../../hooks/useReservation'
+import AnnonceFormModal from '../../components/forms/AnnonceFormModal'
+import { useUtilisateur } from '../../hooks/useUtilisateur'
+import { useUser } from '@clerk/clerk-react'
+import { useAnnoncesPrestataire, useAnnoncesUtilisateur } from '../../hooks/useAnnonce'
+import ReservationForm from '../../components/forms/ReservationForm'
 
 const toCurrency = (value) => `${Number(value || 0).toLocaleString('fr-FR')} DZD`
 
@@ -42,17 +48,44 @@ const PrestataireDashboard = () => {
   const [apiIssues, setApiIssues] = useState([])
   const [myProfile, setMyProfile] = useState(null)
   const [myReservations, setMyReservations] = useState([])
+  const [reservationAnnonceOpen, setReservationAnnonceOpen] = useState(false)
+  const [selectedSlot, setSelectedSlot] = useState(null)
 
   // Modales
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false)
   const [isAvailModalOpen, setIsAvailModalOpen] = useState(false)
   const [editingAvail, setEditingAvail] = useState(null)
+  const [lannonce, setLannonce] = useState(false)
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false)
 
-  const {prestataire,isLoading: prestataireLoading} = usePrestataire(270001)
-  const {disponibilites,DisponibilitesLoading} = useDisponibilites(270001);
+  const {user} = useUser()
+
+  const {utilisateur} = useUtilisateur(user?.id)
+
+  const {prestatairesUtilMap} = usePrestataires()
+
+  const {prestataire,isLoading: prestataireLoading} = usePrestataire(prestatairesUtilMap.get(utilisateur?.Id)?.Id)
+  const {disponibilites,DisponibilitesLoading} = useDisponibilites(prestatairesUtilMap.get(utilisateur?.Id)?.Id);
+  const {reservationProfilMap, ReservationsLoading}= useReservations()
     //console.log("les disponibilites  : ", disponibilites)
 
+  const updateReservation = useUpdateReservation()
+  const deleteReservation = useDeleteReservation()
+
+  const [selectedReservation, setSelectedReservation] = useState(null)
+  const [isAnnonceModalOpen, setIsAnnonceModalOpen] = useState(false)
+  const { annonces, AnnoncesLoading } = useAnnoncesUtilisateur()
+
   console.log("le prestataire : ", prestataire)
+
+  const mesAnnonces = useMemo(() => {
+    if (!utilisateur?.Id) return []
+
+    return annonces.filter(a =>
+      /*Number(a.IdUtilisateur) !== Number(utilisateur.Id) &&*/
+      [1, 2, 6].includes(Number(a.Statut))
+    )
+  }, [annonces, utilisateur?.Id])
 
   const loadData = useCallback(async () => {
     if (false/*!backendUserId*/) return
@@ -61,21 +94,22 @@ const PrestataireDashboard = () => {
 
     const profileResult = prestataire;
 
-    const reservationsResult = null;
+    const reservationsResult = prestataire?.Id
+  ? reservationProfilMap.get(prestataire.Id).filter((a) => {a.Statut ===2 || a.Statut === 1 || a.Statut === 6 }) || []
+  : []
 
-    /*const [profileResult, reservationsResult] = await Promise.allSettled([
-      getMyPrestataireProfile(),
-      getMyPrestataireReservations(),
-    ])*/
+    
 
-    if (true/*profileResult?.status === 'fulfilled'*/) {
+    
+
+    if (true) {
       setMyProfile(profileResult)
     } else {
       issues.push('Profil prestataire')
       //normalizeApiError(profileResult?.reason)
     }
 
-    if (true/*reservationsResult?.status === 'fulfilled'*/) {
+    if (true) {
       setMyReservations(Array.isArray(reservationsResult) ? reservationsResult : [])
     } else {
       issues.push('Réservations')
@@ -84,7 +118,7 @@ const PrestataireDashboard = () => {
 
     setApiIssues(issues)
     setIsLoading(false)
-  }, [/*backendUserId*/isLoading, prestataireLoading, DisponibilitesLoading])
+  }, [prestataire?.Id, reservationProfilMap])
 
   useEffect(() => {
     loadData()
@@ -117,6 +151,41 @@ const PrestataireDashboard = () => {
       alert('Erreur lors de la suppression')
     }
   }
+
+  const handleUpdateReservationStatus = async (id, statut) => {
+    try {
+      await updateReservation.mutateAsync({
+        prestataire: prestataire.Id,
+        id,
+        formData: { Statut: statut, IdProfil: prestataire.Id }
+      })
+
+      loadData()
+    } catch (error) {
+      console.error(error)
+      alert('Erreur lors de la mise à jour du statut')
+    }
+  }
+
+  const openReservationAnnonceModal = (annonce) => {
+    if(selectedSlot === null){
+      setSelectedSlot({IdProfil: prestataire.Id, DateDebut: annonce.DateDebut, DateFin: annonce.DateFin, TypeService: annonce.TypeService, IdAnimal: annonce.IdAnimal, IdAnnonce: annonce.Id})
+    } 
+
+    setSelectedSlot({
+      IdProfil: prestataire.Id,
+      IdAnnonce: annonce.Id,
+      DateDebut: annonce.DateDebut,
+      DateFin: annonce.DateFin,
+      TypeService: annonce.TypeService,
+      IdAnimal: annonce.IdAnimal,
+      PrixSouhaite: annonce.PrixSouhaite,
+      NotesAnnonce: annonce.Notes,
+    })
+    
+    setReservationAnnonceOpen(true)
+  }
+
 
   const openAddAvail = () => { setEditingAvail(null); setIsAvailModalOpen(true) }
 
@@ -228,6 +297,136 @@ const PrestataireDashboard = () => {
             )}
           </div>
         </FadeIn>
+        {/* Annonces */}
+        <FadeIn>
+          <div className="bg-surface-container-lowest border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] rounded-xl overflow-hidden">
+
+            <div className="bg-surface-container border-b-4 border-black px-6 py-4 flex justify-between items-center">
+              <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-primary flex items-center gap-2">
+                <span className="material-symbols-outlined">campaign</span>
+                Mes annonces
+              </h2>
+
+              {/*<button
+                onClick={() => setIsAnnonceModalOpen(true)}
+                className="px-4 py-2 bg-primary text-white font-bold border-2 border-black rounded-lg"
+              >
+                + Nouvelle annonce
+              </button>*/}
+            </div>
+
+            <div className="p-6">
+
+              {AnnoncesLoading && (
+                <div className="flex justify-center py-10">
+                  <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+                </div>
+              )}
+
+              {!AnnoncesLoading && mesAnnonces.length === 0 && (
+                <div className="text-center py-12 max-w-lg mx-auto">
+                  <span className="material-symbols-outlined text-6xl opacity-30">
+                    campaign
+                  </span>
+
+                  <h3 className="mt-4 font-extrabold text-lg text-primary">
+                    Aucune annonce publiée
+                  </h3>
+
+                  <p className="mt-3 text-sm text-on-surface-variant leading-relaxed">
+                    Les annonces vous permettent de publier vos besoins concernant vos animaux
+                    afin d'être contacté par des prestataires qualifiés.
+                  </p>
+
+                  <div className="mt-4 text-xs text-on-surface-variant bg-surface-container border-2 border-black rounded-xl p-4 text-left">
+                    <p className="font-bold mb-2">Exemples d'annonces :</p>
+
+                    <ul className="space-y-1">
+                      <li>🐾 Je cherche un promeneur pour mon chien pendant une semaine.</li>
+                      <li>🏠 Je recherche une garde à domicile pour mon chat durant mes vacances.</li>
+                      <li>🛁 Je souhaite trouver un toiletteur près de chez moi.</li>
+                      <li>🎓 Je cherche un éducateur canin pour mon chiot.</li>
+                    </ul>
+                  </div>
+
+                  {/*<button
+                    onClick={() => setIsAnnonceModalOpen(true)}
+                    className="mt-6 px-6 py-3 bg-primary text-white font-bold border-2 border-black rounded-lg shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all"
+                  >
+                    Créer ma première annonce
+                  </button>*/}
+                </div>
+              )}
+
+              {!AnnoncesLoading && mesAnnonces.length > 0 && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                  {mesAnnonces.map((annonce) => (
+                    <div
+                      key={annonce.Id}
+                      className="bg-white border-2 border-black rounded-xl overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+                    >
+
+                      <div className="p-4 border-b-2 border-black bg-surface-container">
+                        <div className="flex justify-between items-center">
+
+                          <span className="font-extrabold text-primary">
+                            #{annonce.Id}
+                          </span>
+
+                          <span className="px-2 py-1 text-xs border border-black rounded-full bg-primary-fixed">
+                            {annonce.TypeAnnonce}
+                          </span>
+
+                        </div>
+                      </div>
+
+                      <div className="p-4 space-y-2">
+
+                        <p className="font-bold">
+                          Service : {annonce.typeService?.Type || annonce.TypeService}
+                        </p>
+
+                        <p className="text-sm text-on-surface-variant">
+                          {annonce.Notes || "Aucune description"}
+                        </p>
+
+                        <p className="text-sm">
+                          📅 {new Date(annonce.DateDebut).toLocaleDateString("fr-FR")} to {new Date(annonce.DateFin).toLocaleDateString("fr-FR")}
+                        </p>
+
+                        <p className="text-sm">
+                          💰 {Number(annonce.PrixSouhaite || 0).toLocaleString("fr-FR")} DZD
+                        </p>
+
+                      </div>
+
+                      <div className="p-4 border-t-2 border-black flex gap-2">
+
+                        <button
+                          className="flex-1 py-2 bg-primary text-white border-2 border-black rounded-lg font-bold" onClick={() => openReservationAnnonceModal(annonce)}
+                        >
+                          Postuler
+                        </button>
+
+                        <button
+                          className="flex-1 py-2 bg-error text-white border-2 border-black rounded-lg font-bold" onClick={() => {setLannonce(annonce) ;setIsReportModalOpen(true)}}
+                        >
+                          Signaler
+                        </button>
+
+                      </div>
+
+                    </div>
+                  ))}
+
+                </div>
+              )}
+
+            </div>
+
+          </div>
+        </FadeIn>
 
         {/* Disponibilités */}
         <FadeIn className="bg-surface-container-lowest border-4 border-black rounded-xl overflow-hidden shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
@@ -302,7 +501,7 @@ const PrestataireDashboard = () => {
                 myReservations.map((r) => {
                   const { label, cls } = getStatusStyle(r?.Statut)
                   return (
-                    <tr key={r?.Id} className="hover:bg-surface-container transition-colors">
+                    <tr key={r?.Id} className="hover:bg-surface-container transition-colors" onClick={() => setSelectedReservation(r)}>
                       <td className="px-5 py-4 font-mono font-bold text-on-surface-variant">
                         #{String(r?.Id).padStart(4, '0')}
                       </td>
@@ -389,6 +588,81 @@ const PrestataireDashboard = () => {
           />
         </Modal>
       </div>
+
+
+      {selectedReservation && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-surface-container-lowest border-4 border-black rounded-xl max-w-xl w-full shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+
+            <div className="px-6 py-4 border-b-4 border-black bg-surface-container flex justify-between items-center">
+              <h3 className="font-['Chewy'] text-2xl text-primary">
+                Réservation #{selectedReservation.Id}
+              </h3>
+
+              <button onClick={() => setSelectedReservation(null)}>
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <p><strong>Date début :</strong> {new Date(selectedReservation.DateDebut).toLocaleString('fr-FR')}</p>
+              <p><strong>Date fin :</strong> {new Date(selectedReservation.DateFin).toLocaleString('fr-FR')}</p>
+              <p><strong>Prix :</strong> {toCurrency(selectedReservation.PrixFinal)}</p>
+              <p><strong>Notes :</strong> {selectedReservation.Notes || "Aucune note"}</p>
+              <p><strong>Statut :</strong> {selectedReservation.statut?.Statut || selectedReservation.Statut}</p>
+            </div>
+
+            <div className="p-4 border-t-4 border-black bg-surface-container flex gap-3 justify-end">
+              <button
+                onClick={() => handleUpdateReservationStatus(selectedReservation.Id, 4)}
+                className="px-4 py-2 bg-primary text-white border-2 border-black font-bold rounded-lg"
+              >
+                Accepter
+              </button>
+
+              <button
+                onClick={() => handleUpdateReservationStatus(selectedReservation.Id, 5)}
+                className="px-4 py-2 bg-error text-white border-2 border-black font-bold rounded-lg"
+              >
+                Refuser
+              </button>
+
+              {/*<button
+                onClick={() => handleDeleteReservation(selectedReservation.Id)}
+                className="px-4 py-2 bg-black text-white border-2 border-black font-bold rounded-lg"
+              >
+                Supprimer
+              </button>*/}
+            </div>
+          </div>
+        </div>
+      )}
+
+      <Modal
+        isOpen={reservationAnnonceOpen}
+        onClose={() => setReservationAnnonceOpen(false)}
+        title={`Réserver — ${prestataire?.utilisateur?.Nom}`}
+        size="md"
+      >
+        <ReservationForm
+          utilisateur={utilisateur}
+          prestataire={prestataire}
+          initialSlot={selectedSlot}
+          onClose={() => setReservationAnnonceOpen(false)}
+          TypeReservation="annonce"
+        />
+      </Modal>
+
+      {lannonce && (
+        <ReportModal
+          isOpen={isReportModalOpen}
+          onClose={() => setIsReportModalOpen(false)}
+          targetType="lannonce"
+          targetId={lannonce.Id}
+          targetName={lannonce.Nom}
+        />
+      )}
+      
     </PageTransition>
   )
 }

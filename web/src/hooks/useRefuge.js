@@ -66,14 +66,26 @@ export const useRefuges = () => {
         [refuges]
     );
 
+    const refugesNonValides = refuges.filter(
+    refuge => Number(refuge.Statut) === 2 || Number(refuge.Statut) === 6
+    );
+
+    const refugesValides = refuges.filter(
+    refuge => Number(refuge.Statut) !== 2 && Number(refuge.Statut) !== 6
+    );
+    /*console.log(refuges.map(r => ({
+    statut: r.Statut,
+    type: typeof r.Statut
+    })));*/
+
     const isLoadingPhotos = animalsIdsByRefugeQueries.some(query => query.isLoading)
 
-    return { RefugesData, RefugesLoading:RefugesLoading || isLoadingPhotos || ProduitLoading /*|| AnimalLoading || DemandeAdoptionsLoading || DemandeTransfertsCibleLoading*/, isError, error, refugeMap, refuges };
+    return { RefugesData, RefugesLoading:RefugesLoading || isLoadingPhotos || ProduitLoading /*|| AnimalLoading || DemandeAdoptionsLoading || DemandeTransfertsCibleLoading*/, isError, error, refugeMap, refugesNonValides, refuges, refugesValides };
 };
 
 export const useRefuge = (id,utilisateurMap = null) => {
     console.log("utilisateurMap dans useRefuge", utilisateurMap)
-    const { refugeMap, RefugesLoading } = useRefuges(utilisateurMap);
+    const { refugeMap, RefugesLoading } = useRefuges();
     const { DemandeAdoptionsLoading, demandesByRefuge: DemandesAdoption } = useDemandeAdoptions(utilisateurMap)
     const { DemandeTransfertsCibleLoading, demandeTransfertCibleByRefuge: DemandesTransfert } = useDemandeTransfertsByRefugeCible(id, utilisateurMap)
     const { SousCommandesLoading, sousCommandeMips } = useSousCommandes()

@@ -9,5 +9,6 @@ export class Annonce {
         this.PrixSouhaite = data.PrixSouhaite;
         this.Statut = data.Statut;
         this.Notes = data.Notes;
+        this.TypeAnnonce = data.TypeAnnonce;
     }
 }

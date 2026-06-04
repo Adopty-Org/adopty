@@ -36,7 +36,7 @@ export const useAnimals = () => {
         queries: (AnimauxData ?? []).map(animal => ({
             queryKey: ["animaux", animal.Id, "photos"],
             queryFn: () => {
-        console.count(`API GET PHOTOS animal ${animal.Id}`)
+        //console.count(`API GET PHOTOS animal ${animal.Id}`)
         return animalApi.getPhotos(animal.Id)
         },
             enabled: !!animal.Id,
@@ -127,6 +127,12 @@ export const useAnimals = () => {
             const caractereData = caracteresByAnimal.get(race?.Id) ?? EMPTY_ARRAY
             const photos = stablePhotosData[index] ?? EMPTY_ARRAY
             const possessions = stablePossessionsData[index] ?? EMPTY_ARRAY
+
+            /*console.log(
+            a.Id,
+            stablePhotosData[index],
+            stablePossessionsData[index]
+            )*/
             
             return {
                 ...a,
@@ -179,19 +185,66 @@ export const useAnimals = () => {
         return map
     }, [animals])
 
-    const animalMapRefuge = useMemo(() => {
+        const animalMapRefuge = useMemo(() => {
+            const map = new Map()
+            animals.forEach(animal => {
+                const refugeId = animal.possessions[0]?.IdRefuge
+                if (refugeId) {
+                    if (!map.has(refugeId)) {
+                        map.set(refugeId, [])
+                    }
+                    map.get(refugeId).push(animal)
+                }
+            })
+            return map
+        }, [animals])
+
+    const animalMap = useMemo(() => {
         const map = new Map()
         animals.forEach(animal => {
-            const refugeId = animal.possessions[0]?.IdRefuge
-            if (refugeId) {
-                if (!map.has(refugeId)) {
-                    map.set(refugeId, [])
+            const Id = animal.Id
+            if (Id) {
+                if (!map.has(Id)) {
+                    map.set(Id, [])
                 }
-                map.get(refugeId).push(animal)
+                map.get(Id).push(animal)
             }
         })
         return map
     }, [animals])
+
+    //console.log("AnimauxData", animals)
+//console.log("photosQueries", photosQueries)
+//console.log("possessionsQueries", possessionsQueries)
+
+/*photosQueries.forEach((q, i) => {
+  console.log(
+    "PHOTO",
+    AnimauxData?.[i]?.Id,
+    q.status,
+    q.data,
+    q.error
+  )
+})
+
+possessionsQueries.forEach((q, i) => {
+  console.log(
+    "POSSESSION",
+    AnimauxData?.[i]?.Id,
+    q.status,
+    q.data,
+    q.error
+  )
+})
+possessionsQueries.forEach((q, i) => {
+  console.log(
+    AnimauxData?.[i]?.Id,
+    q.status,
+    q.fetchStatus,
+    q.data,
+    q.error
+  )
+})*/
 
     // 🔍 DEBUG: Voir ce qui change
     useEffect(() => {
@@ -227,6 +280,7 @@ export const useAnimals = () => {
         error,
         animalMapUtilisateur,
         animalMapRefuge,
+        animalMap,
         animalMips
     }
 }
@@ -282,7 +336,7 @@ export const useAnimal = (id) => {
         const statut = statutMap.get(a.Statut)
         const race = raceMap.get(a.Race)
         const espece = race ? especeMap.get(race.Espece) : undefined
-        const caractereData = caracteresByAnimal.get(race?.Id) ?? []
+        const caractereData = caracteresByAnimal.get(a?.Id) ?? []
         const photos = PhotosAnimalData ?? []
         const possessions = PossessionsAnimalData ?? []
 

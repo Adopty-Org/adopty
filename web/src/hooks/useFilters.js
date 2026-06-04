@@ -69,19 +69,22 @@ export const useFilters = () => {
 
   // ⚡ MEMOISATION 3: Filtrage principal des animaux
   const filteredAnimaux = useMemo(() => {
-    console.log('🔄 Recalcul des animaux filtrés')
-    
+    console.log("🔄 Recalcul des animaux filtrés")
+    console.log("Animaux totaux avant filtrage:", animals)
+
     return animals.filter(a => {
-      // Filtre par espèce
-      if (espece !== 'Tous' && a?.Race?.Espece?.Nom !== espece) return false
-      
-      // Filtre par race
-      if (race !== 'Tous' && a?.Race?.Nom !== race) return false
-      
-      // Filtre par taille
+      // ✅ Garder seulement les animaux appartenant à un refuge
+      if (!a?.possessions[0]?.IdRefuge) return false
+
+      // ❌ Rejeter les animaux appartenant à un utilisateur
+      if (a?.possessions[0]?.IdUtilisateur) return false
+
+      if (espece !== "Tous" && a?.Race?.Espece?.Nom !== espece) return false
+
+      if (race !== "Tous" && a?.Race?.Nom !== race) return false
+
       if (taille.length > 0 && !taille.includes(a.TailleLabel)) return false
-      
-      // Filtre par recherche
+
       if (search && !a.Nom.toLowerCase().includes(search.toLowerCase())) return false
 
       if (
@@ -98,11 +101,7 @@ export const useFilters = () => {
           return false
         }
       }
-      
-      // ✅ Ajoute ici tes autres filtres si besoin
-      // if (caractere.length > 0 && !caractere.some(c => a.Caracteres?.includes(c))) return false
-      // if (selectedTraits.length > 0 && !selectedTraits.some(t => a.Traits?.includes(t))) return false
-      
+
       return true
     })
   }, [animals, espece, race, taille, search, caractere, selectedTraits])

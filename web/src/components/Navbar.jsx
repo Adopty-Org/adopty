@@ -11,10 +11,12 @@ import { useConversationNotifications } from '../hooks/useConversationNotificati
 import { ConversationList } from './chat/ConversationList'
 import { ChatRoom } from './chat/ChatRoom'
 import { DemandeAdoptionWatcher } from './DemandeAdoptionWatcher'
+import { useUtilisateur } from '../hooks/useUtilisateur'
 
 export const NAVIGATION = [
   {name: "Lobby", path: "/lobby", icon: <HomeIcon className="size-5"/> },
-  {name: "Refuges & Animals", path: "/refanimal", icon: <MapPinHouseIcon className="size-5"/> },
+  {name: "Animaux", path: "/refanimal", icon: <MapPinHouseIcon className="size-5"/> },
+  {name: "Refuges", path: "/realrefuge", icon: <PawPrintIcon className="size-5"/> },
   {name: "Encyclopedie", path: "/encyclopedie", icon: <HomeIcon className="size-5"/> },
   {name: "Shop", path: "/shop", icon: <ShoppingBagIcon className="size-5"/> },
   {name: "Services", path: "/services", icon: <PawPrintIcon className="size-5"/> },
@@ -30,6 +32,14 @@ function Navbar() {
   const [cartOpen, setCartOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { user } = useUser()
+
+  const {utilisateur} = useUtilisateur(user?.id)
+
+  const roles = utilisateur?.Roles ?? [];
+
+  const hasOtherRoleThanUser = roles.some(
+  role => role.Nom !== "Utilisateur"
+  );
 
   const { isSignedIn, isLoaded, signOut } = useAuth();
   const isAuthPage = location.pathname === '/auth'
@@ -432,10 +442,11 @@ function Navbar() {
                 
                     
                     {/* Dashboard temporaire (public pour le moment) */}
+                    { isSignedIn && hasOtherRoleThanUser && (
                     <Link to="/dashboard" className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-lg bg-surface-container border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1px hover:translate-y-1px hover:shadow-none transition-all" title="Dashboard Admin">
                         <span className="material-symbols-outlined text-primary text-xl">admin_panel_settings</span>
                         <span className="font-['Plus_Jakarta_Sans'] font-bold text-xs text-primary uppercase">Dashboard</span>
-                    </Link>
+                    </Link>)}
 
                     {/* Profil / Auth */}
                     <div className="hidden md:block flex items-center gap-2 bg-surface-container-high text-primary font-['Plus_Jakarta_Sans'] font-bold px-3 py-1.5 border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all text-sm rounded-full">
@@ -446,7 +457,18 @@ function Navbar() {
                         </SignedOut>
                         <SignedIn>
                             <Link to="/profil" className="flex items-center gap-2 bg-surface-container-high text-primary font-['Plus_Jakarta_Sans'] font-bold px-3 py-1.5 border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-2px hover:translate-y-2px hover:shadow-none transition-all text-sm rounded-full">
-                            <UserButton afterSignOutUrl="/" appearance={{ elements: { userButtonAvatarBox: "w-6 h-6" } }} />
+                            <div className="relative z-0">
+                                <UserButton
+                                  afterSignOutUrl="/"
+                                  appearance={{
+                                    elements: {
+                                      userButtonAvatarBox: "w-6 h-6",
+                                      userButtonPopoverCard: "!z-0",
+                                      userButtonPopoverActions: "z-0",
+                                    }
+                                  }}
+                                />
+                              </div>
                             Profil
                             </Link>
                         </SignedIn>

@@ -1,4 +1,4 @@
-import { addAnimalToRefugeByIds, CreateRefuge, deleteRefuge, getAllRefuges, getRefugeAnimalsById, getRefugeById, removeAnimalFromRefugeByIds, setAnimalToRefugeByIds, transferBetweenRefuges, transferRefugeToUser, unsetAnimalToRefugeByIds, updateRefuge } from "../database/refuge.db.js";
+import { addAnimalToRefugeByIds, CreateRefuge, deleteRefuge, getAllRefuges, getRefugeAnimalsById, getRefugeById, removeAnimalFromRefugeByIds, setAnimalToRefugeByIds, transferBetweenRefuges, transferRefugeToUser, unsetAnimalToRefugeByIds, updateRefuge, updateRefugeStatut } from "../database/refuge.db.js";
 
 export async function createRefugeControlleur(req,res) {
     try {
@@ -28,7 +28,7 @@ export async function createRefugeControlleur(req,res) {
 export async function updateRefugeControlleur(req,res) {
     try {
         const { id } = req.params;
-        const { Nom,Description,Addresse,AddresseGPS,Telephone,stripeAccountId,stripeAccountStatus } = req.body;
+        const { Nom,Description,Addresse,AddresseGPS,Telephone,stripeAccountId,stripeAccountStatus,Statut } = req.body;
         const refuge = await getRefugeById(id);
         if (!refuge) {
             return res.status(404).json({ message: "Refuge non trouvé" });
@@ -40,7 +40,9 @@ export async function updateRefugeControlleur(req,res) {
             AddresseGPS,
             Telephone,
             stripeAccountId,
-            stripeAccountStatus
+            stripeAccountStatus,
+            Statut
+
         })
         
         res.status(200).json({ message: "Refuge modifié avec succès" });
@@ -215,3 +217,24 @@ export async function transferAnimalBetweenRefugesControlleur(req,res) {
         throw new Error(`Échec du transfert entre refuges: ${error.message}`);
     }
 };
+
+export async function updateRefugeStatutControlleur(req,res) {
+    try {
+        const { id } = req.params;
+        const { Statut } = req.body;
+        const refuge = await getRefugeById(id);
+        if (!refuge) {
+            return res.status(404).json({ message: "Refuge non trouvé" });
+        }
+        await updateRefugeStatut( id ,{
+            Statut
+        })
+        console.log("Statut du refuge mis à jour avec succès");
+        
+        res.status(200).json({ message: "Refuge modifié avec succès" });
+        
+    } catch (error) {
+        console.error("Erreur lors de la modification du refuge:", error);
+        res.status(500).json({ message: "Erreur interne du serveur" });
+    }
+}

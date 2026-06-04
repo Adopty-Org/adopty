@@ -20,6 +20,8 @@ import { usePrestataires } from '../../hooks/usePrestataire'
 import { useRefuges } from '../../hooks/useRefuge'
 import { useSignalements } from '../../hooks/useSignalement'
 import { useCommandes } from '../../hooks/useCommande'
+import { useProduits } from '../../hooks/useProduit'
+import { refugeApi } from '../../lib/api'
 
 const NAV_ITEMS = [
   { id: 'overview', label: 'Vue d\'ensemble', icon: 'dashboard' },
@@ -74,24 +76,46 @@ const Dashboard = () => {
   const [refugesData, setRefugesData] = useState([])
   const [usersData, setUsersData] = useState([])
   const [dashboardStats, setDashboardStats] = useState()
+  const [selectedCommande, setSelectedCommande] = useState(null)
 
   // États pour l'édition Admin
   const [editingAnimal, setEditingAnimal] = useState(null)
   const [isAnimalModalOpen, setIsAnimalModalOpen] = useState(false)
 
+  const {produits, isLoading:ProduitsLoading} = useProduits()
   const {animals,isLoading:AnimauxLoading,isError,error} = useAnimals()
-  const {utilisateurs} = useUtilisateurs()
-  const {prestataires} = usePrestataires()
-  const {refuges} = useRefuges()
-  const {signalements} = useSignalements()
-  const {commandes} = useCommandes()
+  const {utilisateurs, isLoading:UtilisateursLoading} = useUtilisateurs()
+  const {prestataires, isLoading:PrestatairesLoading} = usePrestataires()
+  const {refugesNonValides , refuges, RefugesLoading} = useRefuges()
+  const {signalements, SignalementsLoading} = useSignalements()
+  const {commandes, isLoading:CommandesLoading} = useCommandes()
+  const [successMessage, setSuccessMessage] = useState(false)
   
 
   console.log("commandes : ", commandes)
 
   useEffect(() => {
+    if(AnimauxLoading || ProduitsLoading || UtilisateursLoading || PrestatairesLoading || RefugesLoading || SignalementsLoading || CommandesLoading) return 
     const loadDashboard = async () => {
       setIsLoading(true)
+
+      setRefugesData(refugesNonValides)
+
+      setDashboardStats({
+          animauxTotal: animals?.length,
+          animauxUrgent: 0,//finalAnimaux.filter((a) => a.urgent).length || statsAdmin.animauxUrgent,
+          adoptionsMois: 0,//allAnnonces.length || statsAdmin.adoptionsMois,
+          adoptionsTotal: 0,//allAnnonces.length || statsAdmin.adoptionsTotal,
+          caBoutique:
+            produits.reduce((sum, p) => sum + (Number(p.Prix ?? p.prix ?? 0) * Number(p.Stock ?? p.stock ?? 1)), 0)
+            || 0,//statsAdmin.caBoutique ,
+          commandesEnAttente:
+            commandes.filter((commande) => String(commande.statut?.Statut)?.toLowerCase().includes('attente')).length,
+          signalementsMois: signalements.length ,//|| statsAdmin.signalementsMois,
+          signalementsTotal: signalements.length,// || statsAdmin.signalementsTotal,
+          prestatairesActifs: prestataires.length ,//|| statsAdmin.prestatairesActifs,
+          utilisateurs: refuges.length ,//|| statsAdmin.utilisateurs,
+        })
       /*try {
         const sources = [/*
           { key: 'animaux', label: 'Animaux', request: getAnimaux() },
@@ -168,16 +192,35 @@ const Dashboard = () => {
       } finally {
         setIsLoading(false)
       }
-    */}
+    */setIsLoading(false)}
+
+    setDashboardStats({
+          animauxTotal: animals?.length,
+          animauxUrgent: 0,//finalAnimaux.filter((a) => a.urgent).length || statsAdmin.animauxUrgent,
+          adoptionsMois: 0,//allAnnonces.length || statsAdmin.adoptionsMois,
+          adoptionsTotal: 0,//allAnnonces.length || statsAdmin.adoptionsTotal,
+          caBoutique:
+            produits.reduce((sum, p) => sum + (Number(p.Prix ?? p.prix ?? 0) * Number(p.Stock ?? p.stock ?? 1)), 0)
+            || 0,//statsAdmin.caBoutique ,
+          commandesEnAttente:
+            commandes.filter((commande) => String(commande.statut?.Statut)?.toLowerCase().includes('attente')).length,
+          signalementsMois: signalements.length ,//|| statsAdmin.signalementsMois,
+          signalementsTotal: signalements.length,// || statsAdmin.signalementsTotal,
+          prestatairesActifs: prestataires.length ,//|| statsAdmin.prestatairesActifs,
+          utilisateurs: refuges.length ,//|| statsAdmin.utilisateurs,
+        })
 
     loadDashboard()
-  }, [])
+  }, [AnimauxLoading || ProduitsLoading || UtilisateursLoading || PrestatairesLoading || RefugesLoading || SignalementsLoading || CommandesLoading])
 
   const handleVerifyRefuge = async (id, status) => {
     try {
-      await verifyRefuge(id, status)
+      await refugeApi.updateStatutOfRefuge({ refuge: id, id, formData: { Statut: status } })
       // Recharger tout pour simplifier ou juste mettre a jour l'etat local
-      setRefugesData(prev => prev.map(r => r.Id === id ? { ...r, stripeAccountStatus: status } : r))
+      setRefugesData(prev =>
+        prev.filter(r => r.Id !== id)
+      )
+      setSuccessMessage(true)
     } catch (err) {
       alert('Erreur lors de la validation du refuge')
     }
@@ -217,6 +260,35 @@ const Dashboard = () => {
   //const maxAdoptions = Math.max(...adoptionsMensuelles.map(m => m.count))
   if(AnimauxLoading){
     return <NewLoadingLayout/>
+  }
+
+  
+
+  const SuccessModal = ({ onClose }) => {
+    return (
+      <div className="text-center py-8 space-y-4">
+        <div className="w-20 h-20 bg-primary-fixed border-4 border-black rounded-full flex items-center justify-center mx-auto">
+          <span className="material-symbols-outlined text-4xl text-primary">
+            check_circle
+          </span>
+        </div>
+
+        <h3 className="font-['Chewy'] text-3xl text-primary">
+          Opération réussie !
+        </h3>
+
+        <p className="text-on-surface-variant max-w-sm mx-auto">
+          Le refuge a été mis à jour avec succès.
+        </p>
+
+        <button
+          onClick={onClose}
+          className="mt-4 px-8 py-3 bg-primary text-white font-bold border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all"
+        >
+          Continuer
+        </button>
+      </div>
+    )
   }
 
   return (
@@ -298,13 +370,13 @@ const Dashboard = () => {
             {/* VUE D'ENSEMBLE */}
             {activeSection === 'overview' && (
               <div className="space-y-8">
-                {/* Stat cards * /}
+                {/* Stat cards */}
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
-                  <StatCard icon="pets" label="Animaux en refuge" value={dashboardStats.animauxTotal} sub={`${dashboardStats.animauxUrgent} urgents`} color="primary" delay={0} />
-                  <StatCard icon="favorite" label="Adoptions ce mois" value={dashboardStats.adoptionsMois} sub={`Total: ${dashboardStats.adoptionsTotal}`} color="secondary" delay={0.1} />
-                  <StatCard icon="shopping_bag" label="CA Boutique (EUR)" value={`${dashboardStats.caBoutique.toLocaleString()} EUR`} sub={`${dashboardStats.commandesEnAttente} en attente`} color="tertiary" delay={0.2} />
-                  <StatCard icon="report" label="Signalements" value={dashboardStats.signalementsMois} sub={`Total: ${dashboardStats.signalementsTotal}`} color="surface" delay={0.3} />
-                </div>*/}
+                  <StatCard icon="pets" label="Animaux en refuge" value={dashboardStats?.animauxTotal} sub={`${dashboardStats?.animauxUrgent} urgents`} color="primary" delay={0} />
+                  <StatCard icon="favorite" label="Adoptions ce mois" value={dashboardStats?.adoptionsMois} sub={`Total: ${dashboardStats?.adoptionsTotal}`} color="secondary" delay={0.1} />
+                  <StatCard icon="shopping_bag" label="CA Boutique (EUR)" value={`${dashboardStats?.caBoutique.toLocaleString()} EUR`} sub={`${dashboardStats?.commandesEnAttente} en attente`} color="tertiary" delay={0.2} />
+                  <StatCard icon="report" label="Signalements" value={dashboardStats?.signalementsMois} sub={`Total: ${dashboardStats?.signalementsTotal}`} color="surface" delay={0.3} />
+                </div>
 
                 {/* Graphique adoptions */}
                 <FadeIn delay={0.2} className="bg-surface-container-lowest border-4 border-black rounded-xl p-6 shadow-[6px_6px_0px_0px_rgba(21,66,18,1)]">
@@ -313,7 +385,7 @@ const Dashboard = () => {
                     Adoptions mensuelles
                   </h2>
                   <div className="flex items-end gap-4 h-40">
-                    {/*adoptionsMensuelles.map((m, i) => (
+                    {/*adoptionsMensuelles?.map((m, i) => (
                       <div key={m.mois} className="flex-1 flex flex-col items-center gap-2">
                         <span className="text-sm font-extrabold text-primary">{m.count}</span>
                         <div
@@ -350,11 +422,11 @@ const Dashboard = () => {
                         commandes.slice(0, 3).map(cmd => (
                           <div key={cmd?.Id} className="px-6 py-3 flex items-center justify-between gap-3">
                             <div>
-                              <p className="font-bold text-sm">{cmd?.client}</p>
+                              <p className="font-bold text-sm">{cmd?.IdUtilisateur}</p>
                               <p className="text-xs text-on-surface-variant">{cmd?.produit}</p>
                             </div>
                             <div className="text-right flex-shrink-0">
-                              <p className="font-extrabold text-sm text-primary">{cmd?.montant.toFixed(2)} EUR</p>
+                              <p className="font-extrabold text-sm text-primary">{cmd?.totalGeneral?.toFixed(2)} EUR</p>
                               <StatutBadge statut={cmd?.statut?.Statut} />
                             </div>
                           </div>
@@ -374,7 +446,7 @@ const Dashboard = () => {
                     </div>
                     <div className="divide-y divide-outline-variant">
                       {signalements?.slice(0, 3).map((sig, idx) => (
-                        <div key={sig.id || idx} className="px-6 py-3 flex items-center justify-between gap-3">
+                        <div key={sig.Id || idx} className="px-6 py-3 flex items-center justify-between gap-3">
                           <div>
                             <p className="font-bold text-sm">{sig.animal || sig.TypeCible || 'Signalement'}</p>
                             <p className="text-xs text-on-surface-variant">{sig.lieu || sig.Raison || 'Non renseigne'}</p>
@@ -471,11 +543,11 @@ const Dashboard = () => {
                       <TableEmptyState colSpan={6} icon="receipt_long" message="Aucune commande disponible." />
                     ) : (
                       commandes.map(cmd => (
-                        <tr key={cmd?.Id} className="hover:bg-surface-container transition-colors">
+                        <tr key={cmd?.Id} className="hover:bg-surface-container transition-colors" onClick={() => setSelectedCommande(cmd)}>
                           <td className="px-5 py-4 font-mono font-bold text-on-surface-variant">{cmd?.Id}</td>
-                          <td className="px-5 py-4 font-bold">{cmd?.client}</td>
+                          <td className="px-5 py-4 font-bold">{cmd?.IdUtilisateur}</td>
                           <td className="px-5 py-4 text-on-surface-variant">{cmd?.produit}</td>
-                          <td className="px-5 py-4 font-extrabold text-primary">{cmd?.montant.toFixed(2)} EUR</td>
+                          <td className="px-5 py-4 font-extrabold text-primary">{cmd?.totalGeneral?.toFixed(2)} EUR</td>
                           <td className="px-5 py-4"><StatutBadge statut={cmd?.statut?.Statut} /></td>
                           <td className="px-5 py-4 text-on-surface-variant">{cmd?.date}</td>
                         </tr>
@@ -588,10 +660,10 @@ const Dashboard = () => {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-outline-variant">
-                      {refuges.length === 0 ? (
+                      {refugesData.length === 0 ? (
                         <TableEmptyState colSpan={5} icon="verified_user" message="Aucun refuge à valider." />
                       ) : (
-                        refuges.map(refuge => (
+                        refugesData.map(refuge => (
                           <tr key={refuge?.Id} className="hover:bg-surface-container transition-colors">
                             <td className="px-5 py-4 font-bold">{refuge?.Nom}</td>
                             <td className="px-5 py-4 text-on-surface-variant">{refuge?.Addresse || refuge?.AddresseGPS}</td>
@@ -607,7 +679,7 @@ const Dashboard = () => {
                               <div className="flex gap-2">
                                 {refuge?.stripeAccountStatus !== 'verified' && (
                                   <button 
-                                    onClick={() => handleVerifyRefuge(refuge.Id, 'verified')}
+                                    onClick={() => handleVerifyRefuge(refuge.Id, 4)}
                                     className="px-3 py-1 bg-primary text-white border border-black font-bold text-xs shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]"
                                   >
                                     Approuver
@@ -615,7 +687,7 @@ const Dashboard = () => {
                                 )}
                                 {refuge?.stripeAccountStatus !== 'rejected' && (
                                   <button 
-                                    onClick={() => handleVerifyRefuge(refuge?.Id, 'rejected')}
+                                    onClick={() => handleVerifyRefuge(refuge?.Id, 5)}
                                     className="px-3 py-1 bg-error text-white border border-black font-bold text-xs shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]"
                                   >
                                     Rejeter
@@ -699,6 +771,165 @@ const Dashboard = () => {
           />
         </Modal>
       </div>
+
+      {selectedCommande && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-surface-container-lowest border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-xl max-w-3xl w-full max-h-[90vh] overflow-hidden">
+            
+            <div className="bg-surface-container border-b-4 border-black px-6 py-4 flex justify-between items-center">
+              <h3 className="font-['Chewy'] text-2xl text-primary">
+                Commande #{String(selectedCommande.Id).padStart(6, "0")}
+              </h3>
+
+              <button
+                onClick={() => setSelectedCommande(null)}
+                className="p-2 hover:bg-black/10 rounded-lg"
+              >
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+
+            <div className="p-6 overflow-y-auto max-h-[calc(90vh-80px)] space-y-6">
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="border-2 border-black rounded-xl p-4 bg-white">
+                  <p className="text-xs font-bold text-on-surface-variant uppercase">ID commande</p>
+                  <p className="font-extrabold">{selectedCommande.Id}</p>
+                </div>
+
+                <div className="border-2 border-black rounded-xl p-4 bg-white">
+                  <p className="text-xs font-bold text-on-surface-variant uppercase">Utilisateur</p>
+                  <p className="font-extrabold">#{selectedCommande.IdUtilisateur}</p>
+                </div>
+
+                <div className="border-2 border-black rounded-xl p-4 bg-white">
+                  <p className="text-xs font-bold text-on-surface-variant uppercase">Statut</p>
+                  <div className="mt-2">
+                    <StatutBadge statut={selectedCommande.statut?.Statut ?? selectedCommande.Statut} />
+                  </div>
+                </div>
+
+                <div className="border-2 border-black rounded-xl p-4 bg-white">
+                  <p className="text-xs font-bold text-on-surface-variant uppercase">Total général</p>
+                  <p className="font-extrabold text-primary">
+                    {Number(selectedCommande.totalGeneral ?? 0).toLocaleString("fr-DZ")} DZD
+                  </p>
+                </div>
+              </div>
+
+              <div>
+                <h4 className="font-extrabold text-primary mb-3 flex items-center gap-2">
+                  <span className="material-symbols-outlined">inventory_2</span>
+                  Sous-commandes
+                </h4>
+
+                {selectedCommande.sousCommandes?.length === 0 ? (
+                  <div className="border-2 border-black rounded-xl p-5 text-center text-on-surface-variant font-bold">
+                    Aucune sous-commande trouvée pour cette commande.
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {selectedCommande.sousCommandes.map((sc) => (
+                      <div
+                        key={sc.Id}
+                        className="border-2 border-black rounded-xl p-4 bg-white shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]"
+                      >
+                        <div className="flex justify-between gap-4">
+                          <div>
+                            <p className="font-extrabold">Sous-commande #{sc.Id}</p>
+                            <p className="text-xs text-on-surface-variant font-bold">
+                              Refuge #{sc.IdRefuge}
+                            </p>
+                          </div>
+
+                          <div className="text-right">
+                            <p className="font-extrabold text-primary">
+                              {Number(sc.Total_prix ?? 0).toLocaleString("fr-DZ")} DZD
+                            </p>
+                            <StatutBadge statut={sc.statut?.Statut ?? sc.Statut} />
+                          </div>
+                        </div>
+
+                        {sc.stripe_transfer_id && (
+                          <p className="text-xs mt-2 text-on-surface-variant">
+                            Transfer Stripe : {sc.stripe_transfer_id}
+                          </p>
+                        )}
+
+                        {sc.platformFee != null && (
+                          <p className="text-xs text-on-surface-variant">
+                            Frais plateforme : {Number(sc.platformFee).toLocaleString("fr-DZ")} DZD
+                          </p>
+                        )}
+
+                        <div className="mt-4 border-t-2 border-outline-variant pt-3">
+                          <p className="text-xs font-extrabold uppercase text-on-surface-variant mb-2">
+                            Produits commandés
+                          </p>
+
+                          {sc?.lignesCommande?.length === 0 ? (
+                            <p className="text-xs text-on-surface-variant italic">
+                              Aucun produit trouvé pour cette sous-commande.
+                            </p>
+                          ) : (
+                            <div className="space-y-2">
+                              {(() => {
+                                const lignes = Array.isArray(sc?.lignesCommande)
+                                  ? sc.lignesCommande
+                                  : sc?.lignesCommande
+                                    ? [sc.lignesCommande]
+                                    : []
+
+                                return lignes.length === 0 ? (
+                                  <p className="text-xs text-on-surface-variant italic">
+                                    Aucun produit trouvé pour cette sous-commande.
+                                  </p>
+                                ) : (
+                                  <div className="space-y-2">
+                                    {lignes.map((ligne) => (
+                                      <div
+                                        key={ligne.Id}
+                                        className="flex items-center justify-between gap-3 bg-surface-container rounded-lg border border-black px-3 py-2"
+                                      >
+                                        <div>
+                                          <p className="text-sm font-extrabold">
+                                            Produit #{ligne.IdProduit ?? "—"}
+                                          </p>
+                                          <p className="text-xs text-on-surface-variant">
+                                            Ligne #{ligne.Id}
+                                          </p>
+                                        </div>
+
+                                        <span className="px-2 py-1 rounded-full border border-black text-xs font-extrabold bg-white">
+                                          x{ligne.Quantite ?? 1}
+                                        </span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )
+                              })()}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+            </div>
+          </div>
+        </div>
+      )}
+
+      <Modal
+        isOpen={successMessage}
+        onClose={() => setSuccessMessage(false)}
+      >
+        <SuccessModal
+          onClose={() => setSuccessMessage(false)}
+        />
+      </Modal>
     </PageTransition>
   )
 }

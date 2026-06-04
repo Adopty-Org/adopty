@@ -9,6 +9,9 @@ router.get("/type_service/:TypeService", annonce.getTypeServiceOfAnnonceControll
 router.get("/animal/:Animal", annonce.getAnimalOfAnnonceControlleur);
 router.get("/utilisateur/:Utilisateur", annonce.getUtilisateurOfAnnonceControlleur);
 router.get("/statut/:Statut", annonce.getStatutOfAnnonceControlleur);
+router.get("/type_annonce/prestataire", protectRoute, annonce.getAllAnnoncesPrestataireControlleur);
+router.get("/type_annonce/utilisateur", protectRoute, annonce.getAllAnnoncesUtilisateurControlleur);
+router.patch("/statut/:id", annonce.updateAnnonceStatutControlleur);
 
 // Routes protégées - création, modification, suppression (utilisateurs authentifiés)
 router.post("/", protectRoute, annonce.createAnnonceControlleur);

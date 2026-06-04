@@ -3,11 +3,32 @@ import { utilisateurApi } from "../lib/api"
 import { useMemo } from "react"
 import { usePaniers } from "./usePanier"
 import { useAnimal, useAnimals } from "./useAnimal"
+import { useWishlists } from "./useWishlist"
 
+export const useUtilisateursNues = () => {
+    // 1. Récupérer tous les utilisateurs
+    const { data: utilisateursData, isLoading: utilisateursLoading, isError, error } = useQuery({
+        queryKey: ["utilisateurs"],
+        queryFn: () => utilisateurApi.getAll(),
+    })
+    const utilisateurs = utilisateursData ?? []
+
+    const utilisateurMap = useMemo(
+        () => new Map(utilisateurs.map(c => [c.Id, c])),
+        [utilisateurs]
+    )
+
+    return { 
+        utilisateurs,  // 👈 Tableau d'utilisateurs sans rôles
+        isLoading: utilisateursLoading, // 👈 Considérer le chargement uniquement pour les utilisateurs
+        utilisateurMap
+    }
+}
 
 export const useUtilisateurs = () => {
 
     const {isLoading, panierMips} = usePaniers()
+    const {wishlistMap, isLoading: wishlistsLoading} = useWishlists()
 
     // 1. Récupérer tous les utilisateurs
     const { data: utilisateursData, isLoading: utilisateursLoading, isError, error } = useQuery({
@@ -15,7 +36,7 @@ export const useUtilisateurs = () => {
         queryFn: () => utilisateurApi.getAll(),
     })
 
-    const utilisateursRaw = utilisateursData ?? []
+    const utilisateursRaw = Array.isArray(utilisateursData) ? utilisateursData : []
     //console.log("utilisateursRaw : ", utilisateursRaw)
 
     // 2. Récupérer les rôles pour CHAQUE utilisateur
@@ -29,20 +50,21 @@ export const useUtilisateurs = () => {
 
     // 3. Combiner les utilisateurs avec leurs rôles
     const utilisateurs = useMemo(() => {
-        if (!utilisateursData) return []
+        if (!utilisateursRaw) return []
 
         
         
-        return utilisateursData.map((utilisateur, index) => {
+        return utilisateursRaw.map((utilisateur, index) => {
             const panier = panierMips.get(utilisateur.Id);
             return {
                 ...utilisateur,
                 panier: panier ?? null,
+                wishlist: wishlistMap.get(utilisateur.Id) ?? [],
                 roles: rolesQueries[index]?.data ?? []
             }
             
         })
-    }, [utilisateursData, rolesQueries, ])//isLoading, panierMips]) // Recalculer si les utilisateurs, les rôles ou les paniers changent
+    }, [utilisateursData, rolesQueries, wishlistMap]) // Recalculer si les utilisateurs, les rôles ou les paniers changent
 
     //console.log("utilisateursfini : ", utilisateurs)
 
@@ -55,7 +77,7 @@ export const useUtilisateurs = () => {
 
     return { 
         utilisateurs,  // 👈 Tableau d'utilisateurs avec leurs rôles
-        isLoading: utilisateursLoading || isLoadingRoles ,//|| isLoading, // 👈 Considérer le chargement si les utilisateurs, les rôles ou les paniers sont en cours de chargement
+        isLoading: utilisateursLoading || isLoadingRoles || wishlistsLoading || isLoading, // 👈 Considérer le chargement si les utilisateurs, les rôles ou les paniers sont en cours de chargement
         utilisateurMap,
         isError, 
         error 
@@ -64,13 +86,20 @@ export const useUtilisateurs = () => {
 
 export const useUtilisateur = (id) => {
 
+    /*if (!id && !sessionStorage.getItem("userId")) {
+        console.warn("useUtilisateur appelé sans ID");
+        return { utilisateur: null, isLoading: false, isError: true, error: new Error("ID utilisateur requis") };
+    }*/
+   const finalId = id || sessionStorage.getItem("userId")
+
     const {isLoading:utilisateurPanierLoading, panierMips, refetch: refetchPaniers} = usePaniers()
     const {animalMapUtilisateur, isLoading} = useAnimals()
+    const {wishlistMap, isLoading: wishlistsLoading, refetch: refetchWishlists} = useWishlists()
 
     const { data: UtilisateurData, isLoading: utilisateurLoanding, isError, error, refetch: refetchUtilisateur } = useQuery({
-        queryKey: ["utilisateur", id],
-        queryFn: () => utilisateurApi.getByClerkId(id),
-        enabled: !!id
+        queryKey: ["utilisateur", finalId],
+        queryFn: () => utilisateurApi.getByClerkId(finalId),
+        enabled: !!finalId
     })
 
     const utilisateurRaw = UtilisateurData ?? []
@@ -92,6 +121,7 @@ export const useUtilisateur = (id) => {
     const refetch = async () => {
         // await refetchPaniers()
         await refetchUtilisateur()
+        await refetchWishlists()
     }
 
     // ✅ Plus de .map, on traite directement l'objet
@@ -107,9 +137,14 @@ export const useUtilisateur = (id) => {
             Panier: panier,
             Roles : UtilisateurRolesData ?? [],
             Refuge: UtilisateurRefugesData ?? [],
+            wishlist: wishlistMap.get(a.Id) ?? [],
             Animals: animals ?? []
         }
-    }, [UtilisateurData, UtilisateurRolesData, panierMips, UtilisateurRefugesData]);
+    }, [UtilisateurData, UtilisateurRolesData, panierMips, UtilisateurRefugesData, animalMapUtilisateur, wishlistMap]) // Recalculer si les données changent;
 
-    return { utilisateur, isLoading : utilisateurLoanding || utilisateurPanierLoading || UtilisateurRolesLoading || UtilisateurRefugesLoading || isError, isError, error, refetch }
+    return { utilisateur,
+         isLoading: utilisateurLoanding, 
+         isError, 
+         error, 
+         refetch }
 }

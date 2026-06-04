@@ -1,29 +1,40 @@
 import { useState } from 'react'
+import { useCreateReservation } from '../../hooks/useReservation'
+import { Type } from 'lucide-react'
 
-const ReservationForm = ({utilisateur, prestataire, initialSlot, onClose }) => {
+const ReservationForm = ({utilisateur, prestataire, initialSlot, onClose, TypeReservation }) => {
   const [submitted, setSubmitted] = useState(false)
+
   /*const [form, setForm] = useState({
     prenom: '', nom: '', telephone: '', email: '',
     animal: '', date: '', heure: '', duree: '1',
     notes: '',
   })*/
+
+  const createReservation = useCreateReservation()
  
 
-
   const [form, setForm] = useState({
+    TypeReservation: TypeReservation ?? "reservation",
     IdUtilisateur: utilisateur?.Id,
     IdProfil: initialSlot?.IdProfil || prestataire?.Id,
-    IdAnimal: '',
-    IdAnnonce: null,
+    IdAnimal: initialSlot?.IdAnimal ?? '',
+    IdAnnonce: initialSlot?.IdAnnonce ?? null,
     TypeService: prestataire?.TypeService || prestataire?.typeService?.Id,
     DateDebut: initialSlot?.DateDebut || '',
     DateFin: initialSlot?.DateFin || '',
-    Statut: 'En attente',
+    Statut: 2,//'En attente',
     PrixFinal: 0,
     Notes: '',
   })
 
-  if(!utilisateur?.animals?.length) {
+  const durationHours =
+    (new Date(form.DateFin).getTime() - new Date(form.DateDebut).getTime())
+    / (1000 * 60 * 60)
+
+  const prixFinal = Number(prestataire?.TarifHoraire || 0) * durationHours
+
+  if(!utilisateur?.Animals?.length) {
     return (
       <div className="text-center py-8 space-y-4">
         <div className="w-20 h-20 bg-error-container border-4 border-black rounded-full flex items-center justify-center mx-auto">
@@ -42,8 +53,16 @@ const ReservationForm = ({utilisateur, prestataire, initialSlot, onClose }) => {
 
   const update = (field, value) => setForm(prev => ({ ...prev, [field]: value }))
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
+    setForm(prev => ({ ...prev, PrixFinal: prixFinal }))
+    try {
+      await createReservation.mutateAsync(form)
+      setSubmitted(true)
+    } catch (error) {
+      console.error("Erreur réservation:", error)
+      alert("Erreur lors de la réservation")
+    }
     setSubmitted(true)
   }
 
@@ -87,6 +106,12 @@ const ReservationForm = ({utilisateur, prestataire, initialSlot, onClose }) => {
       <div className="p-3 bg-green-50 border-2 border-black rounded-lg text-sm font-bold">
         Créneau choisi : {new Date(form.DateDebut).toLocaleString('fr-FR')} → {new Date(form.DateFin).toLocaleString('fr-FR')}
       </div>
+
+      {TypeReservation === "annonce" ? (
+        <div className="p-3 bg-blue-50 border-2 border-black rounded-lg text-sm font-bold">
+          <input type="text" readOnly value={form.IdAnimal} />
+        </div>
+      ) : (
       <select
         required
         value={form.IdAnimal}
@@ -94,20 +119,24 @@ const ReservationForm = ({utilisateur, prestataire, initialSlot, onClose }) => {
         className={inputCls}
       >
         <option value="">Choisir un animal</option>
-        {utilisateur?.animals?.map(animal => (
+        {TypeReservation === "annonce" ? ( console.log("initialSlot.IdAnimal:", initialSlot) ||
+          <option key={initialSlot.IdAnimal} value={initialSlot.IdAnimal}>
+            {initialSlot.IdAnimal}
+          </option>
+        ) : (utilisateur?.Animals?.map(animal => (
           <option key={animal.Id} value={animal.Id}>
             {animal.Nom}
           </option>
-        ))}
-      </select>
+        )))}
+      </select>)}
       <div>
         <label className={labelCls}>Notes particulières</label>
-        <textarea className={inputCls + ' h-20 resize-none'} value={form.notes} onChange={e => update('notes', e.target.value)} placeholder="Allergies, comportement particulier..." />
+        <textarea className={inputCls + ' h-20 resize-none'} value={form.Notes} onChange={e => update('Notes', e.target.value)} placeholder="Allergies, comportement particulier..." />
       </div>
 
       {prestataire && (
         <div className="p-3 bg-surface-container border-2 border-dashed border-black rounded-lg text-sm font-bold">
-          Total estimé : <span className="text-primary">{(prestataire.TarifHoraire * parseFloat(form.duree || 1)).toFixed(2)} €</span>
+          Total estimé : <span className="text-primary">{prixFinal.toFixed(2)} €</span>
         </div>
       )}
 

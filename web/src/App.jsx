@@ -66,7 +66,7 @@ function App() {
 
   return (
     <Routes>
-      <Route path="/login" element={ isSignedIn ? <Navigate to = {"/lobby"}/> : /*<Auth />*/ <LoginPage/>}/>
+      <Route path="/login" element={ isSignedIn ? <Navigate to = {"/lobby"}/> : <Auth /> /*<LoginPage/>*/}/>
       {/* on l'a fait sortir car le navbar et le sidebar se metais a travers de notre chemin */}
       {/*<Route path="/sign-up" element={<SignUpPage/>}/>*/}
       {/*<Route path="/testChat" element={<TestChat/>}/>*/}

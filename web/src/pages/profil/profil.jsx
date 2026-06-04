@@ -3,19 +3,27 @@ import { Link, useParams } from 'react-router'
 import { PageTransition, FadeIn } from '../../components/Animations'
 import Modal from '../../components/ui/Modal'
 import AdoptionForm from '../../components/forms/AdoptionForm'
-import { animalApi, especeApi, raceApi } from '../../lib/api'
-import { useQuery } from '@tanstack/react-query'
+import { animalApi, especeApi, ligneWishlistApi, raceApi, wishlistApi } from '../../lib/api'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useAnimals,useAnimal } from '../../hooks/useAnimal'
 import Carousel from '../../components/ui/Carousel'
+import { useRefuge } from '../../hooks/useRefuge'
+import { useUtilisateur, useUtilisateurs, useUtilisateursNues } from '../../hooks/useUtilisateur'
+import { useUser } from '@clerk/clerk-react'
 //import { animaux } from '../data/mockData'
 
 const Profil = () => {
   const { id } = useParams()
   console.log("L'id :   ", id)
   const [adoptionOpen, setAdoptionOpen] = useState(false)
-  const [favoris, setFavoris] = useState(false)
+  //const [favoris, setFavoris] = useState(false)
+  //const {utilisateurMap, isLoading: utilisateursLoading} = useUtilisateurs()
+  const {utilisateurMap, isLoading: utilisateursLoading} = useUtilisateursNues()
+  const { user } = useUser()
+  const {utilisateur, isLoading: utilisateurLoading, refetch} = useUtilisateur(user?.id)
 
   const {animal, isLoading: AnimalLoading, isError, error}= useAnimal(id)
+  const {refuge, RefugesLoading} = useRefuge(animal?.possessions[0]?.IdRefuge, utilisateurMap)
 
   const [showCarousel, setShowCarousel] = useState(false);
   const [carouselStartIndex, setCarouselStartIndex] = useState(0);
@@ -24,6 +32,14 @@ const Profil = () => {
     setCarouselStartIndex(startIndex);
     setShowCarousel(true);
   };
+
+  const queryClient = useQueryClient()
+
+  const isFavorite = utilisateur?.wishlist?.ligneWishlist?.some(
+    l => l.IdAnimal === animal?.Id
+  )
+
+  const favoris = isFavorite
   
   const { data: photos = [] } = useQuery({
     queryKey: ["photos", id],
@@ -32,15 +48,94 @@ const Profil = () => {
   })
 
   console.log("L'animal :   ", animal)
-  if (AnimalLoading || !animal) {
+  console.log("Le refuge :   ", refuge)
+  if (AnimalLoading || !animal || RefugesLoading || utilisateurLoading || utilisateursLoading) {
+    console.log("Loading... ", {AnimalLoading, RefugesLoading, utilisateurLoading, utilisateursLoading})
     return <PageTransition><div className="p-12 text-center">Chargement…</div></PageTransition>
   }
 
-  
+  const openAdoptionModal = () => setAdoptionOpen(true)
 
 
   // Find animal by id or fallback to Barnabé
   //const animal = animaux.find(a => a.id === id) || animaux[0]
+
+  if ((!refuge && !RefugeLoading) || animal?.possessions[0]?.IdRefuge === null) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center p-6">
+        <div className="max-w-lg w-full bg-surface-container-lowest border-4 border-black rounded-3xl p-8 text-center shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+
+          <div className="w-24 h-24 mx-auto mb-6 bg-error-container border-4 border-black rounded-full flex items-center justify-center">
+            <span className="material-symbols-outlined text-error text-5xl">
+              pets
+            </span>
+          </div>
+
+          <h2 className="font-['Chewy'] text-4xl text-primary mb-3">
+            Animal indisponible
+          </h2>
+
+          <p className="text-on-surface-variant font-bold leading-relaxed mb-6">
+            Cet animal n'est actuellement rattaché à aucun refuge.
+            Il ne peut donc pas être proposé à l'adoption pour le moment.
+          </p>
+
+          <div className="bg-secondary-fixed border-2 border-black rounded-xl p-4 mb-6">
+            <p className="text-sm font-bold text-on-surface">
+              L'animal est probablement en cours de transfert,
+              d'archivage ou son dossier est incomplet.
+            </p>
+          </div>
+
+          <Link
+            to="/refanimal"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white border-2 border-black font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all rounded-xl"
+          >
+            <span className="material-symbols-outlined">
+              arrow_back
+            </span>
+            Retour aux animaux
+          </Link>
+        </div>
+      </div>
+    )
+  }
+
+  const handleWishlist = async () => {
+    console.log("Wishlist avant : ", utilisateur?.wishlist, animal?.Id)
+    if(!utilisateur?.wishlist?.Id ){
+      await wishlistApi.create({ IdUtilisateur: utilisateur.Id })
+      refetch() // Recharger les données de l'utilisateur pour obtenir la wishlist créée
+    }
+    if (!utilisateur?.wishlist?.Id || !animal?.Id) return
+
+    if (favoris) {
+      // supprimer de la wishlist
+      await ligneWishlistApi.delete(utilisateur.wishlist.ligneWishlist.find(l => l.IdAnimal === animal.Id)?.Id)
+      console.log("Retirer de la wishlist")
+      queryClient.invalidateQueries({
+        queryKey: ["wishlists"]
+      })
+      await queryClient.invalidateQueries({ queryKey: ["ligneWishlist", utilisateur.wishlist.Id] })
+    } else {
+      // ajouter à la wishlist
+      await ligneWishlistApi.create({
+        IdWishlist: utilisateur.wishlist.Id,
+        IdAnimal: animal.Id,
+        IdProduit: null,
+        Quantite: 1
+      })
+
+      queryClient.invalidateQueries({
+        queryKey: ["wishlists"]
+      })
+      await queryClient.invalidateQueries({ queryKey: ["ligneWishlist", utilisateur.wishlist.Id] })
+      console.log("Ajouter à la wishlist", {
+        IdWishlist: utilisateur.wishlist.Id,
+        IdAnimal: animal.Id
+      })
+    }
+  }
 
   return (
     <PageTransition>
@@ -197,11 +292,15 @@ const Profil = () => {
               <div className="flex justify-between items-start mb-4">
                 <div>
                   <span className="bg-secondary text-white px-3 py-1 rounded-full text-xs font-['Plus_Jakarta_Sans'] font-bold uppercase tracking-widest mb-2 inline-block">{animal.Id}</span>
-                  {<h1 className="text-5xl font-['Chewy'] text-primary mb-1">{animal?.Nom}</h1>}
-                  {<p className="font-['Plus_Jakarta_Sans'] font-bold text-secondary text-lg">{animal?.Race?.Nom} • {animal?.Age}</p>}
+                  <h1 className="text-5xl font-['Chewy'] text-primary mb-1">{animal.Nom}</h1>
+                  <p className="font-['Plus_Jakarta_Sans'] font-bold text-secondary text-lg">
+                    {animal?.Race?.Nom}
+                    {animal?.Race?.Espece?.Nom && <span className="text-on-surface-variant font-normal"> · {animal?.Race?.Espece?.Nom}</span>}
+                    <span className="mx-2">•</span>{animal?.Age}
+                  </p>
                 </div>
                 <button
-                  onClick={() => setFavoris(v => !v)}
+                  onClick={() => /*setFavoris(v => !v)*/handleWishlist()}
                   className="w-12 h-12 bg-white rounded-full border-2 border-black hover:bg-red-50 transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center"
                 >
                   <span className="material-symbols-outlined text-red-500 text-2xl" style={{ fontVariationSettings: favoris ? "'FILL' 1" : "'FILL' 0" }}>favorite</span>
@@ -210,10 +309,12 @@ const Profil = () => {
 
               <div className="grid grid-cols-2 gap-4 py-5 border-y-2 border-black/10 my-5">
                 {[
-                  { icon: 'straighten', label: 'Taille', value: `${animal.Taille} (${animal.Poids}Kg)` },
-                  { icon: 'health_and_safety', label: 'Santé', value: animal.EtatSantee },
-                  //{ icon: 'location_on', label: 'Lieu', value: animal.lieu },
-                  //{ icon: 'home_work', label: 'Habitat idéal', value: animal.habitat },
+                  { icon: 'straighten', label: 'Taille', value: animal?.TailleDisplay ?? animal?.Taille },
+                  { icon: 'scale', label: 'Poids', value: animal?.Poids },
+                  { icon: 'health_and_safety', label: 'Santé', value: animal?.EtatSantee
+                    ? (animal?.EtatSantee === 'Excellent' ? '😄 Excellent' : animal?.EtatSantee === 'Bon' ? '🙂 Bon' : '😟 Mauvais')
+                    : animal?.Santee },
+                  { icon: 'location_on', label: 'Lieu', value: /*animal?.Lieu*/ refuge?.Addresse || 'Inconnu' },
                 ].map(({ icon, label, value }) => (
                   <div key={label} className="flex items-center gap-3">
                     <span className="material-symbols-outlined text-primary bg-primary-fixed p-2 rounded-lg text-lg">{icon}</span>
@@ -227,14 +328,14 @@ const Profil = () => {
 
               <div className="space-y-3">
                 <button
-                  onClick={() => setAdoptionOpen(true)}
-                  className="w-full bg-[#154212] text-white py-4 px-8 border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-2px hover:translate-y-2px hover:shadow-none transition-all flex items-center justify-center gap-3 group font-['Plus_Jakarta_Sans'] font-extrabold text-lg uppercase"
+                  onClick={openAdoptionModal}
+                  className="w-full bg-[#154212] text-white py-4 px-8 border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all flex items-center justify-center gap-3 group font-['Plus_Jakarta_Sans'] font-extrabold text-lg uppercase"
                 >
                   Demander une rencontre
                   <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">pets</span>
                 </button>
                 <p className="text-center text-sm text-on-surface-variant italic">
-                  {animal?.Nom} attend sa famille depuis <strong>{/*animal.joursRefuge*/} jours</strong>.
+                  {animal?.Nom} attend sa famille depuis <strong>{animal?.JoursRefuge} jours</strong>.
                 </p>
               </div>
             </FadeIn>
@@ -255,32 +356,126 @@ const Profil = () => {
           <div className="lg:col-span-8 space-y-10">
             <FadeIn>
               <h2 className="text-3xl font-['Chewy'] text-primary mb-5 flex items-center gap-2">
-                <span className="material-symbols-outlined text-3xl">description</span> L'histoire de {animal?.Nom}
+                <span className="material-symbols-outlined text-3xl">description</span> L'histoire de {animal.Nom}
               </h2>
               <div className="bg-surface-container-lowest p-7 rounded-xl border-l-8 border-secondary leading-relaxed text-base shadow-sm">
-                {animal?.Description}
+                {animal.Description && animal.Description.trim()
+                  ? animal.Description
+                  : <span className="text-on-surface-variant italic">Aucune histoire renseignée pour le moment. Contactez le refuge pour en savoir plus sur {animal.Nom}.</span>
+                }
               </div>
             </FadeIn>
 
             <FadeIn delay={0.1}>
               <h2 className="text-3xl font-['Chewy'] text-primary mb-5 flex items-center gap-2">
-                <span className="material-symbols-outlined text-3xl">star</span> Besoins & Vie quotidienne
+                <span className="material-symbols-outlined text-3xl">star</span> Besoins &amp; Vie quotidienne
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                {[
-                  { icon: 'directions_run', bg: 'bg-tertiary-fixed text-on-tertiary-fixed', title: 'Activité physique', text: `${animal.Nom} a besoin de sorties régulières et de stimulation physique quotidienne.` },
-                  { icon: 'psychology', bg: 'bg-primary-fixed text-on-primary-fixed-variant', title: 'Stimulation mentale', text: 'Jouets d\'occupation et d\'interaction pour canaliser son énergie.' },
-                  { icon: 'pets', bg: 'bg-secondary-fixed text-on-secondary-fixed', title: 'Autres animaux', text: 'Sociable. Une rencontre avec vos animaux actuels sera organisée au refuge.' },
-                  //{ icon: 'home', bg: 'bg-surface-container-highest text-on-surface', title: 'Type de foyer', text: `${animal.habitat} recommandé.` },
-                ].map(({ icon, bg, title, text }) => (
-                  <div key={title} className={`${bg} p-5 rounded-xl border-2 border-black`}>
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="material-symbols-outlined">{icon}</span>
-                      <h3 className="font-['Plus_Jakarta_Sans'] font-bold text-sm uppercase">{title}</h3>
-                    </div>
-                    <p className="text-sm leading-relaxed">{text}</p>
+                <div className="bg-tertiary-fixed text-on-tertiary-fixed p-5 rounded-xl border-2 border-black">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="material-symbols-outlined">directions_run</span>
+                    <h3 className="font-['Plus_Jakarta_Sans'] font-bold text-sm uppercase">Activité physique</h3>
                   </div>
-                ))}
+                  <p className="text-sm leading-relaxed">
+                    {animal?.Energie === 'Haut'
+                      ? `${animal?.Nom} est très actif — plusieurs sorties par jour et de l'exercice intense sont nécessaires.`
+                      : animal?.Energie === 'Bas'
+                      ? `${animal?.Nom} est calme. Des promenades douces quotidiennes suffisent.`
+                      : `${animal?.Nom} a besoin de sorties régulières et de stimulation physique quotidienne.`
+                    }
+                  </p>
+                </div>
+                <div className="bg-primary-fixed text-on-primary-fixed-variant p-5 rounded-xl border-2 border-black">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="material-symbols-outlined">psychology</span>
+                    <h3 className="font-['Plus_Jakarta_Sans'] font-bold text-sm uppercase">Stimulation mentale</h3>
+                  </div>
+                  <p className="text-sm leading-relaxed">
+                    {(animal?.Caractere?.some(c => ['Curieux', 'Joueur', 'Sportif'].includes(c)))
+                      ? `${animal?.Nom} est ${animal?.Caractere?.filter(c => ['Curieux', 'Joueur', 'Sportif'].includes(c)).join(', ').toLowerCase()} — des jouets d'occupation et jeux variés sont essentiels.`
+                      : `Des interactions régulières et quelques jouets suffiront à stimuler ${animal?.Nom}.`
+                    }
+                  </p>
+                </div>
+                <div className="bg-secondary-fixed text-on-secondary-fixed p-5 rounded-xl border-2 border-black">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="material-symbols-outlined">pets</span>
+                    <h3 className="font-['Plus_Jakarta_Sans'] font-bold text-sm uppercase">Autres animaux</h3>
+                  </div>
+                  <p className="text-sm leading-relaxed">
+                    {(animal?.SociableAnimaux === 'oui' || animal?.SociableAnimaux === true)
+                      ? `${animal?.Nom} est sociable avec les autres animaux. Une introduction progressive est recommandée.`
+                      : `${animal?.Nom} préfère être le seul animal du foyer.`
+                    }
+                  </p>
+                </div>
+                <div className="bg-surface-container-highest text-on-surface p-5 rounded-xl border-2 border-black">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="material-symbols-outlined">home</span>
+                    <h3 className="font-['Plus_Jakarta_Sans'] font-bold text-sm uppercase">Type de foyer</h3>
+                  </div>
+                  <p className="text-sm leading-relaxed">
+                    {animal?.Habitat} recommandé.{(animal?.SociableEnfant === 'oui' || animal?.SociableEnfant === true) ? ` Compatible avec les enfants.` : ''}
+                  </p>
+                </div>
+              </div>
+            </FadeIn>
+
+            <FadeIn delay={0.2}>
+              <h2 className="text-3xl font-['Chewy'] text-primary mb-5 flex items-center gap-2 mt-10">
+                <span className="material-symbols-outlined text-3xl">location_on</span> Où rencontrer {animal.Nom} ?
+              </h2>
+              <div className="relative rounded-2xl overflow-hidden border-4 border-black shadow-[8px_8px_0px_0px_rgba(21,66,18,1)] bg-white group">
+                {/* Dark top strip */}
+                <div className="bg-[#154212] px-6 py-4 flex items-center justify-between">
+                  <p className="text-white/70 text-xs font-bold uppercase tracking-widest">
+                    {refuge ? refuge.ville + ' · ' + refuge.codePostal : 'Refuge'}
+                  </p>
+                  {refuge && (
+                    <Link
+                      to={`/refuges?refuge=${refuge.Id}`}
+                      className="text-xs font-bold text-secondary-fixed hover:text-white underline underline-offset-2 transition-colors"
+                    >
+                      Voir tous les refuges →
+                    </Link>
+                  )}
+                </div>
+
+                {/* Location card body */}
+                <div className="p-6 flex items-start gap-5">
+                  <div className="bg-red-50 p-4 rounded-xl border-2 border-black flex-shrink-0">
+                    <span className="material-symbols-outlined text-red-600 text-3xl block">location_on</span>
+                  </div>
+                  <div className="flex-grow">
+                    <h4 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[#1a1c18] text-lg leading-tight">
+                      {refuge ? refuge.Nom : animal.lieu}
+                    </h4>
+                    {refuge && (
+                      <>
+                        <p className="text-sm text-gray-500 font-medium mt-0.5">{refuge.Addresse}</p>
+                        <div className="flex flex-wrap gap-4 mt-3">
+                          <span className="inline-flex items-center gap-1.5 text-xs font-bold text-on-surface-variant">
+                            <span className="material-symbols-outlined text-sm">phone</span>
+                            {refuge.Telephone}
+                          </span>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {/* CTA button */}
+                {refuge && (
+                  <div className="px-6 pb-6">
+                    <Link
+                      to={`/refuges?refuge=${refuge?.Id}`}
+                      className="w-full flex items-center justify-center gap-2 py-3 bg-[#154212] text-white font-['Plus_Jakarta_Sans'] font-extrabold text-sm uppercase tracking-wider border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all rounded-xl"
+                    >
+                      <span className="material-symbols-outlined text-lg">apartment</span>
+                      Visiter le profil du refuge
+                    </Link>
+                  </div>
+                )}
               </div>
             </FadeIn>
           </div>
@@ -289,31 +484,25 @@ const Profil = () => {
           <aside className="lg:col-span-4 space-y-6">
             <FadeIn>
               <div className="bg-[#154212] text-white p-7 rounded-xl border-4 border-black shadow-[8px_8px_0px_0px_rgba(254,158,114,1)]">
-                <h3 className="text-2xl font-['Chewy'] mb-5">Adopter {animal?.Nom}</h3>
+                <h3 className="text-2xl font-['Chewy'] mb-5">Adopter {animal.Nom}</h3>
                 <ul className="space-y-4">
                   {['Remplissez le formulaire en ligne.', 'Contact téléphonique avec nos bénévoles.', 'Rencontre physique au refuge.'].map((step, i) => (
                     <li key={i} className="flex gap-3 items-start">
-                      <span className="shrink-0 w-8 h-8 rounded-full bg-white text-primary flex items-center justify-center font-extrabold">{i + 1}</span>
+                      <span className="flex-shrink-0 w-8 h-8 rounded-full bg-white text-primary flex items-center justify-center font-extrabold">{i + 1}</span>
                       <p className="text-sm pt-1">{step}</p>
                     </li>
                   ))}
                 </ul>
-                <button onClick={() => setAdoptionOpen(true)} className="mt-6 w-full py-3 bg-secondary text-white font-bold border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-2px hover:translate-y-2px hover:shadow-none transition-all">
+                <button onClick={openAdoptionModal} className="mt-6 w-full py-3 bg-secondary text-white font-bold border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all">
                   Commencer →
                 </button>
               </div>
             </FadeIn>
 
-            <FadeIn delay={0.1}>
-              <div className="bg-surface-container-low p-6 rounded-xl border-2 border-black relative overflow-hidden">
-                <span className="material-symbols-outlined absolute -top-2 -right-2 text-8xl text-black/5 rotate-12">format_quote</span>
-                <p className="italic text-on-surface-variant relative z-10 text-sm leading-relaxed">"{animal?.Nom} est le rayon de soleil du refuge. Il accueille chaque visiteur avec un enthousiasme débordant mais toujours respectueux."</p>
-                <p className="mt-3 font-bold text-primary text-sm">— Sarah, Soigneuse</p>
-              </div>
-            </FadeIn>
+
 
             <FadeIn delay={0.2}>
-              <Link to="/shop" className="block bg-white p-5 rounded-xl border-4 border-black text-center group hover:bg-secondary-fixed transition-colors shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+              <Link to="/boutique" className="block bg-white p-5 rounded-xl border-4 border-black text-center group hover:bg-secondary-fixed transition-colors shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
                 <span className="material-symbols-outlined text-tertiary text-4xl mb-2 block group-hover:scale-110 transition-transform">volunteer_activism</span>
                 <h4 className="font-['Plus_Jakarta_Sans'] font-extrabold uppercase text-sm tracking-tight">Soutenir le refuge</h4>
                 <p className="text-xs text-on-surface-variant mt-1">Achetez en boutique — 90% reversés au refuge</p>

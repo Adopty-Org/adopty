@@ -60,7 +60,7 @@ const AdoptionForm = ({ animal, onClose }) => {
       // Métadonnées
       IdUtilisateur: utilisateur?.Id,
       IdRefuge: refuge?.Id,
-      IdAnimal: animal?.Id || animal?.id, // Selon la structure de votre animal
+      IdAnimal: animal.Id, // Selon la structure de votre animal
       Statut: 2/*"en_attente"*/,
       DateDemande: new Date().toISOString(),
       AcceptConditions: form.acceptConditions

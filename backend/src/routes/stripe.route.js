@@ -2,6 +2,7 @@ import { Router } from "express";
 import * as stripeController from "../controlleurs/stripe.controlleur.js";
 import * as connectService from "../services/stripe/connect.service.js";
 import express from 'express';  // ← AJOUTE CETTE LIGNE
+import { protectRoute, refugeOnly } from "../midleware/auth.midleware.js";
 
 const router = Router();
 
@@ -101,5 +102,12 @@ router.post("/refresh/refuge/:refugeId", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+router.get(
+  "/refuge/:refugeId/onboarding-link",
+  protectRoute,
+  refugeOnly,
+  stripeController.createRefugeOnboardingLink
+);
 
 export default router;

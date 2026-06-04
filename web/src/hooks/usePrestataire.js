@@ -117,6 +117,11 @@ export const usePrestataires = () => {
         [prestataires]
     )
 
+    const prestatairesUtilMap = useMemo(
+        () => new Map(prestataires.map(p => [p.IdUtilisateur, p])),
+        [prestataires]
+    )
+
     // 5. Fonction utilitaire pour récupérer un prestataire avec ses specs
     const getPrestataireWithSpecs = (id) => {
         return prestatairesMap.get(id)
@@ -132,6 +137,7 @@ export const usePrestataires = () => {
     return { 
         prestataires, 
         prestatairesMap,
+        prestatairesUtilMap,
         getPrestataireWithSpecs,
         canHandleEspece,
         isLoading: PrestatairesLoading || SpecificationsLoading || especesLoading,
@@ -184,7 +190,7 @@ export const useUpdatePrestataire = () => {
     const queryClient = useQueryClient()
 
     const mutation = useMutation({
-        mutationFn: ({ id, data }) => profilPrestataireApi.update(id, data), // 👈 Prend id et data
+        mutationFn: ({ prestataire, id, data }) => profilPrestataireApi.update(prestataire, id, data), // 👈 Prend id et data
         onSuccess: (data, variables) => {
             // Invalider la liste pour recharger
             queryClient.invalidateQueries({ queryKey: ["prestataires"] })

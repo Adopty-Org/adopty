@@ -24,5 +24,5 @@ export const useTypeServices = () => {
 
 
 
-    return { TypeServicesData, TypeServicesLoading, isError, error, typeServicesMap, typeServicesWithAll }
+    return { TypeServicesData, typeServices, TypeServicesLoading, isError, error, typeServicesMap, typeServicesWithAll }
 }

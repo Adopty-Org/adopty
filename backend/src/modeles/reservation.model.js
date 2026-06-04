@@ -11,5 +11,6 @@ export class Reservation {
         this.Statut = data.Statut;
         this.PrixFinal = data.PrixFinal;
         this.Notes = data.Notes;
+        this.TypeReservation = data.TypeReservation;
     }
 }

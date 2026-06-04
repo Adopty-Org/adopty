@@ -294,7 +294,7 @@ function ServicesPage() {
         title={`Réserver — ${selectedPrestataire?.nom || ''}`}
         size="md"
       >
-        <ReservationForm prestataire={selectedPrestataire} onClose={() => setSelectedPrestataire(null)} />
+        <ReservationForm prestataire={selectedPrestataire} onClose={() => setSelectedPrestataire(null)} TypeReservation="reservation"/>
       </Modal>
     </PageTransition>
   )

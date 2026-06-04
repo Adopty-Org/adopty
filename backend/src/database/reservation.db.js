@@ -3,8 +3,8 @@ import { Reservation } from "../modeles/reservation.model.js";
 
 export const createReservation = async (reservation) => {
     const [result] = await db.query(
-        `INSERT INTO reservation (IdUtilisateur, IdProfil, IdAnimal, IdAnnonce, TypeService, DateDebut, DateFin, Statut, PrixFinal, Notes) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO reservation (IdUtilisateur, IdProfil, IdAnimal, IdAnnonce, TypeService, DateDebut, DateFin, Statut, PrixFinal, Notes, TypeReservation) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
             reservation.IdUtilisateur,
             reservation.IdProfil,
@@ -15,7 +15,9 @@ export const createReservation = async (reservation) => {
             reservation.DateFin,
             reservation.Statut,
             reservation.PrixFinal,
-            reservation.Notes
+            reservation.Notes,
+            reservation.TypeReservation
+
         ]
     );
 
@@ -70,6 +72,20 @@ export const updateReservation = async (id, reservation) => {
   return result.affectedRows;
 };
 
+export const updateReservationStatut = async (id, reservation) => {
+  const [result] = await db.query(
+    `UPDATE reservation SET 
+      Statut = ?
+     WHERE Id = ?`,
+    [
+      reservation.Statut,
+      id
+    ]
+  );
+
+  return result.affectedRows;
+};
+
 export const deleteReservation = async (id) => {
   const [result] = await db.query(
     "DELETE FROM reservation WHERE Id = ?",
@@ -79,3 +95,16 @@ export const deleteReservation = async (id) => {
   return result.affectedRows;
 };
 
+export const getAllReservationsByPrestataire = async (PrestataireId) => {
+  const [rows] = await db.query("SELECT * FROM reservation WHERE IdProfil = ?",[
+    PrestataireId
+  ]);
+  return rows.map(row => new Reservation(row));
+};
+
+export const getAllReservationsByUtilisateur = async (UtilisateurId) => {
+  const [rows] = await db.query("SELECT * FROM reservation WHERE IdUtilisateur = ?",[
+    UtilisateurId
+  ]);
+  return rows.map(row => new Reservation(row));
+};

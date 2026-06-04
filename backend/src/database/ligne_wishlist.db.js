@@ -3,12 +3,12 @@ import { LigneWishlist } from "../modeles/ligne_wishlist.model.js";
 
 export const createLigneWishlist = async (ligne_wishlist) => {
     const [result] = await db.query(
-        `INSERT INTO ligne_wishlist (IdWishlist, IdProduit, Quantite) 
-        VALUES (?, ?, ?)`,
+        `INSERT INTO ligne_wishlist (IdWishlist, IdProduit, IdAnimal, DateWishlist) 
+        VALUES (?, ?, ?, NOW())`,
         [
             ligne_wishlist.IdWishlist,
             ligne_wishlist.IdProduit,
-            ligne_wishlist.Quantite
+            ligne_wishlist.IdAnimal,
         ]
     );
 
@@ -36,12 +36,12 @@ export const updateLigneWishlist = async (id, ligne_wishlist) => {
     `UPDATE ligne_wishlist SET 
       IdWishlist = ?, 
       IdProduit = ?,
-      Quantite = ?
+      IdAnimal = ?
      WHERE Id = ?`,
     [
       ligne_wishlist.IdWishlist,
       ligne_wishlist.IdProduit,
-      ligne_wishlist.Quantite,
+      ligne_wishlist.IdAnimal,
       id
     ]
   );
@@ -58,3 +58,7 @@ export const deleteLigneWishlist = async (id) => {
   return result.affectedRows;
 };
 
+export const getLigneWishlistsByWishlist = async (wishlistId) => {
+  const [rows] = await db.query("SELECT * FROM ligne_wishlist WHERE IdWishlist = ?", [wishlistId]);
+  return rows.map(row => new LigneWishlist(row));
+};

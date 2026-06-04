@@ -3,8 +3,8 @@ import { Annonce } from "../modeles/annonce.model.js";
 
 export const createAnnonce = async (annonce) => {
     const [result] = await db.query(
-        `INSERT INTO annonce (IdUtilisateur, IdAnimal, TypeService, DateDebut, DateFin, PrixSouhaite, Statut, Notes) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO annonce (IdUtilisateur, IdAnimal, TypeService, DateDebut, DateFin, PrixSouhaite, Statut, Notes, TypeAnnonce) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
             annonce.IdUtilisateur,
             annonce.IdAnimal,
@@ -13,7 +13,8 @@ export const createAnnonce = async (annonce) => {
             annonce.DateFin,
             annonce.PrixSouhaite,
             annonce.Statut,
-            annonce.Notes
+            annonce.Notes,
+            annonce.TypeAnnonce
         ]
     );
 
@@ -46,7 +47,8 @@ export const updateAnnonce = async (id, annonce) => {
       DateFin = ?,
       PrixSouhaite = ?,
       Statut = ?,
-      Notes = ?
+      Notes = ?,
+      TypeAnnonce = ?
      WHERE Id = ?`,
     [
       annonce.IdUtilisateur,
@@ -57,6 +59,7 @@ export const updateAnnonce = async (id, annonce) => {
       annonce.PrixSouhaite,
       annonce.Statut,
       annonce.Notes,
+      annonce.TypeAnnonce,
       id
     ]
   );
@@ -73,3 +76,27 @@ export const deleteAnnonce = async (id) => {
   return result.affectedRows;
 };
 
+
+export const getAllAnnoncesUtilisateur = async () => {
+  const [rows] = await db.query("SELECT * FROM annonce WHERE TypeAnnonce = 'DEMANDE'");
+  return rows.map(row => new Annonce(row));
+};
+
+export const getAllAnnoncesPrestataire = async () => {
+  const [rows] = await db.query("SELECT * FROM annonce WHERE TypeAnnonce = 'OFFRE'");
+  return rows.map(row => new Annonce(row));
+};
+
+export const updateAnnonceStatut = async (id, annonce) => {
+  const [result] = await db.query(
+    `UPDATE annonce SET 
+      Statut = ?
+     WHERE Id = ?`,
+    [
+      annonce.Statut,
+      id
+    ]
+  );
+
+  return result.affectedRows;
+};
