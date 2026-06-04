@@ -8,6 +8,7 @@ import { usePrestataire } from '../../hooks/usePrestataire'
 import { useDisponibilites } from '../../hooks/useDisponibilite'
 import { useUtilisateur } from '../../hooks/useUtilisateur'
 import { useUser } from '@clerk/clerk-react'
+import ReportModal from '../../components/ReportModal'
 //import { useRequireAuthAction } from '../hooks/useRequireAuthAction'
 //import { useRoleAccess } from '../hooks/useRoleAccess'
 //import { getDisponibilitesByProfil } from '../services/publicApi'
@@ -34,6 +35,7 @@ const ProfilPrestataire = () => {
   const { id } = useParams()
   const [reservationOpen, setReservationOpen] = useState(false)
   const [calendarView, setCalendarView]       = useState(false)
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false)
   //const { requireAuthAction }                 = useRequireAuthAction()
   // const { backendUserId, isSignedIn }         = useRoleAccess()
   const {prestataire, isLoading} = usePrestataire(id)
@@ -325,7 +327,7 @@ const ProfilPrestataire = () => {
                     Accéder au Dashboard →
                   </Link>
                 </div>
-              ) : (
+              ) : (<>
                 <div className="bg-[#154212] text-white border-4 border-black rounded-2xl p-6 shadow-[6px_6px_0px_0px_rgba(254,158,114,1)] space-y-4">
                   <h3 className="font-['Chewy'] text-2xl">Réserver {prestataire?.utilisateur?.Nom.split(' ')[0]}</h3>
                   <ul className="space-y-3">
@@ -347,10 +349,22 @@ const ProfilPrestataire = () => {
                     {nbDisponibles > 0 ? 'Réserver →' : 'Indisponible'}
                   </button>
                 </div>
+                <FadeIn delay={0.35} className='margin-top-20px'>
+                <button
+                  onClick={() => setIsReportModalOpen(true)}
+                  className="flex items-center gap-2 justify-center w-full px-5 py-3 bg-[#ba1a1a] text-white border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all font-['Plus_Jakarta_Sans'] font-bold text-sm rounded-lg"
+                >
+                  <span className="material-symbols-outlined text-base">warning</span>
+                  Signaler ce prestataire
+                </button>
+              </FadeIn>
+              </>
               )}
             </FadeIn>
           </aside>
+          
         </div>
+        
       </div>
 
       {/* Modal réservation */}
@@ -369,7 +383,15 @@ const ProfilPrestataire = () => {
         />
       </Modal>
 
-      
+      {prestataire && (
+        <ReportModal
+          isOpen={isReportModalOpen}
+          onClose={() => setIsReportModalOpen(false)}
+          targetType="prestataire"
+          targetId={prestataire.Id}
+          targetName={prestataire?.Nom ?? "blud"}
+        />
+      )}
     </PageTransition>
   )
 }

@@ -36,7 +36,7 @@ export const useUtilisateurs = () => {
         queryFn: () => utilisateurApi.getAll(),
     })
 
-    const utilisateursRaw = utilisateursData ?? []
+    const utilisateursRaw = Array.isArray(utilisateursData) ? utilisateursData : []
     //console.log("utilisateursRaw : ", utilisateursRaw)
 
     // 2. Récupérer les rôles pour CHAQUE utilisateur
@@ -50,11 +50,11 @@ export const useUtilisateurs = () => {
 
     // 3. Combiner les utilisateurs avec leurs rôles
     const utilisateurs = useMemo(() => {
-        if (!utilisateursData) return []
+        if (!utilisateursRaw) return []
 
         
         
-        return utilisateursData.map((utilisateur, index) => {
+        return utilisateursRaw.map((utilisateur, index) => {
             const panier = panierMips.get(utilisateur.Id);
             return {
                 ...utilisateur,

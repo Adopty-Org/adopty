@@ -55,6 +55,8 @@ const PrestataireDashboard = () => {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false)
   const [isAvailModalOpen, setIsAvailModalOpen] = useState(false)
   const [editingAvail, setEditingAvail] = useState(null)
+  const [lannonce, setLannonce] = useState(false)
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false)
 
   const {user} = useUser()
 
@@ -408,7 +410,7 @@ const PrestataireDashboard = () => {
                         </button>
 
                         <button
-                          className="flex-1 py-2 bg-error text-white border-2 border-black rounded-lg font-bold"
+                          className="flex-1 py-2 bg-error text-white border-2 border-black rounded-lg font-bold" onClick={() => {setLannonce(annonce) ;setIsReportModalOpen(true)}}
                         >
                           Signaler
                         </button>
@@ -650,6 +652,16 @@ const PrestataireDashboard = () => {
           TypeReservation="annonce"
         />
       </Modal>
+
+      {lannonce && (
+        <ReportModal
+          isOpen={isReportModalOpen}
+          onClose={() => setIsReportModalOpen(false)}
+          targetType="lannonce"
+          targetId={lannonce.Id}
+          targetName={lannonce.Nom}
+        />
+      )}
       
     </PageTransition>
   )

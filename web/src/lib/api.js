@@ -520,7 +520,7 @@ export const annonceApi = {
         return data;
     },
 
-    uupdateStatut: async ({ id, formData }) => {
+    updateStatut: async ({ id, formData }) => {
         const { data } = await axiosInstance.patch(`/annonces/statut/${id}`, formData);
         return data;
     },
@@ -1878,8 +1878,23 @@ export const reservationApi = {
         );
         return data;
     },
+
     updateStatutOfReservation: async ({ prestataire, id, formData }) => {
         const { data } = await axiosInstance.put(`/reservations/statut/${id}/${prestataire}`, formData);
+        return data;
+    },
+
+    getReservationByUtilisateur: async (animal) => {
+        const { data } = await axiosInstance.get(
+            `/reservations/utilisateur/reserve/${animal}`
+        );
+        return data;
+    },
+
+    getReservationByPrestataire: async (animal) => {
+        const { data } = await axiosInstance.get(
+            `/reservations/prestataire/reserve/${animal}`
+        );
         return data;
     },
 };
@@ -1938,6 +1953,13 @@ export const signalementApi = {
     getByStatut: async (statut) => {
         const { data } = await axiosInstance.get(
             `/signalements/statut/${statut}`
+        );
+        return data;
+    },
+
+    getSignalementByUtilisateur: async (utilisateur) => {
+        const { data } = await axiosInstance.get(
+            `/signalements/utilisateurs/${utilisateur}`
         );
         return data;
     },

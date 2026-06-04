@@ -11,6 +11,7 @@ export const ConversationList = ({ onSelectConversation, selectedConversationId 
     const [unreadCounts, setUnreadCounts] = useState({});
     const { user } = useUser();
     const [isRefreshing, setIsRefreshing] = useState(false);
+    const [tab, setTab] = useState("messages")
 
     
 
@@ -82,6 +83,7 @@ export const ConversationList = ({ onSelectConversation, selectedConversationId 
                     
                     // Vérifier si l'utilisateur actuel est participant
                     const isUserParticipant = participants.some(p => p.Id === utilisateur.Id);
+                    const myParticipant = participants.find(p => p.Id === utilisateur.Id)
                     
                     if (isUserParticipant) {
                         // Enrichir la conversation avec les infos nécessaires pour l'affichage
@@ -89,7 +91,7 @@ export const ConversationList = ({ onSelectConversation, selectedConversationId 
                         
                         // Déterminer le nom d'affichage
                         let displayName = `Conversation ${conv.Id}`;
-                        if (conv.Type === "direct" && otherParticipants.length === 1) {
+                        if ((conv.Type === "direct"||conv.Type === "private") && otherParticipants.length === 1) {
                             const other = otherParticipants[0];
                             displayName = `${other.Prenom || ''} ${other.Nom || ''}`.trim() || "Utilisateur";
                         } else if (conv.Type === "group") {
@@ -113,6 +115,18 @@ export const ConversationList = ({ onSelectConversation, selectedConversationId 
                             newUnreadCounts[conv.Id] = unreadCount;
                         }
 
+                        console.log("🔥 CONV DISPLAY DEBUG", {
+  convId: conv.Id,
+  convType: conv.Type,
+  currentUserId: utilisateur.Id,
+  participants,
+  otherParticipants,
+  otherCount: otherParticipants.length,
+  displayName,
+  conv:conv,
+  myParticipant: myParticipant
+})
+
                         userConversations.push({
                             id: conv.Id,
                             type: conv.Type,
@@ -124,6 +138,8 @@ export const ConversationList = ({ onSelectConversation, selectedConversationId 
                             lastMessage: lastMessage,
                             lastMessageTime: lastMessage ? lastMessage.CreatedAt : conv.CreatedAt,
                             lastMessageContent: lastMessage ? lastMessage.Contenu : "Aucun message",
+                            myRole: myParticipant?.Role,
+                            myStatut: myParticipant?.Statut,
                         });
                         //console.log(`Conv ${conv.Id} - Unread count:`, userConversations);
                     }
@@ -221,64 +237,132 @@ export const ConversationList = ({ onSelectConversation, selectedConversationId 
     }
     //console.log("Conversations with unread counts:", conversations);
 
-    return (
-        <div style={styles.container}>
-            <h3 style={styles.title}>Mes conversations</h3>
-            <div style={styles.list}>
-                {conversations.map((conv) => {
-                    const hasUnread = unreadCounts[conv.id] > 0;
-                    const unreadCount = unreadCounts[conv.id] || 0;
+    //const requests = conversations.filter(conv => conv.type === "request")
+    const requests = conversations.filter(conv => (conv.myStatut === 2 || conv.myStatut === 6))
+    //const messages = conversations.filter(conv => (conv.myStatut !== 2 && conv.myStatut === 6))
+    const messages = conversations.filter(conv => conv.type !== "request")
+    const shownConversations = tab === "requests" ? requests : messages
 
-                    
-                    return (
-                        <div
-                            key={conv.id}
-                            onClick={() => handleSelectConversation(conv.id)}
-                            style={{
-                                ...styles.conversationItem,
-                                ...(selectedConversationId === conv.id ? styles.selectedItem : {}),
-                                ...(hasUnread && !selectedConversationId === conv.id ? styles.unreadItem : {}),
-                            }}
-                        >
-                            <div style={styles.avatar}>
-                                {conv.type === "group" ? "👥" : "👤"}
-                                {hasUnread && <div style={styles.unreadDot} />}
-                            </div>
-                            <div style={styles.convInfo}>
-                                <div style={styles.convNameRow}>
-                                    <div style={{
-                                        ...styles.convName,
-                                        ...(hasUnread ? styles.unreadName : {})
-                                    }}>
-                                        {conv.displayName}
-                                    </div>
-                                    {hasUnread && (
-                                        <div style={styles.unreadBadge}>
-                                            {unreadCount > 99 ? '99+' : unreadCount}
-                                        </div>
-                                    )}
-                                </div>
-                                <div style={styles.lastMessage}>
-                                    <span style={styles.lastMessageText}>
-                                        {conv.lastMessageContent?.length > 50 
-                                            ? conv.lastMessageContent.substring(0, 50) + '...' 
-                                            : conv.lastMessageContent}
-                                    </span>
-                                    <span style={styles.lastMessageTime}>
-                                        {formatRelativeTime(conv.lastMessageTime)}
-                                    </span>
-                                </div>
-                                <div style={styles.convMeta}>
-                                    {conv.type === "group" 
-                                        ? `${conv.participants.length} participants`
-                                        : "Direct message"}
-                                </div>
-                            </div>
-                        </div>
-                    );
-                })}
+    return (
+        <aside className="flex-shrink-0 border-r-4 border-black flex flex-col h-full w-full lg:w-80 bg-surface-container-lowest">
+            
+            {/* Header */}
+            <div className="px-4 py-4 border-b-4 border-black bg-surface-container">
+            <div className="flex items-center justify-between">
+                <h3 className="font-['Chewy'] text-2xl text-primary">
+                Mes conversations
+                </h3>
+
+                {isRefreshing && (
+                <span className="material-symbols-outlined text-primary animate-spin text-xl">
+                    sync
+                </span>
+                )}
             </div>
-        </div>
+            </div>
+
+            {/* Onglets */}
+            <div className="flex border-b-4 border-black flex-shrink-0">
+            <button
+                onClick={() => setTab("messages")}
+                className={`flex-1 py-3 text-xs font-bold uppercase tracking-wider transition-colors
+                ${tab === "messages"
+                    ? "bg-primary text-white"
+                    : "bg-surface-container text-on-surface-variant hover:bg-surface-container-highest"}`}
+            >
+                Messages
+                {messages.length > 0 && (
+                <span className={`ml-1.5 px-1.5 py-0.5 rounded-full text-[10px] font-bold border border-black
+                    ${tab === "messages" ? "bg-white text-primary" : "bg-primary text-white"}`}>
+                    {messages.length}
+                </span>
+                )}
+            </button>
+
+            <button
+                onClick={() => setTab("requests")}
+                className={`flex-1 py-3 text-xs font-bold uppercase tracking-wider transition-colors border-l-4 border-black relative
+                ${tab === "requests"
+                    ? "bg-secondary text-white"
+                    : "bg-surface-container text-on-surface-variant hover:bg-surface-container-highest"}`}
+            >
+                Demandes
+                {requests.length > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-error text-white text-[10px] font-bold rounded-full border-2 border-black flex items-center justify-center">
+                    {requests.length}
+                </span>
+                )}
+            </button>
+            </div>
+
+            {/* Liste */}
+            <div className="flex-1 overflow-y-auto">
+            {shownConversations.map((conv) => {
+                const hasUnread = unreadCounts[conv.id] > 0
+                const unreadCount = unreadCounts[conv.id] || 0
+                const isSelected = selectedConversationId === conv.id
+
+                return (
+                <button
+                    key={conv.id}
+                    onClick={() => handleSelectConversation(conv.id)}
+                    className={`w-full text-left px-4 py-4 border-b border-outline-variant transition-all flex items-center gap-3 relative
+                    hover:bg-surface-container
+                    ${isSelected ? "bg-primary-fixed border-l-4 border-l-primary" : ""}
+                    ${hasUnread && !isSelected ? "bg-secondary-fixed/40" : ""}
+                    `}
+                >
+                    {/* Avatar */}
+                    <div className={`relative w-11 h-11 rounded-full border-2 border-black flex items-center justify-center flex-shrink-0
+                    ${conv.type === "group" ? "bg-primary" : "bg-secondary"}
+                    `}>
+                    <span className="text-white font-bold text-sm">
+                        {conv.type === "group"
+                        ? "👥"
+                        : (conv.displayName || "?").charAt(0).toUpperCase()}
+                    </span>
+
+                    {hasUnread && (
+                        <span className="absolute -bottom-1 -right-1 w-4 h-4 bg-error rounded-full border-2 border-black" />
+                    )}
+                    </div>
+
+                    {/* Infos */}
+                    <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-2">
+                        <p className={`text-sm truncate ${hasUnread ? "font-extrabold text-on-surface" : "font-bold"}`}>
+                        {conv.displayName}
+                        </p>
+
+                        <span className="text-[10px] text-on-surface-variant flex-shrink-0">
+                        {formatRelativeTime(conv.lastMessageTime)}
+                        </span>
+                    </div>
+
+                    <p className={`text-xs truncate mt-1 ${hasUnread ? "font-bold text-on-surface" : "text-on-surface-variant"}`}>
+                        {conv.lastMessageContent?.length > 50
+                        ? conv.lastMessageContent.substring(0, 50) + "..."
+                        : conv.lastMessageContent}
+                    </p>
+
+                    <p className="text-[10px] text-on-surface-variant mt-1">
+                        {conv.type === "group"
+                        ? `${conv.participants.length} participants`
+                        : "Direct message"}
+                    </p>
+                    </div>
+
+                    {/* Badge non lu */}
+                    {hasUnread && (
+                    <div className="min-w-5 h-5 px-1.5 rounded-full bg-error text-white text-[10px] font-bold border-2 border-black flex items-center justify-center">
+                        {unreadCount > 99 ? "99+" : unreadCount}
+                    </div>
+                    )}
+                </button>
+                )
+            })}
+            </div>
+        </aside>
     );
 };
 
@@ -480,4 +564,61 @@ styleSheet.textContent = `
         opacity: 0.6;
     }
 `;
-document.head.appendChild(styleSheet);
+document.head.appendChild(styleSheet);{/*
+        <div style={styles.container}>
+            <h3 style={styles.title}>Mes conversations</h3>
+            <div style={styles.list}>
+                {conversations.map((conv) => {
+                    const hasUnread = unreadCounts[conv.id] > 0;
+                    const unreadCount = unreadCounts[conv.id] || 0;
+
+                    
+                    return (
+                        <div
+                            key={conv.id}
+                            onClick={() => handleSelectConversation(conv.id)}
+                            style={{
+                                ...styles.conversationItem,
+                                ...(selectedConversationId === conv.id ? styles.selectedItem : {}),
+                                ...(hasUnread && !selectedConversationId === conv.id ? styles.unreadItem : {}),
+                            }}
+                        >
+                            <div style={styles.avatar}>
+                                {conv.type === "group" ? "👥" : "👤"}
+                                {hasUnread && <div style={styles.unreadDot} />}
+                            </div>
+                            <div style={styles.convInfo}>
+                                <div style={styles.convNameRow}>
+                                    <div style={{
+                                        ...styles.convName,
+                                        ...(hasUnread ? styles.unreadName : {})
+                                    }}>
+                                        {conv.displayName}
+                                    </div>
+                                    {hasUnread && (
+                                        <div style={styles.unreadBadge}>
+                                            {unreadCount > 99 ? '99+' : unreadCount}
+                                        </div>
+                                    )}
+                                </div>
+                                <div style={styles.lastMessage}>
+                                    <span style={styles.lastMessageText}>
+                                        {conv.lastMessageContent?.length > 50 
+                                            ? conv.lastMessageContent.substring(0, 50) + '...' 
+                                            : conv.lastMessageContent}
+                                    </span>
+                                    <span style={styles.lastMessageTime}>
+                                        {formatRelativeTime(conv.lastMessageTime)}
+                                    </span>
+                                </div>
+                                <div style={styles.convMeta}>
+                                    {conv.type === "group" 
+                                        ? `${conv.participants.length} participants`
+                                        : "Direct message"}
+                                </div>
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+        </div>*/}

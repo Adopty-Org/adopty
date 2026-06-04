@@ -6,6 +6,7 @@ const router = Router()
 // routes speciales
 
 router.get("/utilisateur/:Utilisateur", signalement.getUtilisateurOfSignalementControlleur);
+router.get("/utilisateurs/:Utilisateur", signalement.getAllSignalementsByUtilisateurControlleur);
 router.get("/statut/:Statut", signalement.getStatutOfSignalementControlleur);
 
 router.post("/", signalement.createSignalementControlleur);

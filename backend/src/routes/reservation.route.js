@@ -5,6 +5,8 @@ import { protectRoute, isOwnerOrAdmin, isPrestataireOwnerOrAdmin } from "../midl
 const router = Router()
 
 // Routes spéciales de lecture (protégées)
+router.get("/prestataire/reserve/:Prestataire", protectRoute, reservation.getAllReservationsByPrestataireControlleur);
+router.get("/utilisateur/reserve/:Utilisateur", protectRoute, reservation.getAllReservationsByUtilisateurControlleur);
 router.get("/utilisateur/:Utilisateur", protectRoute, reservation.getUtilisateurOfReservationControlleur);
 router.get("/type_service/:TypeService", reservation.getTypeServiceOfReservationControlleur);
 router.get("/statut/:Statut", reservation.getStatutOfReservationControlleur);

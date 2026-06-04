@@ -3,7 +3,7 @@ import { getAnimalById } from "../database/animal.db.js";
 import { getAnnonceById } from "../database/annonce.db.js";
 import { createDisponibilite } from "../database/disponibilite.db.js";
 import { getProfilPrestataireById } from "../database/profil_prestataire.db.js";
-import { createReservation, deleteReservation, getAllReservations, getReservationById, updateReservation, updateReservationStatut } from "../database/reservation.db.js";
+import { createReservation, deleteReservation, getAllReservations, getAllReservationsByPrestataire, getAllReservationsByUtilisateur, getReservationById, updateReservation, updateReservationStatut } from "../database/reservation.db.js";
 import { getStatutById } from "../database/statut.db.js";
 import { getTypeServiceById } from "../database/type_service.db.js";
 import { getUtilisateurById } from "../database/utilisateur.db.js";
@@ -256,4 +256,36 @@ export async function updateStatutOfReservationControlleur(req,res) {
   } finally {
     connection.release()
   }
+}
+
+export async function getAllReservationsByPrestataireControlleur(req,res) {
+    try {
+        const { Prestataire } = req.params;
+        const utilisateur = await getAllReservationsByPrestataire(Prestataire);
+        if (!utilisateur) {
+            return res.status(404).json({ message: "Reservation a un utilisateur inexistant !(non trouvé)" });
+        }
+        console.log("les reservations par prestataire : ", utilisateur)
+        res.status(200).json(utilisateur);
+        
+    } catch (error) {
+        console.error("Erreur lors de l'obtention de l'animal de l'annonce:", error);
+        res.status(500).json({ message: "Erreur interne du serveur" });
+    }
+}
+
+export async function getAllReservationsByUtilisateurControlleur(req,res) {
+    try {
+        const { Utilisateur } = req.params;
+        const utilisateur = await getAllReservationsByUtilisateur(Utilisateur);
+        if (!utilisateur) {
+            return res.status(404).json({ message: "Reservation a un utilisateur inexistant !(non trouvé)" });
+        }
+        console.log("les reservations par utilisateur : ", utilisateur)
+        res.status(200).json(utilisateur);
+        
+    } catch (error) {
+        console.error("Erreur lors de l'obtention de l'animal de l'annonce:", error);
+        res.status(500).json({ message: "Erreur interne du serveur" });
+    }
 }

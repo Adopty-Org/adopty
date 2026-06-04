@@ -27,6 +27,29 @@ export const useSignalements = () => {
     })
 }
 
+export const useSignalementsByUser = (id) => {
+
+    const {data:SignalementsData, isLoading:SignalementsLoading, isError, error } = useQuery({
+        queryKey: ["signalements"],
+        queryFn: () =>  signalementApi.getSignalementByUtilisateur(id),
+    }) 
+
+    const signalements = SignalementsData ?? []
+
+    const signalementMap = useMemo(
+    () => new Map(signalements.map(e => [e.Id, e])),
+    [signalements]
+  )
+
+    return ({
+        signalements,
+        signalementMap,
+        SignalementsLoading,
+        isError,
+        error
+    })
+}
+
 export const useCreateSignalement = () => {
   const queryClient = useQueryClient()
 

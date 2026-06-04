@@ -3,6 +3,7 @@ import { Link, useParams, useNavigate } from 'react-router'
 import { PageTransition, FadeIn } from '../../components/Animations'
 import Pagination from '../../components/ui/Pagination'
 import { useRefuge } from '../../hooks/useRefuge'
+import ReportModal from '../../components/ReportModal'
 //import { getRefugeById, getAnimauxByRefuge } from '../services/publicApi'
 //import { mapRefuge } from '../mappers/refugeMapper'
 //import { mapAnimals } from '../mappers/animalMapper'
@@ -72,6 +73,7 @@ const RefugeProfile = () => {
   const [error, setError] = useState(null)
   const [filterStatut, setFilterStatut] = useState('all')
   const [currentPage, setCurrentPage] = useState(1)
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false)
 
   const [hasLoaded, setHasLoaded] = useState(false) // ✅ Flag pour éviter les rechargements
   const {refuge: refugeData, RefugesLoading} = useRefuge(id)
@@ -164,7 +166,7 @@ const RefugeProfile = () => {
         <FadeIn className="flex items-center gap-2 text-sm font-bold text-on-surface-variant mb-8">
           <Link to="/" className="hover:text-primary transition-colors">Accueil</Link>
           <span className="material-symbols-outlined text-base">chevron_right</span>
-          <Link to="/refuges" className="hover:text-primary transition-colors">Refuges</Link>
+          <Link to="/realrefuge" className="hover:text-primary transition-colors">Refuges</Link>
           <span className="material-symbols-outlined text-base">chevron_right</span>
           <span className="text-primary">{refuge?.Nom}</span>
         </FadeIn>
@@ -336,10 +338,21 @@ const RefugeProfile = () => {
               </div>
             </FadeIn>
 
+            {/* Bouton Signaler */}
+            <FadeIn delay={0.35}>
+              <button
+                onClick={() => setIsReportModalOpen(true)}
+                className="flex items-center gap-2 justify-center w-full px-5 py-3 bg-[#ba1a1a] text-white border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all font-['Plus_Jakarta_Sans'] font-bold text-sm rounded-lg"
+              >
+                <span className="material-symbols-outlined text-base">warning</span>
+                Signaler ce refuge
+              </button>
+            </FadeIn>
+
             {/* Lien retour */}
             <FadeIn delay={0.4}>
               <Link
-                to="/refuges"
+                to="/realrefuge"
                 className="flex items-center gap-2 justify-center w-full px-5 py-3 bg-surface-container-lowest border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all font-bold text-sm rounded-2xl"
               >
                 <span className="material-symbols-outlined text-base group-hover:-translate-x-1 transition-transform">arrow_back</span>
@@ -349,6 +362,16 @@ const RefugeProfile = () => {
           </div>
         </div>
       </div>
+
+      {refuge && (
+        <ReportModal
+          isOpen={isReportModalOpen}
+          onClose={() => setIsReportModalOpen(false)}
+          targetType="refuge"
+          targetId={refuge.Id}
+          targetName={refuge.Nom}
+        />
+      )}
     </PageTransition>
   )
 }

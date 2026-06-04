@@ -13,6 +13,7 @@ import { useUtilisateur } from '../../hooks/useUtilisateur'
 import { useUser } from '@clerk/clerk-react'
 import { ligneWishlistApi, wishlistApi } from '../../lib/api'
 import { useQueryClient } from '@tanstack/react-query'
+import ReportModal from '../../components/ReportModal'
 
 const ProductDetail = () => {
   const { id } = useParams()
@@ -27,6 +28,7 @@ const ProductDetail = () => {
   //const { requireAuthAction } = useRequireAuthAction()
 
   const [hasLoaded, setHasLoaded] = useState(false) // ✅ Flag pour éviter les rechargements
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false)
 
   const queryClient = useQueryClient()
 
@@ -247,6 +249,8 @@ const ProductDetail = () => {
           </div>
         </div>
 
+        
+
         {/* Refuge Info Section */}
         <FadeIn delay={0.3} className="mt-12">
           <h2 className="text-3xl font-['Plus_Jakarta_Sans'] font-extrabold text-primary mb-8 flex items-center gap-3">
@@ -297,7 +301,46 @@ const ProductDetail = () => {
             </div>
           </div>
         </FadeIn>
+
+        {/* Bouton Signaler */}
+        <FadeIn delay={0.35} className="margin-top-20px">
+          <button
+            onClick={() => setIsReportModalOpen(true)}
+            className="
+              w-full
+              flex items-center justify-center gap-2
+              px-5 py-3
+              bg-surface-container
+              text-error
+              border-4 border-black
+              rounded-xl
+              font-bold text-sm
+              shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]
+              hover:bg-error
+              hover:text-white
+              hover:translate-x-[2px]
+              hover:translate-y-[2px]
+              hover:shadow-none
+              transition-all
+            "
+          >
+            <span className="material-symbols-outlined">
+              flag
+            </span>
+            Signaler ce produit
+          </button>
+        </FadeIn>
       </div>
+
+      {produit && (
+        <ReportModal
+          isOpen={isReportModalOpen}
+          onClose={() => setIsReportModalOpen(false)}
+          targetType="produit"
+          targetId={produit.Id}
+          targetName={produit.Nom}
+        />
+      )}
     </PageTransition>
   )
 }

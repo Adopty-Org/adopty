@@ -128,11 +128,11 @@ export const useAnimals = () => {
             const photos = stablePhotosData[index] ?? EMPTY_ARRAY
             const possessions = stablePossessionsData[index] ?? EMPTY_ARRAY
 
-            console.log(
+            /*console.log(
             a.Id,
             stablePhotosData[index],
             stablePossessionsData[index]
-            )
+            )*/
             
             return {
                 ...a,

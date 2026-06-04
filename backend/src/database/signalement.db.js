@@ -67,3 +67,9 @@ export const deleteSignalement = async (id) => {
   return result.affectedRows;
 };
 
+export const getAllSignalementsByUtilisateur = async (id) => {
+  const [rows] = await db.query("SELECT * FROM signalement WHERE IdUtilisateur = ?",[
+    id
+  ]);
+  return rows.map(row => new Signalement(row));
+};

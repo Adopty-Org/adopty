@@ -95,6 +95,52 @@ export const useReservation = (id) => {
     }
 }
 
+export const useReservationsByPrestataire = (id) => {
+
+    const {data:ReservationsData, isLoading:ReservationsLoading, isError, error } = useQuery({
+        queryKey: ["reservations", "prestataire", id],
+        queryFn: () =>  reservationApi.getReservationByPrestataire(id),
+    }) 
+
+    const reservations = ReservationsData ?? []
+
+    const reservationMap = useMemo(
+    () => new Map(reservations.map(e => [e.Id, e])),
+    [reservations]
+  )
+
+    return ({
+        reservations,
+        reservationMap,
+        ReservationsLoading,
+        isError,
+        error
+    })
+}
+
+export const useReservationsByUtilisateur = (id) => {
+
+    const {data:ReservationsData, isLoading:ReservationsLoading, isError, error } = useQuery({
+        queryKey: ["reservations", "utilisateur", id],
+        queryFn: () =>  reservationApi.getReservationByUtilisateur(id),
+    }) 
+
+    const reservations = ReservationsData ?? []
+
+    const reservationMap = useMemo(
+    () => new Map(reservations.map(e => [e.Id, e])),
+    [reservations]
+  )
+
+    return ({
+        reservations,
+        reservationMap,
+        ReservationsLoading,
+        isError,
+        error
+    })
+}
+
 export const useCreateReservation = () => {
     const queryClient = useQueryClient()
 

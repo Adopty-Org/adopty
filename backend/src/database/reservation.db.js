@@ -95,3 +95,16 @@ export const deleteReservation = async (id) => {
   return result.affectedRows;
 };
 
+export const getAllReservationsByPrestataire = async (PrestataireId) => {
+  const [rows] = await db.query("SELECT * FROM reservation WHERE IdProfil = ?",[
+    PrestataireId
+  ]);
+  return rows.map(row => new Reservation(row));
+};
+
+export const getAllReservationsByUtilisateur = async (UtilisateurId) => {
+  const [rows] = await db.query("SELECT * FROM reservation WHERE IdUtilisateur = ?",[
+    UtilisateurId
+  ]);
+  return rows.map(row => new Reservation(row));
+};

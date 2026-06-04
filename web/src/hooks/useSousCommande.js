@@ -16,7 +16,7 @@ export const useSousCommandes = () => {
 
   const { statutMap } = useStatut()
 
-  const sousCommandesRaw = SousCommandesData ?? []
+  const sousCommandesRaw =  Array.isArray(SousCommandesData) ? SousCommandesData : []
 
   const lignesQueries = useQueries({
     queries: sousCommandesRaw.map((sc) => ({

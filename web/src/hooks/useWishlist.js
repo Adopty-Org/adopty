@@ -14,12 +14,13 @@ export const useWishlists = () => {
     queryFn: wishlistApi.getAll,
   })
 
-  const wishlists = WishlistsData ?? []
+  // ✅ ICI
+  const wishlists = Array.isArray(WishlistsData) ? WishlistsData : []
 
   const ligneWishlistQueries = useQueries({
-    queries: wishlists?.map(wishlist => ({
+    queries: wishlists.map(wishlist => ({
       queryKey: ["ligneWishlist", wishlist?.Id],
-      queryFn: () => ligneWishlistApi.getLignesByWishlist(wishlist?.Id),
+      queryFn: () => ligneWishlistApi.getLignesByWishlist(wishlist.Id),
       enabled: !!wishlist?.Id,
     }))
   })

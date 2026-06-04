@@ -260,7 +260,7 @@ const UserProfile = () => {
           formData: { Statut: statut, IdProfil: prestataire.Id }
         })
 
-        await annonceApi.uupdateStatut({
+        await annonceApi.updateStatut({
           id: IdAnnonce,
           formData: { Statut: statut }
         })

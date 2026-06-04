@@ -226,7 +226,7 @@ const BreedDetailModal = ({ breed, isOpen, onClose }) => {
                           Aucun {breed?.Nom} au refuges en ce moment.
                         </p>
                         <Link
-                          to="/animaux"
+                          to="/refanimal"
                           onClick={onClose}
                           className="text-xs font-black uppercase text-primary underline underline-offset-4"
                         >
