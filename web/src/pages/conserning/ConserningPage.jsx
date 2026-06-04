@@ -206,14 +206,14 @@ const APropos = () => {
             </p>
             <div className="flex flex-wrap items-center justify-center gap-5">
               <Link
-                to="/animaux"
+                to="/refanimal"
                 className="bg-white text-primary px-8 py-4 font-['Plus_Jakarta_Sans'] font-extrabold text-lg border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none transition-all flex items-center gap-3"
               >
                 <span className="material-symbols-outlined">pets</span>
                 Adopter maintenant
               </Link>
               <Link
-                to="/boutique"
+                to="/shop"
                 className="bg-secondary text-white px-8 py-4 font-['Plus_Jakarta_Sans'] font-extrabold text-lg border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none transition-all flex items-center gap-3"
               >
                 <span className="material-symbols-outlined">volunteer_activism</span>

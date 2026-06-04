@@ -107,7 +107,10 @@ const Dashboard = () => {
           adoptionsMois: 0,//allAnnonces.length || statsAdmin.adoptionsMois,
           adoptionsTotal: 0,//allAnnonces.length || statsAdmin.adoptionsTotal,
           caBoutique:
-            produits.reduce((sum, p) => sum + (Number(p.Prix ?? p.prix ?? 0) * Number(p.Stock ?? p.stock ?? 1)), 0)
+            commandes.reduce(
+    (sum, cmd) => sum + Number(cmd.totalGeneral ?? 0),
+    0
+  )
             || 0,//statsAdmin.caBoutique ,
           commandesEnAttente:
             commandes.filter((commande) => String(commande.statut?.Statut)?.toLowerCase().includes('attente')).length,
@@ -200,7 +203,10 @@ const Dashboard = () => {
           adoptionsMois: 0,//allAnnonces.length || statsAdmin.adoptionsMois,
           adoptionsTotal: 0,//allAnnonces.length || statsAdmin.adoptionsTotal,
           caBoutique:
-            produits.reduce((sum, p) => sum + (Number(p.Prix ?? p.prix ?? 0) * Number(p.Stock ?? p.stock ?? 1)), 0)
+            commandes.reduce(
+    (sum, cmd) => sum + Number(cmd.totalGeneral ?? 0),
+    0
+  )
             || 0,//statsAdmin.caBoutique ,
           commandesEnAttente:
             commandes.filter((commande) => String(commande.statut?.Statut)?.toLowerCase().includes('attente')).length,
@@ -374,7 +380,7 @@ const Dashboard = () => {
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
                   <StatCard icon="pets" label="Animaux en refuge" value={dashboardStats?.animauxTotal} sub={`${dashboardStats?.animauxUrgent} urgents`} color="primary" delay={0} />
                   <StatCard icon="favorite" label="Adoptions ce mois" value={dashboardStats?.adoptionsMois} sub={`Total: ${dashboardStats?.adoptionsTotal}`} color="secondary" delay={0.1} />
-                  <StatCard icon="shopping_bag" label="CA Boutique (EUR)" value={`${dashboardStats?.caBoutique.toLocaleString()} EUR`} sub={`${dashboardStats?.commandesEnAttente} en attente`} color="tertiary" delay={0.2} />
+                  <StatCard icon="shopping_bag" label="CA Boutique (DZD)" value={`${dashboardStats?.caBoutique.toLocaleString()} DZD`} sub={`${dashboardStats?.commandesEnAttente} en attente`} color="tertiary" delay={0.2} />
                   <StatCard icon="report" label="Signalements" value={dashboardStats?.signalementsMois} sub={`Total: ${dashboardStats?.signalementsTotal}`} color="surface" delay={0.3} />
                 </div>
 
@@ -426,7 +432,7 @@ const Dashboard = () => {
                               <p className="text-xs text-on-surface-variant">{cmd?.produit}</p>
                             </div>
                             <div className="text-right flex-shrink-0">
-                              <p className="font-extrabold text-sm text-primary">{cmd?.totalGeneral?.toFixed(2)} EUR</p>
+                              <p className="font-extrabold text-sm text-primary">{cmd?.totalGeneral?.toFixed(2)} DBZ</p>
                               <StatutBadge statut={cmd?.statut?.Statut} />
                             </div>
                           </div>

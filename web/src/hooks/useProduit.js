@@ -93,28 +93,21 @@ export const useProduitPhotos = (produitId) => {
 }
 
 export const useCreateProduit = () => {
-    const queryClient = useQueryClient()
+  const queryClient = useQueryClient()
 
-    const mutation = useMutation({
-        mutationFn: (refugeId, produitData) => produitApi.create(refugeId, produitData),
-        onSuccess: (data) => {
-            // Invalider la liste des produits
-            queryClient.invalidateQueries({ queryKey: ["produits"] })
-            
-            // Optionnel : ajouter directement au cache
-            queryClient.setQueryData(["produits"], (oldData) => {
-                if (!oldData) return [data]
-                return [...oldData, data]
-            })
-            
-            console.log("Produit créé avec succès:", data)
-        },
-        onError: (error) => {
-            console.error("Erreur lors de la création du produit:", error)
-        }
-    })
+  return useMutation({
+    mutationFn: ({ refugeId, produitData }) =>
+      produitApi.create(refugeId, produitData),
 
-    return mutation
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["produits"] })
+      console.log("Produit créé avec succès:", data)
+    },
+
+    onError: (error) => {
+      console.error("Erreur lors de la création du produit:", error)
+    }
+  })
 }
 
 export const useUpdateProduit = () => {

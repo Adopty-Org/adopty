@@ -9,6 +9,8 @@ const ProductForm = ({ initialData = null, refugeId, onClose, onSuccess }) => {
 
   const productId = initialData?.id ?? initialData?.Id ?? null
 
+  const [photos, setPhotos] = useState([])
+
   const createProduit = useCreateProduit()
   const updateProduit = useUpdateProduit()
 
@@ -19,7 +21,7 @@ const ProductForm = ({ initialData = null, refugeId, onClose, onSuccess }) => {
     Categorie: initialData?.categorie ?? initialData?.Categorie ?? 'Accessoires',
     Reduction: initialData?.reduction ?? initialData?.Reduction ?? 0,
     Disponibilite: initialData?.disponibilite ?? initialData?.Disponibilite ?? true,
-    IdRefuge: refugeId ?? initialData?.idRefuge ?? initialData?.IdRefuge,
+    //IdRefuge: refugeId ?? initialData?.idRefuge ?? initialData?.IdRefuge,
   })
 
   const handleChange = (e) => {
@@ -30,16 +32,58 @@ const ProductForm = ({ initialData = null, refugeId, onClose, onSuccess }) => {
     }))
   }
 
+  const handlePhotoChange = (e) => {
+    setPhotos(Array.from(e.target.files))
+  }
+
   const handleSubmit = async (e) => {
+  e.preventDefault()
+  setIsLoading(true)
+  setError(null)
+
+  try {
+    const data = new FormData()
+
+    Object.entries(formData).forEach(([key, value]) => {
+      data.append(key, value)
+    })
+
+    data.append("IdRefuge", refugeId)
+
+    photos.forEach(photo => {
+      data.append("photos", photo)
+    })
+
+    if (productId) {
+      updateProduit.mutate({
+        productId,
+        produitData: data
+      })
+    } else {
+      createProduit.mutate({
+        refugeId,
+        produitData: data
+      })
+    }
+
+    onSuccess()
+    onClose()
+  } catch (err) {
+    const msg = err?.response?.data?.message || err?.message || "Une erreur est survenue lors de l'enregistrement."
+    setError(msg)
+  } finally {
+    setIsLoading(false)
+  }
+}/*const handleSubmit = async (e) => {
     e.preventDefault()
     setIsLoading(true)
     setError(null)
 
     try {
       if (productId) {
-        updateProduit.mutate( refugeId, { productId, formData })
+        updateProduit.mutate( refugeId, { productId: productId, formData: formData })
       } else {
-        createProduit.mutate( refugeId, formData )
+        createProduit.mutate({ refugeId: refugeId, produitData:formData })
       }
       onSuccess()
       onClose()
@@ -49,7 +93,7 @@ const ProductForm = ({ initialData = null, refugeId, onClose, onSuccess }) => {
     } finally {
       setIsLoading(false)
     }
-  }
+  }*/
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -144,6 +188,20 @@ const ProductForm = ({ initialData = null, refugeId, onClose, onSuccess }) => {
           <span className="text-sm font-bold">Disponible en ligne</span>
         </label>
       </div>
+
+      {!initialData && (
+        <div className="space-y-2">
+          <label className="text-xs font-bold uppercase tracking-wider text-on-surface-variant">Photos (Min. 1)</label>
+          <input
+            required
+            type="file"
+            multiple
+            accept="image/*"
+            onChange={handlePhotoChange}
+            className="w-full bg-white border-2 border-black px-4 py-3 text-sm font-body focus:outline-none focus:ring-2 focus:ring-primary rounded-lg file:mr-4 file:py-1 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-primary file:text-white"
+          />
+        </div>
+      )}
 
       <div className="flex gap-3 pt-4">
         <button

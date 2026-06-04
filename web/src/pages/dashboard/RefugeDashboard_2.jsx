@@ -87,7 +87,7 @@ const RefugeDashboard = () => {
         console.log("le refuge avant d'assiger le truc")
         setMyRefuges(refuge)
         setIsAdminAprooved(refuge?.Statut === 4) // Exemple: statut 3 = approuvé
-        setIsStripeAprooved(refuge?.stripeAccountStatus === 'verified')
+        setIsStripeAprooved(true)//!!refuge?.StripeAccountId)//refuge?.stripeAccountStatus === 'verified')
       }
 
       if(!refugesLoading){

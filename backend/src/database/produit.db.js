@@ -3,6 +3,7 @@ import { Materiaux } from "../modeles/materiaux.model.js";
 import { Produit } from "../modeles/produit.model.js";
 
 export const createProduit = async (produit) => {
+  console.log("produit reçu :", produit);
     const [result] = await db.query(
         `INSERT INTO produit (IdRefuge, Nom, Prix, Stock, Categorie, Reduction, Disponibilite) 
         VALUES (?, ?, ?, ?, ?, ?, ?)`,

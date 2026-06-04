@@ -1,4 +1,4 @@
-import cloudinary from "../config/cloudinary.js"
+import cloudinary from "../config/cloudinary.js";
 import { Animal } from "../modeles/animal.model.js";
 import { createAnimal, deleteAnimal, getAllAnimals, getAnimalById, getAnimalsPossession, updateAnimal } from "../database/animal.db.js";
 import { createPhotoAnimal, getAnimalPhotosById } from "../database/photo.db.js";

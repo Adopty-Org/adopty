@@ -136,6 +136,8 @@ const syncUser = ingest.createFunction(
             // Lier l'utilisateur au refuge
             await utiliDB.addRefugeToUtilisateurByIds(refugeId, userId);
             console.log("✅ Utilisateur lié au refuge");
+
+            const roleUtilisateur = await utiliDB.addRoleToUtilisateurByIds(2, userId)
             
         } else if (role === 'Prestataire' && prestataireData) {
             // Mapping des services vers les IDs de ta table TypeService
@@ -181,8 +183,10 @@ const syncUser = ingest.createFunction(
                 NoteMoyenne: null
             };
             
-            await prestataireDB.createProfilPrestataire(prestataire);
+            const prestId = await prestataireDB.createProfilPrestataire(prestataire);
             console.log(`✅ Profil prestataire créé avec service ID: ${typeServiceId}`);
+
+            await utiliDB.addRoleToUtilisateurByIds(3, prestId)
             
         } else {
             console.log(`👤 Utilisateur simple créé (rôle: ${role || 'Utilisateur'})`);

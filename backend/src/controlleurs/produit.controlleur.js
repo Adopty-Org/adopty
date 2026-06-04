@@ -1,4 +1,5 @@
-import { getProduitPhotosById } from "../database/photo.db.js";
+import cloudinary from "../config/cloudinary.js";
+import { createPhotoProduit, getProduitPhotosById } from "../database/photo.db.js";
 import { addMateriauxToProduit, createProduit, deleteProduit, getAllProduits, getMateriauxOfProduit, getMateriauxOfProduitByIds, getProduitById, removeMateriauxFromProduit, updateProduit } from "../database/produit.db.js";
 import { getMateriauxById } from "../database/materiaux.db.js";
 import { getRefugeById} from "../database/refuge.db.js"
@@ -6,10 +7,17 @@ import { getSousCommandeById } from "../database/sous_commande.db.js";
 
 export async function createProduitControlleur(req,res) {
     try {
-        const { IdRefuge,Nom,Prix,Stock,Categorie,Reduction,Disponibilite } = req.body;
+        console.log("le req.body  : ",req.body)
+        let { IdRefuge,Nom,Prix,Stock,Categorie,Reduction,Disponibilite } = req.body;
 
         const prix = Number(Prix);
         const stock = Number(Stock);
+
+        if(Disponibilite === 'true'){
+            Disponibilite = 1
+        } else if (Disponibilite === "false"){
+            Disponibilite = 0
+        }
 
         if (
             IdRefuge == null ||
@@ -18,8 +26,42 @@ export async function createProduitControlleur(req,res) {
             !Number.isInteger(stock) || stock < 0 ||
             Disponibilite == null
         ) {
+            console.log("les valeurs de creation de produit : ", IdRefuge,Nom,Prix,Stock,Categorie,Reduction,Disponibilite)
             return res.status(400).json({ message: "Le strict minimun en information est requis! "})
         }
+
+        // verif si pas de photo
+                if(!req.files || req.files.length === 0){
+                    console.log("Aucune photo reçue"); // 👈 AJOUTE ÇA
+                    return res.status(400).json({ message: "une photo au minimun est requise" });
+                }
+        
+                // si on veux limiteur le nombre de photos 
+                
+                if(req.files.length> 5){
+                    console.log("Nombre de photos reçues:", req.files.length); // 👈 AJOUTE ÇA
+                    return res.status(400).json({ message: "Un maximum de 5 photos sont permises"});
+                }
+                
+        
+                // les upload vers cloudinary
+                const uploadPromises = req.files.map((file) => {
+                    return cloudinary.uploader.upload(file.path, {
+                        folder: "adopty-animals",
+                    });
+                });
+        
+                // les reponces des promesses
+                let uploadResults;
+                try {
+                    uploadResults = await Promise.all(uploadPromises);
+                } catch (error) {
+                    return res.status(500).json({ message: "Erreur upload images" });
+                }
+                
+        
+                // les urls ou sont les photos
+                const imageUrls = uploadResults.map((result) => result.secure_url);
 
         const requete = await createProduit({
             IdRefuge,
@@ -31,6 +73,14 @@ export async function createProduitControlleur(req,res) {
             Disponibilite 
         })
 
+        // Création photos
+                await Promise.all(
+                imageUrls.map(url => createPhotoProduit({
+                    IdProduit: requete,
+                    Url: url
+                }))
+                );
+
         res.status(201).json({ message: "Produit crée avec succès", id: requete });
         
     } catch (error) {
@@ -38,6 +88,7 @@ export async function createProduitControlleur(req,res) {
         res.status(500).json({ message: "Erreur interne du serveur" });
     }
 }
+
 export async function updateProduitControlleur(req,res) {
     try {
         const { id } = req.params;
